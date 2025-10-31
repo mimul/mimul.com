@@ -3,5 +3,6 @@
   command = "npm run build"
 [build.environment]
   PYTHON_VERSION="3.10.11"
+  NODE_VERSION="v22.20.0"
   YARN_FLAGS = "--no-ignore-optional"
   SHARP_IGNORE_GLOBAL_LIBVIPS="true"
