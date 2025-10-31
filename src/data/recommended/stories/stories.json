@@ -1,0 +1,198 @@
+[
+  {
+    "title": "조직문화에 도움될만한 아티클 모음",
+    "description": "조직 구조, 리더십, 포용/충돌관리, 협업, 투명성, 커뮤니케이션, 피트백 등 다영한 분야에 대한 아티클 모음.",
+    "url": "https://www.holloway.com/s/syllabus-company-culture",
+    "date": "2019-09-11T14:22:49.256Z",
+    "tags": [
+      "culture"
+    ]
+  },
+  {
+    "title": "Use The Index, Luke!",
+    "description": "SQL 인덱싱과 쿼리 성능에 대한 웹-기반 무료 책/튜토리얼로, 개발자들이 데이터베이스 성능 문제를 이해하고 실무에 적용할 수 있도록 설계된 자료들이 많음.",
+    "url": "https://use-the-index-luke.com/",
+    "date": "2019-08-11T18:36:19.639Z",
+    "tags": [
+      "database"
+    ]
+  },
+  {
+    "title": "좋은 소프트웨어를 만들려면",
+    "description": "좋은 소프트웨어를 만들기 위해 접근방법, 프로세스, 개발 방법 등 내용이 정리되어 있음.",
+    "url": "https://knowledge.csc.gov.sg/ethos-issue-21/how-to-build-good-software/",
+    "date": "2019-07-25T17:10:20.639Z",
+    "tags": [
+      "software"
+    ]
+  },
+  {
+    "title": "Great developers are raised, not hired",
+    "description": "위대한 개발자는 고용하는 것이 아니라 키우는 것이다.",
+    "url": "https://sizovs.net/mentoring/",
+    "date": "2019-04-11T20:19:27.139Z",
+    "tags": [
+      "programmer"
+    ]
+  },
+  {
+    "title": "How to Design Software Good",
+    "description": "좋은 소프트웨어를 설계하려면?",
+    "url": "https://www.haiku-os.org/docs/HIG/index.xml",
+    "date": "2019-01-01T21:09:17.139Z",
+    "tags": [
+      "software"
+    ]
+  },
+  {
+    "title": "Why programming is difficult",
+    "description": "왜 프로그래밍은 어려울까?",
+    "url": "https://joearms.github.io/#2014-02-07%20Why%20programming%20is%20difficult",
+    "date": "2018-12-25T21:12:08.638Z",
+    "tags": ["programming"]
+  },
+  {
+    "title": "Systems, not Programs",
+    "description": "프로그램이 아닌 시스템에서 생각하자.",
+    "url": "https://shalabh.com/programmable-systems/systems-not-programs.html",
+    "date": "2018-10-10T09:09:20.139Z",
+    "tags": [
+      "software"
+    ]
+  },
+  {
+    "title": "Why Python is Slow: Looking Under the Hood",
+    "description": "왜 파이썬이 느린가?.",
+    "url": "https://jakevdp.github.io/blog/2014/05/09/why-python-is-slow/",
+    "date": "2014-05-13T20:02:54.638Z",
+    "tags": ["python"]
+  },
+  {
+    "title": "The Clean Architecture",
+    "description": "By Robert C. Martin (Uncle Bob)",
+    "url": "http://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html",
+    "date": "2012-08-13T16:42:21.638Z",
+    "tags": ["design-patterns"]
+  },
+  {
+    "title": "What every programmer should know about memory",
+    "description": "모든 프로그래머가 알아야할 메모리의 모든 것.",
+    "url": "https://lwn.net/Articles/250967/",
+    "date": "2007-10-13T18:45:51.638Z",
+    "tags": ["memory"]
+  },
+  {
+    "title": "Google Research Blog",
+    "description": "알고리즘 및 이론, 생성형 AI/기초모델, 머신러닝, 자연어처리, 음성처리, 검색, 양자컴퓨팅 등의 다양한 기술 내용을 다루고 있음.",
+    "url": "https://research.google/blog/",
+    "date": "2020-02-13T14:30:21.638Z",
+    "tags": ["tech-blog"]
+  },
+  {
+    "title": "Amazon Science Blog",
+    "description": "추론, 클라우드, 컴퓨터 비전, 머신 러닝, 양자 기술, 로보틱스, 검색 및 정보 검색 등 기술적 딥다이브(Deep-dives) 및 연구자 관점의 전문가 시각의 글들을 다루고 있음.",
+    "url": "https://www.amazon.science/blog",
+    "date": "2020-01-25T20:22:13.638Z",
+    "tags": ["tech-blog"]
+  },
+  {
+    "title": "Netflix 기술 블로그",
+    "description": "스케일러블 시스템, 데이터 분석 및 플랫폼, 콘텐츠 처리 파이프라인, 클라이언트/API/프론트엔드 기술, 운영 및 신뢰성(Resilience)/성능관리, 오픈소스 및 내부 도구 등에 관련된 내용들을 다루고 있음.",
+    "url": "https://netflixtechblog.com",
+    "date": "2019-12-24T09:11:36.638Z",
+    "tags": ["tech-blog"]
+  },
+  {
+    "title": "The Airbnb Tech Blog",
+    "description": "대규모 인프라 설계 및 운영, 머신러닝/AI와 데이터 활용, 개발 도구 및 클라이언트 기술, 오픈소스 공개/활용 경험 그리고 조직문화 등의 글들을 다루고 있음.",
+    "url": "https://medium.com/airbnb-engineering",
+    "date": "2019-12-18T21:02:22.638Z",
+    "tags": ["tech-blog"]
+  },
+  {
+    "title": "Visual Information Theory",
+    "description": "정보이론(Information Theory)의 핵심 개념들을 시각적(visual) 방식으로 풀어쓴 글.",
+    "url": "https://colah.github.io/posts/2015-09-Visual-Information/",
+    "date": "2015-11-12T13:02:58.638Z",
+    "tags": ["information-theory"]
+  },
+  {
+    "title": "Good and Bad Technical Debt",
+    "description": "기술 부채(Technical Debt)를 흔히 무조건 나쁜 것으로만 보지만, 사실은 좋은 부채(Good Debt)와 나쁜 부채(Bad Debt)로 나눠 생각할 필요가 있다는 주장의 글.",
+    "url": "https://blog.crisp.se/2013/10/11/henrikkniberg/good-and-bad-technical-debt",
+    "date": "2013-10-15T12:55:37.638Z",
+    "tags": ["technical-debt"]
+  },
+  {
+    "title": "터미널에서 ls 커맨드를 치면 일어나는 일들",
+    "description": "터미널을 열고 ls 명령을 입력했을 때 내부에서 실제로 어떤 일이 벌어지는지를 단계별로 설명하고 있는 글.",
+    "url": "https://www.warp.dev/blog/what-happens-when-you-open-a-terminal-and-enter-ls",
+    "date": "2013-01-13T15:20:17.638Z",
+    "tags": ["terminal"]
+  },
+  {
+    "title": "Parse, don’t validate",
+    "description": "데이터가 들어오는 시점에 단순히 검증(validate)만 하는 것이 아니라, 데이터를 구조화(parsing)해서 더 이상 잘못된 상태(invalid state)를 갖지 않는 타입/구조로 변환하라는 설계 철학을 담고 있는 글.",
+    "url": "https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/",
+    "date": "2021-02-03T18:09:17.638Z",
+    "tags": ["programming"]
+  },
+  {
+    "title": "Code Red: The Business Impact of Code Quality",
+    "description": "고품질 코드가 결함이 15배 적었고, 개발속도가 2배 빠르며, 문제 해결 시간이 좀 더 예측 가능했다고 함. 그래서 고품질 코드의 비즈니스 이점은 분명하다는 논문.",
+    "url": "https://arxiv.org/abs/2203.04374",
+    "date": "2021-03-20T19:23:14.638Z",
+    "tags": ["code-quality"]
+  },
+  {
+    "title": "Is High Quality Software Worth the Cost?",
+    "description": "소프트웨어 품질을 일반적으로 생각하는 것처럼 품질이 높으면 비용이 더 든다는 식으로 단순히 보면 안되고 내부 품질과 외부 품질을 나누어야 하고 내부 품질이 좋으면 향후 기능 추가·변경이 쉬워지고 비용이 낮아진다는 것이 핵심 주장의 글.",
+    "url": "https://martinfowler.com/articles/is-quality-worth-cost.html",
+    "date": "2021-04-04T21:02:19.638Z",
+    "tags": ["software-cost"]
+  },
+  {
+    "title": "How browsers work",
+    "description": "사용자가 요청한 웹 리소스를 서버에서 받아와 브라우저 창에 표시하는 브라우저 랜더링 프로세스에 대한 내용의 글.",
+    "url": "https://web.dev/articles/howbrowserswork",
+    "date": "2013-08-08T23:02:20.213Z",
+    "tags": ["browser"]
+  },
+  {
+    "title": "Design Docs at Google",
+    "description": "Google의 엔지니어링 문화에서 중요하게 다뤄지는 디자인 문서(Design Doc) 작성 관행을 정리한 글. 매뉴얼 수준이 아니라, 조직 내에서 중요한 설계 결정(trade-offs), 대안(alternatives), 설계 이유(reasoning)을 명확히 공유하는 수단으로 활용한다는 내용의 글.",
+    "url": "https://www.industrialempathy.com/posts/design-docs-at-google/",
+    "date": "2021-04-08T18:44:20.213Z",
+    "tags": ["design"]
+  },
+  {
+    "title": "13 Best Design System Examples in 2025",
+    "description": "왜 기업들이 고유의 디자인 시스템을 구축하는지, 디자인 시스템에서 배울 수 있는 것들, 디자인 시스템 구축 시의 도전과 해결책, 주요 예시 13개를 소개하면서 디자인 시스템을 만들기 위해서 필요한 고민들을 정리해 놓은 글.",
+    "url": "https://www.uxpin.com/studio/blog/best-design-system-examples/",
+    "date": "2025-07-10T17:22:35.223Z",
+    "tags": ["design"]
+  },
+  {
+    "title": "The Patterns of Scalable, Reliable, and Performant Large-Scale Systems",
+    "description": "대규모 시스템이 확장성(scalability), 신뢰성(reliability/availability), 성능(performance) 등에서 직면하는 문제들을 이해하고 실전 엔지니어링 경험과 패턴들을 알 수 있도록 읽을거리(북마크 사이트 정보 제공)를 제공함.",
+    "url": "https://binhnguyennus.github.io/awesome-scalability/",
+    "date": "2025-09-10T19:10:08.243Z",
+    "tags": ["scale"]
+  },
+  {
+    "title": "The End of Programming as We Know It",
+    "description": "개발자나 기술 조직은 변화하는 환경에 맞춰 스킬셋과 역할을 재정의해야한다는 내용의 글(기업이나 조직 입장은 AI 협업 개발 환경, 에이전트 생태계 설계, 새로운 인적자원 개발 전략이 필요하고, 개발자는 코드만 쓰는 개발자보다는 문제를 정의하고 설계하며 AI를 활용해 만드는 개발자로 진화가 필요)",
+    "url": "https://www.oreilly.com/radar/the-end-of-programming-as-we-know-it/",
+    "date": "2025-02-10T19:19:33.443Z",
+    "tags": ["ai"]
+  },
+  {
+    "title": "Software Engineering at Google(무료 책)",
+    "description": "Google이 사용하는 소프트웨어 엔지니어링 관행(코드베이스를 유지하고 건강하게 확장하기 위한 조직·문화·도구·프로세스)을 다루고 있으며, 규모, 시간, 비용 세가지 큰 축을 중심으로 이야기하며 느낄수 있는 교훈이 많이 담겨져 있는 무료 책. ",
+    "url": "https://abseil.io/resources/swe-book",
+    "date": "2025-01-03T22:37:41.143Z",
+    "tags": ["google"]
+  }
+]
+
+

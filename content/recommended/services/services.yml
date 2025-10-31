@@ -1,0 +1,99 @@
+---
+- title: Google 번역보다 훨씬 자연스러운 번역 도구 - DeepL
+  url: https://www.deepl.com/ko/translator
+  description: 뉴럴머신번역(NMT) 엔진을 사용하고 글로벌 언어 지원, 용어집(Glossary) 지원으로 맞춤화 번역 기능 제공하고 있는 온라인 번역 서비스.
+  image: ""
+  date: "2023-11-12T15:31:28.263Z"
+  tags:
+    - translator
+- title: Cron의 동작 시점이나 스케줄을 시각적으로 확인할 수 있는 도구 - Cron Tool
+  url: https://tool.crontap.com/cronjob-debugger
+  description: 온라인 상에서 cron/cron‐expression(crontab 형식) 입력하고 즉시 동작 시점이나 스케줄을 시각적으로 확인할 수 있는 웹기반 도구.
+  image: ""
+  date: "2023-12-24T18:21:28.263Z"
+  tags:
+    - developer-tool
+- title: 개발자나 엔지니어가 일상적으로 겪는 번거로운 변환작업·포맷정리·인코딩/디코딩 등을 한 곳에서 처리할 수 있도록 만든 툴킷 - DevToys
+  url: https://devtoys.app/
+  description: A Swiss Army knife for developers라는 슬로건을 가진 데스크탑 앱으로, 개발자가 일상적으로 사용하는 다양한 도구들(변환작업·포맷정리·인코딩/디코딩)을 하나로 묶어 제공하며 DevToys CLI(명령어 기반 버전)가 있어 GUI와 커맨드라인 모두 사용 가능하고, 오픈소스이며 무료로 이용 가능함.
+  image: ""
+  date: "2022-12-28T20:31:58.263Z"
+  tags:
+    - developer-tool
+- title: 텍스트, 코드, 이미지, PDF 등 다양한 파일을 비교를 해주는 도구 - Diffchecker
+  url: https://www.diffchecker.com/
+  description: 두 버전의 텍스트, 코드, 이미지, PDF 등 다양한 파일을 비교(diff)할 수 있는 온라인 도구.
+  image: ""
+  date: "2021-11-14T22:18:48.263Z"
+  tags:
+    - developer-tool
+- title: 코드/데이터 포맷팅·미니파잉·변환 도구 - Code Beautify
+  url: https://codebeautify.org/
+  description: 웹 기반의 코드/데이터 포맷팅·미니파잉·변환 도구이며 다양한 언어 및 데이터 형식(JSON, XML, HTML, CSS, JavaScript 등)을 지원하며, 개발자·웹디자이너가 코드나 데이터를 보기 쉽고 관리하기 쉬운 형태로 바꿀 수 있게 함.
+  image: ""
+  date: "2021-07-28T23:05:44.263Z"
+  tags:
+    - developer-tool
+- title: UI/UX 디자이너들을 위한 디자인 레퍼런스 라이브러리 서비스 - Mobbin
+  url: https://mobbin.com/
+  description: UI/UX 디자이너들을 위한 디자인 레퍼런스 라이브러리 서비스로, 모바일 및 웹 애플리케이션의 실제 화면(Screen) 및 패턴을 대량으로 제공하고 있음.
+  image: ""
+  date: "2020-08-22T23:05:44.263Z"
+  tags:
+    - design-tool
+- title: 웹, 모바일, React, Tailwind, Figma 등 다양한 플랫폼과 프레임워크를 위한 오픈 소스 UI 요소를 제공하는 커뮤니티 기반 라이브러리 - Uiverse.io
+  url: https://uiverse.io/
+  description: 웹, 모바일, React, Tailwind, Figma 등 다양한 플랫폼과 프레임워크를 위한 오픈 소스 UI 요소를 제공하는 커뮤니티 기반 라이브러리이고, 디자이너와 개발자가 직접 만든 6,930개 이상의 UI 컴포넌스를 무료로 이용할 수 있으며, 개인 및 상업적 용도로도 사용 가능.
+  image: ""
+  date: "2020-07-25T20:05:24.263Z"
+  tags:
+    - design-tool
+- title: 손으로 그린 듯한 느낌의 다이어그램을 쉽게 작성할 수 있는 오픈 소스 온라인 화이트보드 도구 - Excalidraw
+  url: https://excalidraw.com/
+  description: 손으로 그린 듯한 느낌의 다이어그램을 쉽게 작성할 수 있는 오픈 소스 온라인 화이트보드 도구이며, 실시간 협업 기능을 지원하며, 브레인스토밍, 다이어그램 작성, 프레젠테이션, 교육 등 다양한 용도로 활용 가능.
+  image: ""
+  date: "2020-07-25T20:05:24.263Z"
+  tags:
+    - developer-tool
+- title: 웹과 모바일 애플리케이션을 위한 정교하고 개성 있는 오픈 소스 아이콘 라이브러리를 제공하는 플랫폼 - MingCute
+  url: https://www.mingcute.com/
+  description: 웹과 모바일 애플리케이션을 위한 정교하고 개성 있는 오픈 소스 아이콘 라이브러리를 제공하는 플랫폼.
+  image: ""
+  date: "2020-03-15T21:33:45.263Z"
+  tags:
+    - design-tool
+- title: 비즈니스 운영에서 수작업·반복작업을 줄이고, 앱과 앱 간의 연결을 통해 흐름을 자동화함으로써 조직 전체의 효율성과 확장성을 높이는 데 매우 유용한 툴 - Zapier
+  url: https://zapier.com/
+  description: 8,000개 이상의 앱을 연결하여 반복적인 업무를 자동화하는 AI 기반 워크플로우 플랫폼. 개발 지식 없이도 다양한 앱 간 데이터 이동, 알림 발송, CRM 업데이트 등 복잡한 작업을 자동화할 수 있음.
+  image: ""
+  date: "2021-04-25T22:01:08.263Z"
+  tags:
+    - developer-tool
+- title: 채널 기반 커뮤니케이션, 앱 연동 및 자동화, 기업 내부 프로세스를 자동화 등을 지원하는 도구 - Slack
+  url: https://slack.com/
+  description: 팀 커뮤니케이션과 협업을 위한 AI 기반 디지털 작업 운영 체제(OS)로, 업무를 보다 효율적이고 유연하게 관리할 수 있도록 돕는 플랫폼.
+  image: ""
+  date: "2019-05-05T09:01:08.263Z"
+  tags:
+    - collaboration-tool
+- title: 개발과 관련된 모든것을 이어주는 도구 - GitHub
+  url: https://github.com/
+  description: 소프트웨어 개발자와 팀이 코드를 호스팅하고 협업하며 관리할 수 있도록 지원하는 세계 최대의 플랫폼이며, Git을 기반으로 하여 버전 관리, 코드 리뷰, 프로젝트 관리, CI/CD, 문서화 등 다양한 기능을 제공.
+  image: ""
+  date: "2018-06-06T09:11:08.263Z"
+  tags:
+    - developer-tool
+- title: 팀과 조직이 업무를 체계적으로 관리하고 협업할 수 있도록 돕는 도구 - Asana
+  url: https://asana.com/
+  description: 팀과 조직이 업무를 체계적으로 관리하고 협업할 수 있도록 돕는 클라우드 기반의 프로젝트 관리 플랫폼이며, 특히 원격 근무와 분산 팀 환경에서 효율적인 업무 진행을 지원.
+  image: ""
+  date: "2018-09-08T10:14:33.263Z"
+  tags:
+    - collaboration-tool
+- title: SQL 쿼리를 작성하고 실행하며 그 결과를 시각화할 수 있게 설계된 도구 - SQLPad
+  url: https://sqlpad.github.io/en/introduction/
+  description: PostgreSQL, MySQL, SQL Server, ClickHouse, Crate, Vertica, Trino, Presto, SAP HANA, BigQuery, SQLite, TiDB 등을 지원하며 신규 서비스 런칭해서 바로 원하는 데이터 뷰를 볼 수 있고 개발자가 아닌 마케터(쿼리를 안다면)도 접근 가능한 툴.
+  image: ""
+  date: "2022-02-09T21:19:52.263Z"
+  tags:
+    - developer-tool

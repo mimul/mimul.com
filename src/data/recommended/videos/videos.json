@@ -1,0 +1,72 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=P6FORpg0KVo",
+    "title": "How to Make Learning as Addictive as Social Media | Luis Von Ahn | TED",
+    "tags": ["good-to-know"],
+    "date": "2024-02-25T07:11:58Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=nUcO7n4hek4",
+    "title": "The Evolution of Reddit.com's Architecture",
+    "tags": ["reddit"],
+    "date": "2018-02-15T20:36:24Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=x1Uz3rMlOBo",
+    "title": "Scaling Slack",
+    "tags": ["slack"],
+    "date": "2018-02-10T22:19:38Z",
+    "type": "youtube"
+  },
+    {
+    "url": "https://www.youtube.com/watch?v=IO4teCbHvZw",
+    "title": "Scaling Facebook Live Videos to a Billion Users",
+    "tags": ["facebook"],
+    "date": "2017-07-25T22:55:14Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=K-fI2BeTLkk",
+    "title": "How Uber scaled its Real Time Infrastructure to Trillion events per day",
+    "tags": ["uber"],
+    "date": "2017-01-23T10:09:58Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=J5auCY4ajK8",
+    "title": "Real-Time Delivery Architecture at Twitter",
+    "tags": ["twitter"],
+    "date": "2016-01-05T18:19:38Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=E708csv4XgY",
+    "title": "Messaging at Scale at Instagram",
+    "tags": ["instagram"],
+    "date": "2015-10-20T22:34:26Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=G-lGCC4KKok",
+    "title": "Scalability at YouTube",
+    "tags": ["youtube"],
+    "date": "2013-11-22T21:14:21Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=iG9CE55wbtY",
+    "title": "켄 로빈슨 경: 학교가 창의성을 죽인다(Do schools kill creativity?) | TED",
+    "tags": ["creativity"],
+    "date": "2025-09-24T22:10:23Z",
+    "type": "youtube"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=iCvmsMzlF7o",
+    "title": "브레네 브라운: 취약성의 힘(The power of vulnerability) | TED",
+    "tags": ["vulnerability"],
+    "date": "2025-09-23T20:19:43Z",
+    "type": "youtube"
+  }
+]

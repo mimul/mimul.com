@@ -1,0 +1,247 @@
+---
+title: 까먹는 리눅스 커맨드들
+description: 자주 쓰거나 중요한 이슈(장애 등) 빌생시 까먹는 일을 완화하기 위해 기록해 둔 명령어들.
+author: Mimul
+date: "2022-10-21T20:3026:09.000Z"
+topics:
+  - linux
+---
+리눅스 서버에 들어가면 자주 사용하는 커맨드들을 잊지 않게 하기 위해서 기록해 둡니다.
+### 로그인 실패 건수 확인
+
+**1. root 계정의 로그인 실패 정보 확인**
+
+```bash
+> perl -ne 'print "$1\n" if(/Failed password for (\w.+) from/)' /var/log/secure | sort | uniq -c | sort -rn |head -10
+248 root
+ 43 invalid user 123456
+ 25 invalid user admin
+  6 invalid user test
+  3 invalid user user
+  2 invalid user 123
+  1 invalid user oracle
+  1 invalid user com
+  1 invalid user ubuntu
+  1 invalid user password
+```
+
+**2.IP별로 로그인 실패 시도 건수**
+
+```
+> perl -ne 'print "$1\n" if(/Failed password\D+((\d+\.){3}\d+)/)' /var/log/secure | sort | uniq -c | sort -rn |head -10
+98 197.248.10.108
+34 115.238.236.74
+21 51.38.57.78
+14 195.154.112.70
+3 92.222.216.71
+2 203.115.15.210
+1 5.39.79.48
+1 203.110.179.26
+1 195.154.113.173
+1 94.191.108.176
+```
+계정별 로그인 실패 건수를 확인하고 로그인 실패가 1000단위가 넘어갈 경우 주기적으로 ssh 포트 변경, root 계정의 패스워드를 변경해 주고, IP별로 로그인 실패 시도 건수이고 건수가 IP는 블럭킹해준다.
+
+### 시스템 오류 메세지 확인
+
+1. dmesg를 통해 segfault, oom-killer os레벨의 오류 메세지 확인.
+
+```bash
+> dmesg | tail
+```
+
+2. messages에서 커널과 OS의 표준 프로세스의 로그를 봄.
+
+```bash
+> cat /var/log/messages | egrep -i "emerg|alert|crit|error|warn|fail"
+```
+
+3. secure 로그를 통해 ssh 연결 실패 정보를 보고 횟수가 많은지 파악해서 패스워드 변경 주기를 앞당기는 근거로 활용함.
+
+```bash
+> cat /var/log/secure |tail
+```
+
+### 메모리 확인(free)
+
+CentOs7에서 메모리 용량을 확인하는 free 명령으로 얻을 수 있는 버퍼 및 캐시 영역에는 스왑 영역도 포함되어 있으며, 단순히 메모리 사용 용량 = 메모리 전체 - free - buff/cache 식으로 계산하면 메모리 사용 용량을 과소 평가하게 된다. 최신의 linux 커널은 이러한 부분을 고려하여 메모리 정보를 표시하고 있다.
+
+```bash
+# free
+              total        used        free      shared  buff/cache   available
+Mem:        7747768     4060148      219100      402732     3468520     2964992
+Swap:       2097148      347400     1749748
+
+# cat /proc/meminfo |grep 'MemTotal\|MemFree\|Buffers\|Cached'
+MemTotal:        7747768 kB
+MemFree:          217628 kB
+Buffers:          434212 kB
+Cached:          2604220 kB
+SwapCached:        42892 kB
+```
+
+메모리 정보 확인 스크립트.
+
+```bash
+# cat memory-usage-free.sh
+#!/bin/bash
+export LANG=C, LC_ALL=C
+
+free | awk '
+    BEGIN{
+        total=0; used=0; available=0; rate=0;
+    }
+
+    /^Mem:/{
+        total = $2;
+        available = $7;
+    }
+
+    END {
+        used = total - available;
+        rate= 100 * used / total;
+        printf("total(KB)\tused(KB)\tavailable(KB)\tused-rate(%)\n");
+        printf("%d \t %d \t %d \t %.1f\n", total, used, available, rate);
+    }';
+
+# ./memory-usage-free.sh
+total(KB)	used(KB)	available(KB)	used-rate(%)
+7747768 	4783068 	2964700 	    61.7
+```
+
+### 파일 시스템 확인(df)
+
+```bash
+# df -Th
+Filesystem                Type      Size  Used Avail Use% Mounted on
+/dev/xvda3                ext4       17G  8.2G  7.6G  52% /
+devtmpfs                  devtmpfs  3.9G     0  3.9G   0% /dev
+tmpfs                     tmpfs     3.7G     0  3.7G   0% /dev/shm
+tmpfs                     tmpfs     3.7G  467M  3.3G  13% /run
+tmpfs                     tmpfs     3.7G     0  3.7G   0% /sys/fs/cgroup
+/dev/xvda1                ext4      969M  184M  719M  21% /boot
+tmpfs                     tmpfs     757M     0  757M   0% /run/user/0
+/dev/mapper/DataVG-Data00 ext3       79G   45G   31G  60% /app
+tmpfs                     tmpfs     757M     0  757M   0% /run/user/500
+tmpfs                     tmpfs     757M     0  757M   0% /run/user/302
+```
+
+디스크 사용량 순으로 확인하려면 아래와 같다.
+
+```bash
+# ionice -c 2 -n 7 nice -n 19 du -scm /* | sort -rn
+54234 total
+45280 /app
+3047  /data
+2339  /usr
+1558  /logs
+603 /var
+584 /opt
+475 /run
+182 /boot
+132 /home
+38  /etc
+```
+
+### 네트워크 상태 확인
+
+netmon.sh 스크립트를 실행하여 TIME_WAIT가 많을 경우 커널 튜닝을 진행하고 CLOSE_WAIT 등이 있을 경우 비정상적인 상황을 모니터링 한다.
+
+```bash
+#!/bin/bash
+COUNT=10
+while :
+do
+        if [ $COUNT = 10 ]
+        then
+                printf "+--------+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+ \n"
+                printf "|  TIME  |ESTAB|LISTN|T_WAT|CLOSD|S_SEN|S_REC|C_WAT|F_WT1|F_WT2|CLOSI|L_ACK| \n"
+                printf "+--------+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+ \n"
+                COUNT=0
+        fi
+        COUNT=`expr $COUNT + 1`
+        TIME=`/bin/date +%H:%M:%S`
+        printf "|%s" ${TIME}
+        netstat -an | \
+        awk 'BEGIN {
+                CLOSED = 0;
+                LISTEN = 0;
+                SYN_SENT = 0;
+                SYN_RECEIVED = 0;
+                ESTABLISHED = 0;
+                CLOSE_WAIT = 0;
+                FIN_WAIT_1 = 0;
+                FIN_WAIT_2 = 0;
+                CLOSING = 0;
+                LAST_ACK = 0;
+                TIME_WAIT = 0;
+                OTHER = 0;
+                }
+                $6 ~ /^CLOSED$/ { CLOSED++; }
+                $6 ~ /^CLOSE_WAIT$/ { CLOSE_WAIT++; }
+                $6 ~ /^CLOSING$/ { CLOSING++; }
+                $6 ~ /^ESTABLISHED$/ { ESTABLISHED++; }
+                $6 ~ /^FIN_WAIT1$/ { FIN_WAIT_1++; }
+                $6 ~ /^FIN_WAIT2$/ { FIN_WAIT_2++; }
+                $6 ~ /^LISTEN$/ { LISTEN++; }
+                $6 ~ /^LAST_ACK$/ { LAST_ACK++; }
+                $6 ~ /^SYN_SENT$/ { SYN_SENT++; }
+                $6 ~ /^SYN_RECV$/ { SYN_RECEIVED++; }
+                $6 ~ /^TIME_WAIT$/ { TIME_WAIT++; }
+
+                END {
+                        printf "| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d|\n",ESTABLISHED,LISTEN,TIME_WAIT,CLOSED,SYN_SENT,SYN_RECEIVED,CLOSE_WAIT,FIN_WAIT_1,FIN_WAIT_2,CLOSING,LAST_ACK;
+                }'
+        sleep 2
+done
+```
+
+실행을 하면 아래와 같은 결과물을 볼 수 있다.
+
+```bash
+> netmon.sh
++--------+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|  TIME  |ESTAB|LISTN|T_WAT|CLOSD|S_SEN|S_REC|C_WAT|F_WT1|F_WT2|CLOSI|L_ACK|
++--------+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+|18:28:27|  230|   24|   88|    0|    0|    0|    1|    0|    0|    0|    0|
+|18:28:29|  230|   24|   88|    0|    0|    0|    1|    0|    0|    0|    0|
+```
+
+### 부하 상황 확인
+
+```bash
+# ionice -c 2 -n 7 nice -n 19 top -c
+top - 16:23:33 up 708 days,  5:16,  1 user,  load average: 0.00, 0.01, 0.05
+Tasks: 216 total,   1 running, 215 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.3 us,  0.2 sy,  0.0 ni, 99.6 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  7747768 total,  1486568 free,  3926668 used,  2334532 buff/cache
+KiB Swap:  2097148 total,  1797684 free,   299464 used.  3085096 avail Mem
+
+  PID USER   PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+21086 user1  20   0 4939348 1.052g  14316 S   0.7 14.2   2:06.99 /bin/java -Djava.util.logging.config.file=....
+28596 user1  20   0  138788   4412   2928 S   0.7  0.1  46:37.03 /bin/httpd -f ...
+63578 user1  20   0 4891980 1.090g  14840 S   0.7 14.7   8:26.39 /bin/java -server -XX:+UseG1GC -XX:G1RSetUpdatingPauseTimePercent=5 ...
+28632 user1  20   0  138364   4256   2916 S   0.3  0.1  47:08.71 /app/apache/bin/httpd -f /app/apache/conf/httpd.conf -k start
+30213 user1  20   0 4897136 862568  11164 S   0.3 11.1 137:15.45 /bin/java -server -XX:+UseG1GC -XX:G1RSetUpdatingPauseTimePercent=5 ...
+```
+
+### DNS Look Up 확인
+
+```bash
+for i in {1..10}; do curl -k -o /dev/null -s -w "DNS-Lookup [%{time_namelookup}] Time-Connect [%{time_connect}] Time-PreTransfer [%{time_pretransfer}] Time-StartTransfer [%{time_starttransfer}] Total-Time [%{time_total}] Response-Code [%{http_code}]\n" https://www.mimul.com; done
+```
+
+결과하면은 아래와 같다.
+
+```bash
+DNS-Lookup [0.061] Time-Connect [0.151] Time-PreTransfer [0.446] Time-StartTransfer [0.938] Total-Time [1.479] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.079] Time-PreTransfer [0.315] Time-StartTransfer [0.391] Total-Time [0.834] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.079] Time-PreTransfer [0.315] Time-StartTransfer [0.391] Total-Time [0.835] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.076] Time-PreTransfer [0.305] Time-StartTransfer [0.378] Total-Time [0.804] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.079] Time-PreTransfer [0.315] Time-StartTransfer [0.392] Total-Time [0.838] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.094] Time-PreTransfer [0.359] Time-StartTransfer [0.451] Total-Time [0.991] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.092] Time-PreTransfer [0.354] Time-StartTransfer [0.444] Total-Time [0.970] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.077] Time-PreTransfer [0.305] Time-StartTransfer [0.379] Total-Time [0.811] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.076] Time-PreTransfer [0.302] Time-StartTransfer [0.376] Total-Time [0.803] Response-Code [200]
+DNS-Lookup [0.004] Time-Connect [0.076] Time-PreTransfer [0.305] Time-StartTransfer [0.380] Total-Time [0.810] Response-Code [200]
+```

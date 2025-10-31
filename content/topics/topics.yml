@@ -1,0 +1,372 @@
+---
+- title: Makefile
+  slug: makefile
+  description: Makefile is a script file used by the build automation tool called make, and is used to automate and manage repetitive tasks such as compiling, testing, and installing software projects.
+  image: ""
+- title: AI
+  slug: ai
+  description: "Artificial Intelligence (AI) is transforming industries by enabling machines to perform intelligent tasks, including learning, reasoning, and self-correction."
+  image: ""
+- title: Analytics
+  slug: analytics
+  description:
+    Google Analytics (GA) is the one which we used in almost all the public
+    facing websites.
+  image: analytics.png
+- title: Android
+  slug: android
+  description: ""
+  image: android.svg
+- title: Angular
+  slug: angular
+  description: ""
+  image: angular-icon-1.svg
+- title: API
+  slug: api
+  description: ""
+  image: ""
+- title: API Management
+  slug: api-management
+  description: ""
+  image: ""
+- title: Thinking
+  slug: thinking
+  description: "생각하는 사람"
+  image: "thinking.png"
+- title: Asynchronous Programming
+  slug: asynchronous-programming
+  description:
+    I tend to use Async - Await every where possible. Not just in C#, now
+    a days in the JavaScript instead of the promises.
+  image: ""
+- title: Awesome Lists
+  slug: awesome-list
+  description: An awesome list is a list of awesome things curated by the community.
+  image: awesome.svg
+- title: Amazon Web Services
+  slug: aws
+  description: ""
+  image: ""
+- title: Microsoft Azure
+  slug: azure
+  description: ""
+  image: azure-1.svg
+- title: Career
+  slug: career
+  description: ""
+  image: ""
+- title: Cache
+  slug: cache
+  description: One area to check for performance.
+  image: ""
+- title: CI/CD
+  slug: ci-cd
+  description: ""
+  image: ""
+- title: Cloudflare
+  slug: cloudflare
+  description: Offering CDN, DNS, DDoS protection and security.
+  image: "cloudflare-1.svg"
+- title: Cloud Native
+  slug: cloud-native
+  description: ""
+  image: ""
+- title: CMS
+  slug: cms
+  description: Best in class listed under this tag
+  image: ""
+- title: Cryptography
+  slug: cryptography
+  description: ""
+  image: ""
+- title: CSS
+  slug: css
+  description: ""
+  image: "css-3.svg"
+- title: CQRS
+  slug: cqrs
+  description: ""
+  image: ""
+- title: Crypto
+  slug: crypto
+  description: ""
+  image: ""
+- title: Dapr
+  slug: dapr
+  description:
+    Dapr is a portable, event-driven runtime that makes it easy for developers
+    to build resilient, microservice stateless and stateful applications that run
+    on the cloud
+  image: dapr.png
+- title: Dart
+  slug: dart
+  description: ""
+  image: dart.svg
+- title: Databases
+  slug: databases
+  description: ""
+  image: ""
+- title: Debug
+  slug: debug
+  description: ""
+  image: ""
+- title: Design Patterns
+  slug: design-patterns
+  description: ""
+  image: ""
+- title: Developer Tools
+  slug: developer-tools
+  description: ""
+  image: ""
+- title: DevOps
+  slug: devops
+  description: ""
+  image: ""
+- title: Documentation
+  slug: documentation
+  description: ""
+  image: ""
+- title: Docker
+  slug: docker
+  description: ""
+  image: "docker.svg"
+- title: Download Site
+  slug: download-site
+  description: ""
+  image: ""
+- title: Event Sourcing pattern
+  slug: event-sourcing
+  description: ""
+  image: ""
+- title: Flutter
+  slug: flutter
+  description: ""
+  image: flutter.svg
+- title: Gatsby
+  slug: gatsby
+  description: ""
+  image: gatsby.svg
+- title: Git
+  slug: git
+  description: ""
+  image: "git-icon.svg"
+- title: GitHub
+  slug: github
+  description: ""
+  image: github-1.svg
+- title: GitLab
+  slug: gitlab
+  description: ""
+  image: "gitlab.svg"
+- title: Good To Know
+  slug: good-to-know
+  description: ""
+  image: ""
+- title: Google
+  slug: google
+  description: ""
+  image: "google-icon.svg"
+- title: GraphQL
+  slug: graphql
+  description: ""
+  image: "graphql.svg"
+- title: gRPC
+  slug: grpc
+  description: ""
+  image: ""
+- title: IDE
+  slug: ide
+  description: ""
+  image: ""
+- title: Identity
+  slug: identity
+  description: ""
+  image: ""
+- title: iOS
+  slug: ios
+  description: ""
+  image: "apple-ios.svg"
+- title: iPhone
+  slug: iphone
+  description: ""
+  image: "apple-1.svg"
+- title: JavaScript
+  slug: javascript
+  description: ""
+  image: javascript.svg
+- title: JetBrains
+  slug: jetbrains
+  description: ""
+  image: ""
+- title: Jira
+  slug: jira
+  description: ""
+  image: ""
+- title: Kubernetes
+  slug: kubernetes
+  description: ""
+  image: k8s.svg
+- title: Laptops
+  slug: laptops
+  description: ""
+  image: ""
+- title: LINQ
+  slug: linq
+  description: ""
+  image: ""
+- title: Linux
+  slug: linux
+  description: ""
+  image: linux-tux.svg
+- title: Machine Learning
+  slug: machine-learning
+  description: ""
+  image: ""
+- title: Markdown
+  slug: markdown
+  description: "Markdown is a lightweight markup language for creating formatted text using a plain-text editor"
+  image: ""
+- title: Microservices
+  slug: microservices
+  description: ""
+  image: ""
+- title: ML.NET
+  slug: ml-net
+  description: "An open source and cross-platform machine learning framework"
+  image: "mlnet-icon.png"
+- title: Monitoring
+  slug: monitoring
+  description: ""
+  image: ""
+- title: MySQL
+  slug: mysql
+  description: ""
+  image: ""
+- title: Next.js
+  slug: nextjs
+  description: ""
+  image: ""
+- title: NGINX
+  slug: nginx
+  description: ""
+  image: nginx-1.svg
+- title: NoSQL
+  slug: nosql
+  description: ""
+  image: ""
+- title: Nuxt.js
+  slug: nuxtjs
+  description: ""
+  image: nuxt-emoji.png
+- title: OAuth 2.0
+  slug: oauth2
+  description: ""
+  image: oauth.svg
+- title: Open Source
+  slug: open-source
+  description: ""
+  image: ""
+- title: Obsidian
+  slug: obsidian
+  description: ""
+  image: ""
+- title: OpenTelemetry
+  slug: opentelemetry
+  description: ""
+  image: ""
+- title: Oracle
+  slug: oracle
+  description: ""
+  image: oracle-6.svg
+- title: ORM
+  slug: orm
+  description: ""
+  image: ""
+- title: React
+  slug: react
+  description: ""
+  image: react.svg
+- title: Productivity
+  slug: productivity
+  description: ""
+  image: productivity.jpg
+- title: Privacy
+  slug: privacy
+  description: ""
+  image: privacy.svg
+- title: Project Management
+  slug: project-management
+  description: ""
+  image: ""
+- title: Security
+  slug: security
+  description: ""
+  image: ""
+- title: Search Engine Optimization
+  slug: seo
+  description: ""
+  image: ""
+- title: Software Development
+  slug: software-development
+  description: ""
+  image: ""
+- title: SQL Server
+  slug: sql-server
+  description: ""
+  image: microsoft-sql-server.svg
+- title: SSL
+  slug: ssl
+  description: ""
+  image: ""
+- title: Software Architecture
+  slug: software-architecture
+  description: Software architecture refers to the fundamental structures of a software system and the discipline of creating such structures and systems.
+  image: ""
+- title: Style Guide
+  slug: style-guide
+  description: ""
+  image: ""
+- title: Svelte
+  slug: svelte
+  description: ""
+  image: ""
+- title: Testing
+  slug: testing
+  description: ""
+  image: ""
+- title: TypeScript
+  slug: typescript
+  description: ""
+  image: "typescript.svg"
+- title: Ubuntu
+  slug: ubuntu
+  description: ""
+  image: ubuntu-1.svg
+- title: Umbraco
+  slug: umbraco
+  description: ""
+  image: ""
+- title: Visual Studio Code
+  slug: vscode
+  description: ""
+  image: visual-studio-code-1.svg
+- title: Vue.js
+  slug: vue
+  description: ""
+  image: vue-9.png
+- title: WCF
+  slug: wcf
+  description: ""
+  image: ""
+- title: Web3
+  slug: web3
+  description: "Web1 was read-only, Web2 is read-write, Web3 will be read-write-own"
+  image: ""
+- title: Website Benchmark
+  slug: website-benchmark
+  description: ""
+  image: ""
+- title: Webmention
+  slug: webmention
+  description: ""
+  image: ""

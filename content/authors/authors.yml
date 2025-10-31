@@ -1,0 +1,7 @@
+- name: Mimul
+  slug: mimul
+  bio: |
+    Mimul is a programmer, technologist, exercise enthusiast and more.
+  avatar: ./avatars/hahojin.jpg
+  twitter: "@mimul"
+  featured: true
