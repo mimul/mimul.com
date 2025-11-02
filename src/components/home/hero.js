@@ -82,16 +82,6 @@ export default function Hero() {
                       width: 23,
                     },
                     {
-                      src: "/img/topics/aspnet-core.png",
-                      height: 20,
-                      width: 20,
-                    },
-                    {
-                      src: "/img/topics/dot-net-core-7.svg",
-                      height: 20,
-                      width: 20,
-                    },
-                    {
                       src: "/img/topics/flutter.svg",
                       height: 20,
                       width: 20,
