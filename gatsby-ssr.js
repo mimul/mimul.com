@@ -6,9 +6,9 @@ export const onRenderBody = ({ setHeadComponents, setPostBodyComponents }) => {
     head: true,
   };
 
-  if (process.env.NODE_ENV !== `production`) {
-    return null;
-  }
+  // if (process.env.NODE_ENV !== `production`) {
+  //   return null;
+  // }
   if (pluginOptions.googleAdClientId === undefined) {
     return null;
   }
