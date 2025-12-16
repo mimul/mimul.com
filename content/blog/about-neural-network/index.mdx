@@ -1,6 +1,6 @@
 ---
-title: TensorFlow를 통해 딥러닝의 기반 기술인 NN(Neural Network) 이해
-description: 딥러닝의 기반 기술인 뉴럴 네트워크에 대해 요소 기술, 이론을 설명하고, 간단한 신경망을 구현하면서 패턴도 설명하고, 신경망이 어떻게 작동하는지를 정리한 글.
+title: TensorFlow를 통해 딥러닝의 기반 기술인 NN(Neural Network) 이해(1)
+description: 딥러닝의 기반 기술인 뉴럴 네트워크에 대해 요소 기술, 이론을 설명하고, 간단한 신경망을 구현하면서 패턴도 설명하고, 신경망이 어떻게 작동하는지를 정리한 글(데이터 준비, 문제 유형, 전처리, 방법의 선택과 모델 정의)
 author: Mimul
 date: "2019-01-18T22:25:48.000Z"
 lastModificationTime: "2019-01-18T22:25:48.000Z"
@@ -10,9 +10,9 @@ tags:
   - deep-learning
   - ai
 ---
-딥러닝의 기반 기술인 뉴럴 네트워크에 대해 요소 기술, 이론을 설명하고, 간단한 신경망을 구현하면서 패턴도 설명하고, 신경망이 어떻게 작동하는지를 이해하는 것을 목표로 한다. 신경망의 구현은 보다 심플한 코드로 하기 위해 Python(버전 3.6)과 딥러닝의 라이브러리 TensorFlow의 최신판 2.0을 이용한다. TensorFlow에는 고수준 API Keras(이하 tf.keras)를 사용한다. 개발 환경에 [Google Colaboratory(이하 Colab)](https://colab.research.google.com/)를 사용하고 신경망의 시각화에 구글에서 만든 [Playground](https://mimul.github.io/playground)를 이용한다.
+딥러닝의 기반 기술인 뉴럴 네트워크에 대해 요소 기술, 이론을 설명하고, 간단한 신경망을 구현하면서 패턴도 설명하고, 신경망이 어떻게 작동하는지를 이해하는 것을 목표로 합니다. 신경망의 구현은 보다 심플한 코드로 하기 위해 Python(버전 3.6)과 딥러닝의 라이브러리 TensorFlow의 최신판 2.0을 이용합니다. TensorFlow에는 고수준 API Keras(이하 tf.keras)를 사용합니다. 개발 환경에 [Google Colaboratory(이하 Colab)](https://colab.research.google.com/)를 사용하고 신경망의 시각화에 구글에서 만든 [Playground](https://mimul.github.io/playground)를 이용합니다. 이 [Playground](https://mimul.github.io/playground/#activation=tanh&activspacer=false&loss=mse&batchSize=10&batchFull=false&dataset=gauss&regDataset=reg-plane&learningRate=0.03&regularizationRate=0&noise=0&networkShape=&seed=0.58573&showTrainData=true&showValidationData=false&showTestData=true&discretize=false&percTrainData=50&x=true&y=true&xTimesY=false&xSquared=false&ySquared=false&sinX=false&sinY=false&problem=classification&initOrigin=false&hideText=true&xSquared_hide=true&ySquared_hide=true&xTimesY_hide=true&sinX_hide=true&sinY_hide=true)를 이용하면 쉽게 딥러닝의 기반 기술인 NN(Neural Network)을 쉽게 이해하게 해줍니다.
 
-그리고 여기에서 사용된 python 코드는 [Github](https://github.com/mimul/playground/blob/main/examples/tf2_keras_neuralnetwork.ipynb)에 공유되어 있다.
+여기에서 사용된 python 코드는 [Github](https://github.com/mimul/playground/blob/main/examples/tf2_keras_neuralnetwork.ipynb)에 공유되어 있습니다.
 
 ### 사전 준비 
 
@@ -38,7 +38,7 @@ tags:
 
 ![훈련 후의 2차원 좌표계](./trainning_x.png)
 
-배경색은 Playground에서 트레이닝 후의 기계 학습 모델의 예측 결과를 시각화한 것이다(※ 플롯되어 있는 각 점은 오른쪽 상단의 청색 배경과 왼쪽 하단의 주황색 배경 사이에 흰색선이 만들어진 것을 알 수 있다. 이것이 위의 선에 해당하는 것으로 결정 경계(Decision boundary)라고 한다. 여기까지 신경망에서 작성한 기계 학습 모델로 분류 문제를 푸는게 어떤 것인지를 알 수 있었다.
+배경색은 Playground에서 트레이닝 후의 기계 학습 모델의 예측 결과를 시각화한 것이다(※ 플롯되어 있는 각 점은 오른쪽 상단의 청색 배경과 왼쪽 하단의 주황색 배경 사이에 흰색선이 만들어진 것을 알 수 있다). 이것이 위의 선에 해당하는 것으로 결정 경계(Decision boundary)라고 한다. 여기까지 신경망에서 작성한 기계 학습 모델로 분류 문제를 푸는게 어떤 것인지를 알 수 있다.
 
 그 다음 어떤 데이트 세트를 사용할 것인가는 가우시안(Gaussian, 정규 분포의 산 형상과 같이 특정 기준점에 집중하여 분포하는 데이터)을 선택하면 된다. 분류 문제와 데이터 종류를 설정하기 위한 코드를 Python으로 기술해 보자.
 
