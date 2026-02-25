@@ -50,7 +50,6 @@ CNAME 레코드를 사용하여 CDN 공급자를 가리키는 경우는 CDN의 D
 
 -  CDN 서비스(Amazon CloudFront, Google Cloud CDN, Cloudflare, Akamai, CDNetworks, Incapsul, Fastly, Limeligh, Edgecast)를 알아두어 필요시 사용할 줄 알아야 한다.
 
-
 ### 3. 웹 사이트 액세스와 보안 통신
 
 사용자의 브라우저가 CDN의 에지 서버(또는 최종 웹 서버)에 연결하면 TLS 핸드셰이크가 발생한다. 사용자가 웹 브라우저를 사용하여 mimul.com 사이트에 액세스하면 HTTP/HTTPS 프로토콜을 통해 데이터 교환이 이루어진다. HTTPS는 TLS(Transport Layer Security)를 이용하여 통신을 암호화하고 TLS 인증서를 통해 서버의 신원을 증명한다. HTTPS 연결은 사용자와 사이트 간의 통신이 보호되고 신뢰할 수 있는 보안 연결이 설정된다. 아래 그림은 DNS Lookup 다음의 프로세스를 나타낸다. 실제 단계별로 타임을 기록하는 스크립트도 공유한다. 이것으로 각 단계별로 처리시간을 확인할 수 있고 DDOS에 의한 DNS 장애도 이 스크립트로 유추하기도 했다.

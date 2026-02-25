@@ -225,7 +225,7 @@
     ]
   },
   {
-    "title": "Software Engineering at Google(무료책)",
+    "title": "Software Engineering at Google(무료 책)",
     "description": "Google이 사용하는 소프트웨어 엔지니어링 관행(코드베이스를 유지하고 건강하게 확장하기 위한 조직·문화·도구·프로세스)을 다루고 있으며, 규모, 시간, 비용 세가지 큰 축을 중심으로 이야기하며 느낄수 있는 교훈이 많이 담겨져 있는 무료 책.",
     "url": "https://abseil.io/resources/swe-book",
     "date": "2025-01-03T22:37:41.143Z",
@@ -266,7 +266,43 @@
     "url": "http://zachgoldberg.com/ctohandbook/",
     "date": "2023-10-22T08:49:33.143Z",
     "tags": [
-      "browser"
+      "cto"
+    ]
+  },
+  {
+    "title": "LLM(transformer)의 근간이 된 논문 - Attention Is All You Need",
+    "description": "RNN과 CNN을 사용하지 않고 Attention 만 사용하는 신경 기계 번역 Transformer를 제안함.",
+    "url": "https://arxiv.org/abs/1706.03762",
+    "date": "2025-10-24T07:33:21.143Z",
+    "tags": [
+      "llm"
+    ]
+  },
+  {
+    "title": "스탠포드 대학 LLM 무료 강의",
+    "description": "RNN과 CNN을 사용하지 않고 Attention 만 사용하는 신경 기계 번역 Transformer를 제안함Transformers: self-attention, architecture, variants, optimization techniques (sparse attention, low-rank attention, flash attention), LLMs: prompting, finetuning, preference tuning, optimization techniques, Applications: LLM-as-a-judge, RAG, agents, reasoning models.",
+    "url": "https://cme295.stanford.edu/syllabus/",
+    "date": "2025-12-27T09:01:21.143Z",
+    "tags": [
+      "llm"
+    ]
+  },
+  {
+    "title": "Google Style Guides",
+    "description": "Google에서 사용되는 프로그래밍 언어별 스타일 가이드.",
+    "url": "https://google.github.io/styleguide/",
+    "date": "2018-04-22T08:38:48.143Z",
+    "tags": [
+      "coding-style"
+    ]
+  },
+  {
+    "title": "Postgresql Internal",
+    "description": "Postgresql Internal 한글 번역본",
+    "url": "https://www.ninanolabs.com/document/postgresql_internals-14_kr.pdf",
+    "date": "2022-02-15T10:22:11.143Z",
+    "tags": [
+      "PostgreSQL"
     ]
   }
 ]

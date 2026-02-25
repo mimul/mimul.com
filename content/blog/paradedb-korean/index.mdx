@@ -1,0 +1,367 @@
+---
+title: PostgreSQL에서 한글 전문 검색(BM25) 실현
+description: PostgreSQL 확장(ParadeDB)을 통한 BM25 관련도 스코어링을 갖춘 한글 전문 검색을 정리함.
+author: Mimul
+date: "2019-06-17T22:28:12.000Z"
+lastModificationTime: "2019-06-17T23:15:33.000Z"
+image: "./postgres-search.png"
+tags:
+  - postgres
+  - paradedb
+---
+
+여기에서는 PostgreSQL 확장(ParadeDB)을 통한 BM25 관련도 스코어링을 갖춘 한글 전문 검색을 다룹니다. ParadeDB(pg_search)는 Tantivy 기반의 전체 텍스트 검색 엔진으로, ElasticSearch와 동일한 BM25 알고리즘에 의한 관련도 스코어링을 갖추고 있어 ElasticSearch의 대안으로도 가능합니다. 
+
+### Postgres 에코시스템의 힘
+
+각각의 용도에 맞는 전문 데이터베이스를 쓰게 되면 관리해야 할 시스템이 급격히 늘어나며 복잡도, 유지비, 장애 대응 면에서 큰 부담이 될 수 있다. 특히 전문 데이터베이스에 대한 전문가가 없는 기업이라면 고민이 깊어질 수 밖에 없다. 하지만, PostgreSQL 하나면 원하는 아래와 같은 기능을 해결할 수 있다. 그리고 다양한 전문 데이터베이스에 대한 운영/유지보수에 대한 비용이나 리스크도 줄일 수 있다.
+
+| 전문 데이터베이스       | Postgres 확장                     |
+| ------------------ | --------------------------------- |
+| ElasticSearch      | pg_textsearch(BM25 검색)           |
+| Pinecone, Qdrant   | pgvector + pgvectorscale(벡터 검색) |
+| InfluxDB           | TimescaleDB(시계열)                 |
+| Redis              | UNLOGGED 테이블 + 인메모리 처리         |
+| MongoDB            | JSONB + 인덱싱                      |
+| Kafka              | pgmq 확장(+SKIP LOCKED 패턴)         |
+| 특수 GIS            | PostGIS                           |
+
+PostgreSQL 생태계에는 다양한 확장(extension)이 존재하며, 이들은 많은 전문 DB가 제공하는 기능과 기술적으로 동등하거나 더 나은 알고리즘을 제공한다. AI 시대에도 PostgreSQL 생태계가 중요해지고 있고, 다양한 테스트 환경도 원 데이터베이스로 쉽게 만들 수 있어 생산성도 올라간다. 여기에서는 먼저 한글 전문 검색 시스템에 대해 PostgreSQL의 가능성을 실펴본다.
+
+### 검색 시스템의 구성 방법들
+
+**1. ElasticSearch**
+
+ElasticSearch는 독립적인 분산 검색 엔진이다. Apache Lucene을 기반으로 수십억 행 규모의 데이터에 대해서도 밀리초 단위로 검색할 수 있는 성능을 가지고 있다. 그렇지만, ElasticSearch를 도입했을 때 가장 고민하는 것이 PostgreSQL과의 데이터 동기화다. 새 레코드를 추가하거나 기존 레코드를 업데이트할 때마다 변경 내용을 ElasticSearch에 반영해야 한다. 정기적인 배치 동기화에서는 몇 시간의 데이터 지연이 발생할 수 있으며, 실시간성이 요구되는 용도에서는 Change Data Capture(CDC)와 같은 구조를 별도로 구축해야 한다.
+
+**2. ParadeDB(pg_search)**
+
+PostgreSQL 확장 기능으로, 내부에서는 Tantivy(Rust로 구현된 Lucene 상당의 검색 엔진)를 사용하고 있고 PostgreSQL의 인덱스 액세스 메소드 API를 통해 BM25 인덱스를 실현하고 있다. 데이터는 PostgreSQL 내에서 중앙 집중식으로 관리되고 쿼리로 접근 가능하며 BM25와 ACID 기능을 지원한다.
+
+ElasticSearch와 ParadeDB를 비교해보면 아래와 같다.
+
+|비교 항목|ElasticSearch|ParadeDB(pg_search)|
+|---|---|---|
+|배포|전용 클러스터 필요|PostgreSQL 확장으로 추가|
+|데이터 동기화|ETL/CDC 파이프라인 필요|필요 없음(트랜잭션 내 자동 반영)|
+|스코어링|BM25(Lucene)|BM25(Tantivy)|
+|트랜젝션|비대응|ACID 준수|
+|SQL JOIN|불가(다른 시스템)|일반 SQL에서 가능|
+|분산 검색|대응(샤딩)|지원되지 않음(단일 노드)|
+|운영 비용|높음(전문 지식 필요)|낮음(PostgreSQL에 통합)|
+
+앞으로는 PostgreSQL 생태계의 검색시스템 확장 제품인 ParadeDB(pg_search)를 더 상세히 다루어 본다.
+
+### ParadeDB란?
+
+ParadeDB는 PostgreSQL의 확장 기능으로 전체 텍스트 검색(pg_search)과 분석 처리(pg_analytics)의 기능을 제공하고 있다. 여기에서는 pg_search에 중점을 둔다.
+
+pg_search 내부에서는 Tantivy라는 검색 엔진이 작동하고 있다. Tantivy는 Rust로 작성된 Apache Lucene의 대체 구현으로, BM25 스코어링에 의한 관련도 랭킹, 전치 인덱스에 의한 고속 검색, 각종 토크나이저에 의한 다언어 대응 등의 기능을 갖추고 있다.
+
+BM25(Best Matching 25)는 ElasticSearch에서도 채택된 관련도 스코어링 알고리즘이다. 검색 키워드가 문서에 몇번 나타나는지(TF: Term Frequency)와 키워드가 모든 문서에서 얼마나 드문지(IDF: Inverse Document Frequency)를 조합하여 각 문서의 점수를 계산한다. 자주 나오는 키워드일수록 점수가 오르지만, 어느 문서에도 출현하는 일반적인 단어("의" "에서" 등)는 점수에 대한 영향이 작아진다.
+
+한글 처리에는 Lindera라는 토크 나이저가 사용된다. Lindera는 IPADIC 사전이 내장된 형태소 분석기로 한글 텍스트를 의미 있는 단어 단위로 나눌 수 있다. 이를 통해 '인공지능의 최신 동향'이라는 문장을 '인공', '지능', '의', '최신', '동향'이라는 토큰으로 나누어 각 토큰에 대해 BM25 점수를 계산한다.
+
+###4. 환경 구축
+
+이번 검증에 사용된 코드는 [Github](https://github.com/mimul/database/tree/main/paradedb)에서 확인 가능하다.
+
+**1. Docker Compose 설정**
+
+아래 내용으로 compose.yaml을 작성한다. ParadeDB의 Docker 이미지에는 pg_search 확장이 포함되어 있으므로 CREATE EXTENSION을 실행할 필요가 없다. 컨테이너를 시작하면 바로 사용할 수 있다.
+
+```
+services:
+  paradedb:
+    image: paradedb/paradedb:latest
+    container_name: paradedb
+    environment:
+      POSTGRES_USER: paradedb
+      POSTGRES_PASSWORD: paradedb
+      POSTGRES_DB: paradedb
+    ports:
+      - "15432:5432"
+    volumes:
+      - paradedb_data:/var/lib/postgresql/
+
+volumes:
+  paradedb_data:
+```
+
+**2. 테이블 및 데이터 준비**
+
+검증용 테이블과 데이터를 준비한다. setup.sql 테이블과 데이터가 준비되어 있어 이것을 실행해 데이터 준비를 한다.
+
+```
+CREATE TABLE articles (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    category TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+> docker compose up -d
+> docker exec -i paradedb psql -U paradedb -d paradedb < setup.sql
+```
+
+데이터에는 기술, 과학, 비즈니스, 문화, 건강, 교육, 환경, 사회와 같은 카테고리의 기사나 논문이 포함되어 있다. 각 기사는 200~400자 정도의 본문을 가지고 있으며, 실제 뉴스 기사와 논문에 가까운 내용으로 되어 있다.
+
+[mecab-ko](https://github.com/i0seph/textsearch_ko) 이용한 한글 full-text search를 위해서 아래 작업을 수행한다.
+
+```
+> git clone https://bitbucket.org/eunjeon/mecab-ko.git
+> cd mecab-ko
+> ./configure
+> make && make install
+
+> apt install automake libtool -y
+> vi /etc/ld.so.conf 
+/usr/local/lib
+
+> wget https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/mecab-ko-dic-2.1.1-20180720.tar.gz
+> cd mecab-ko-dic/
+> ./configure
+> make && make install
+
+> echo '아버지가방에들어가신다'|mecab
+아버지 NNG,*,F,아버지,*,*,*,*
+가 JKS,*,F,가,*,*,*,*
+방 NNG,장소,T,방,*,*,*,*
+에 JKB,*,F,에,*,*,*,*
+들어가 VV,*,F,들어가,*,*,*,*
+신다  EP+EC,*,F,신다,Inflect,EP,EC,시/EP/*+ㄴ다/EC/*
+EOS
+
+> git clone https://github.com/i0seph/textsearch_ko.git
+> cd textsearch_ko
+> make USE_PGXS=1
+postgres.h 못찾을 경우
+> apt install postgresql-server-dev-18
+> make USE_PGXS=1 install
+
+> psql -U paradedb
+paradedb=# \i ts_mecab_ko.sql
+```
+
+**3. 벤치마크 실행**
+
+아래 검색 방법을 테스트 한다.
+
+|  종류 |  방법 | 한글 대응 |
+|---|---|---|
+|ParadeDB BM25|전치 인덱스 + 형태소 해석|lindera(korean)로 대응|
+|PostgreSQL LIKE|부분 문자열 매칭|그대로 사용 가능|
+|PostgreSQL tsvector|텍스트 검색|mecab-ko로 한글 대응|
+
+세가지 유형의 검색 기법을 비교하기 위해 각각에 해당하는 색인을 생성한다.
+
+```
+-- 1. ParadeDB BM25 lindera 한글 토크나이저 사용
+DROP INDEX IF EXISTS search_idx;
+CREATE INDEX search_idx ON articles
+USING bm25 (
+    id,
+    (title::pdb.lindera(korean)),
+    (body::pdb.lindera(korean)),
+    (category::pdb.lindera(korean))
+)
+WITH (key_field='id');
+
+-- 2. PostgreSQL GIN 색인(pg_trgm) LIKE 검색 가속화
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+DROP INDEX IF EXISTS trgm_title_idx;
+DROP INDEX IF EXISTS trgm_body_idx;
+CREATE INDEX trgm_title_idx ON articles USING gin (title gin_trgm_ops);
+CREATE INDEX trgm_body_idx ON articles USING gin (body gin_trgm_ops);
+
+-- 3. PostgreSQL GIN tsvector 색인(simple 사전 - 한글용 임베디드 사전이 없기 때문에)
+DROP INDEX IF EXISTS ts_title_idx;
+DROP INDEX IF EXISTS ts_body_idx;
+CREATE INDEX ts_title_idx ON articles USING gin (to_tsvector('korean', title));
+CREATE INDEX ts_body_idx ON articles USING gin (to_tsvector('korean', body));
+
+-- ANALYZE
+ANALYZE articles;
+```
+먼저 ParadeDB의 Lindera 토크나이저가 한긒 텍스트를 올바르게 분할할 수 있는지 확인한다.
+
+```
+> SELECT '차세대반도체'::pdb.lindera(korean)::text[];
+      text
+-----------------
+ {차세대,반도체}
+(1 row)
+
+Time: 0.514 ms
+
+> SELECT '클라우드입문가이드'::pdb.lindera(korean)::text[];
+          text
+------------------------
+ {클라우드,입문,가이드}
+(1 row)
+
+Time: 0.393 ms
+
+> SELECT '기계학습을활용한이미지인식'::pdb.lindera(korean)::text[];
+                text
+------------------------------------
+ {기계,학습,을,활용,한,이미지,인식}
+(1 row)
+
+Time: 0.374 ms
+```
+
+'기계학습을활용한이미지인식'이라는 문자열이 '기계', '학습', '을', '활용', '한', '이미지', '인식'이라는 7개의 토큰으로 나뉜다. IPADIC 사전을 기반으로 형태소 분석이 제대로 작동하고 있음을 알 수 있다.
+
+**4. 성능 측정 결과**
+
+|쿼리|ParadeDB BM25|PostgreSQL LIKE|PostgreSQL tsvector|
+|---|---|---|---|
+|인공지능|2.454 ms|2.003 ms|0.848 ms|
+|디지털트랜스포메이션|2.822 ms|12.859 ms|96.373 ms|
+
+짧은 키워드인 인공지능은 거의 차이가 없는데, 디지털 트랜스포메이션 키우드 검색에서는 BM25가 LIKE 검색보다 5배 빠르다. 이 차이가 발생하는 이유는 EXPLAIN ANALYZE의 출력에서 ​​확인할 수 있다. LIKE는 긴 문자열의 부분 일치 검색에서 pg_trgm 인덱스를 효율적으로 사용할 수 없으며 Seq Scan(순차 스캔)으로 폴백했다. 6,855행을 스캔하고 그중 일치하는 행만을 돌려주고 있어, 테이블 전체에 가까운 범위를 읽어내고 있다.
+tsvector도 mecab을 사용했지만 단어가 길어질수록 응답속도가 늦어지는 것을 확인할 수 있다. 반면 BM25는 형태소 분석한 토큰으로 Tantivy의 전치 인덱스를 빼기 때문에 Custom Scan(검색 인덱스로부터 직접 취득)으로 완료하고 있어 키워드의 길이에 관계없이 안정된 속도로 검색할 수 있다.
+
+```
+--- ParadeDB BM25: 디지털 트랜스포메이션 QUERY PLAN  ---
+ Aggregate  (cost=46.25..46.26 rows=1 width=8) (actual time=1.834..1.835 rows=1.00 loops=1)
+   Buffers: shared hit=48
+   ->  Custom Scan (ParadeDB Scan) on articles  (cost=10.00..34.16 rows=4833 width=0) (actual time=1.150..1.604 rows=4799.00 loops=1)
+         Table: articles
+         Index: search_idx
+         Segment Count: 2
+         Heap Fetches: 66
+         Exec Method: NormalScanExecState
+         Scores: false
+         Tantivy Query: {"with_index":{"query":{"match":{"field":"body","value":"디지털트랜스포메이션","tokenizer":null,"distance":null,"transposition_cost_one":null,"prefix":null,"conjunction_mode":false}}}}
+         Buffers: shared hit=48
+ Planning:
+   Buffers: shared hit=43
+ Planning Time: 0.594 ms
+ Execution Time: 1.926 ms
+(15 rows)
+
+Time: 2.822 ms
+
+--- PostgreSQL LIKE: 디지털 트랜스포메이션 QUERY PLAN ---
+ Aggregate  (cost=727.52..727.53 rows=1 width=8) (actual time=11.848..11.849 rows=1.00 loops=1)
+   Buffers: shared hit=623
+   ->  Seq Scan on articles  (cost=0.00..724.38 rows=1257 width=0) (actual time=0.080..11.765 rows=1257.00 loops=1)
+         Filter: (body ~~ '%디지털 트랜스포메이션%'::text)
+         Rows Removed by Filter: 6855
+         Buffers: shared hit=623
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.541 ms
+ Execution Time: 11.875 ms
+(10 rows)
+
+Time: 12.859 ms
+
+--- PostgreSQL tsvector: 디지털트랜스포메이션 QUERY PLAN ---
+ Aggregate  (cost=382.44..382.45 rows=1 width=8) (actual time=395.779..395.780 rows=1.00 loops=1)
+   Buffers: shared hit=549
+   ->  Bitmap Heap Scan on articles  (cost=35.07..382.13 rows=127 width=0) (actual time=0.903..395.459 rows=1302.00 loops=1)
+         Recheck Cond: (to_tsvector('korean'::regconfig, body) @@ '''디지털'' <-> ''트랜스'' <-> ''포메이션'''::tsquery)
+         Heap Blocks: exact=540
+         Buffers: shared hit=549
+         ->  Bitmap Index Scan on ts_body_idx  (cost=0.00..35.04 rows=127 width=0) (actual time=0.373..0.373 rows=1302.00 loops=1)
+               Index Cond: (to_tsvector('korean'::regconfig, body) @@ '''디지털'' <-> ''트랜스'' <-> ''포메이션'''::tsquery)
+               Index Searches: 1
+               Buffers: shared hit=9
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.258 ms
+ Execution Time: 395.799 ms
+(14 rows)
+
+Time: 96.373 ms
+
+```
+
+### BM25 검색에 사용할 수 있는 실용적인 기능
+
+**1. 관련도 점수별 순위**
+
+BM25는 각 검색 결과에 대한 관련도 점수를 계산하여 가장 높은 점수를 가진 결과를 높은 수준으로 표시할 수 있다.
+
+```
+SELECT id, title, pdb.score(id) AS score
+FROM articles
+WHERE title ||| '인공지능' OR body ||| '인공지능'
+ORDER BY score DESC
+LIMIT 10;
+
+id | title                              | score
+16 | 전이 학습 기반 소량 데이터 객체 인식 개선	  | 10.6050415
+3	 | 강화학습 기반 게임 AI 의사결정 효율 개선	   | 10.563667
+20 | LLM 할루시네이션 방지를 위한 RAG 적용	   | 10.5226145
+9	 | 시계열 분석 기반 주가 예측 오차율 감소	     | 10.44146
+12 | 능동 학습을 활용한 데이터 라벨링 비용 절감	  | 10.44146
+```
+
+**2. 스니펫 및 하이라이트**
+
+검색 키워드 주변 텍스트를 강조 표시하여 검색할 수 있다. start_tag와 end_tag를 지정하면 HTML 태그와 같은 임의의 마커로 강조 표시를 둘러쌀 수 있다.
+
+```
+SELECT title, pdb.snippet(body, start_tag => '【', end_tag => '】') AS highlighted
+FROM articles
+WHERE body ||| '기계학습'
+ORDER BY pdb.score(id) DESC
+LIMIT 3;
+
+title                |     highlighted
+한국의농림수산업에서기술혁신 | 대응과 글로벌 경쟁력 유지라는 두가지 큰 과제에 직면하고 있다. 인공 지능과 【기계】 【학습】 기술은 이러한 과제에 
+지속가능농업생산의국제 비교	| 대응과 글로벌 경쟁력 유지라는 두가지 큰 과제에 직면하고 있다. 인공 지능과 【기계】 【학습】 기술은 이러한 과제에 
+자동차업계의디지털 변혁	   | 대응과 글로벌 경쟁력 유지라는 두가지 큰 과제에 직면하고 있다. 인공 지능과 【기계】 【학습】 기술은 이러한 과제에 
+
+```
+
+**3. OR 검색 및 AND 검색**
+
+BM25 검색에서는 전용 연산자를 사용하여 OR 검색과 AND 검색을 결합할 수 있다. ```|||``` OR (논리 합), ```&&&``` AND (논리 곱)에 해당한다. LIKE에서 AND 검색을 수행하기 위해 ```WHERE body LIKE '%키워드1%' AND body LIKE '%키워드2%'``` 여러 조건을 작성해야하지만 BM25에서는 하나의 연산자로 간결하게 작성할 수 있다.
+
+```
+-- OR
+SELECT id, title FROM articles
+WHERE body ||| '우주 탐사';
+
+-- AND
+SELECT id, title FROM articles
+WHERE body &&& '신재생에너지 환경문제';
+```
+
+**4. 패싯 집계**
+
+Facet은 검색결과에 검색 필터(기술 -> 59, 예술 -> 39, 과학 -> 64)별로 개수를 표시하는 기능이다. 사용자가 필터와 함께 검색 결과를 탐색할 수 있게 해주는 검색 기능의 핵심이다.
+
+```
+SELECT category, count(*) AS cnt, avg(pdb.score(id))::numeric(10,4) AS avg_score
+FROM articles
+WHERE body ||| '기술'
+GROUP BY category
+ORDER BY cnt DESC;
+
+```
+
+### 기능 평가 결과
+
+|평가축|ParadeDB BM25|PostgreSQL LIKE|PostgreSQL tsvector|
+|---|---|---|---|
+|한글 대응|가능|가능|가능(mecab)|
+|관련도 스코어링|가능|불가능|불가능|
+|스니펫/하이라이트|가능|불가능|불가능|
+|검색 정밀도(노이즈가 적음)|그렇다|그렇다|그렇다|
+|소규모 데이터에서의 성능|좋음|좋음|좋음|
+|중간 규모 데이터의 성능|좋음|좋음|좋음|
+|긴 쿼리에서의 성능|좋음|안좋음|안좋음|
+|패싯/집계|가능|불가능|불가능|
+|설치 용이성|좋음|좋음|좋음|
+
+### 참고 사이트
+- [ParadeDB 공식 사이트](https://www.paradedb.com/)
+- [Full Text Search over Postgres: Elasticsearch vs. Alternatives](https://www.paradedb.com/blog/elasticsearch-vs-postgres)
+- [Mecab 형태소 분석기와 mecab-ko-dic 사전을 이용한 PostgreSQL 한국어 전문검색 full text search 확장모듈](https://github.com/i0seph/textsearch_ko)

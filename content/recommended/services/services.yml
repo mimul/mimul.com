@@ -97,3 +97,24 @@
   date: "2022-02-09T21:19:52.263Z"
   tags:
     - developer-tool
+- title: 전문화된 여러 AI가 역할을 나눠 협업하는 OpenCode 플러그인 - oh-my-opencode
+  url: https://github.com/code-yeongyu/oh-my-opencode
+  description: oh-my-opencode는 OpenCode를 위한 플러그인으로 Sisyphus 오케스트레이터가 이끄는 7개의 전문 에이전트가 여러 LLM을 성격에 맞게 선택해서 병렬로 작업하여 원하는 목표를 이루어 준다. 12k+ GitHub 스타를 기록했고, 개발자와 커뮤니티에 화제의 프로젝트.
+  image: ""
+  date: "2026-01-02T22:23:14.263Z"
+  tags:
+    - ai-tool
+- title: 구동된 프로세스의 상세 정보를 알려주는 클라이언트 툴 - witr
+  url: https://github.com/pranshuparmar/witr
+  description: 구동되고 있는 프로세스의 프로세스명, PID, 포트, 시작경로, 경고 (root 권한, 공개 포트, 메모리 사용량 등) 등 어떠한 프로세스인지 해설해 주는 Linux용 CLI 툴. Go로 구현됨.
+  image: ""
+  date: "2026-01-05T20:34:14.263Z"
+  tags:
+    - developer-tool
+- title: PostgreSQL백업 자동화 오픈소스 도구 - Postgresus
+  url: https://github.com/databasus/databasus
+  description: 시간, 일, 주, 월별 백업 일정 지정할 수 있고, 내장된 스마트 압축 기능으로 저장 공간을 4-8배 절약, 원클릭 복원 기능을 지원, 이메일, Telegram 등에 알림도 가능.
+  image: ""
+  date: "2025-09-22T17:21:14.263Z"
+  tags:
+    - database-tool
