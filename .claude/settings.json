@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "tool in [\"Edit\", \"Write\", \"NotebookEdit\"]",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport json, sys\ndata = json.load(sys.stdin)\nparams = data.get('tool_input', {})\nfile_path = params.get('file_path', '')\nif file_path and 'content/blog/' not in file_path:\n    print(json.dumps({'decision': 'block', 'reason': f'제약 위반: content/blog/ 외부 파일 수정 금지 - {file_path}'}))\nelse:\n    print(json.dumps({'decision': 'approve'}))\n\""
+          }
+        ]
+      }
+    ]
+  }
+}
