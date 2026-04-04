@@ -104,13 +104,13 @@ _3) Flow State(플로우 상태)_
 
 처리량과 리드 타임 빈도가 개발 생산성의 주요 지표이지만, 빈도를 질로 전환하는 고민도 필요합니다. 장애 없는 리드 타임, 제품 가치와 연계된 처리량을 함께 고려해야 합니다.
 
-#### 1) 단위 테스트를 강화해 버그 발견율을 높인다
+#### 1.단위 테스트를 강화해 버그 발견율을 높인다
 
 ![Global Analysis of Productivity and Quality](./sdlc_p_q.png)
 
 Capers Jones의 ["Applied Software Measurement"](https://www.amazon.com/Applied-Software-Measurement-Analysis-Productivity/dp/0071502440)에서 단계별 결함 발생 확률(파란색), 결함 발견 확률(노란색), 결함 처리 비용(빨간색)을 분석합니다. 결함 처리 비용이 가장 낮은 단계인 단위 테스트를 강화해 버그 발견율을 높이는 방향이 바람직합니다.
 
-#### 2) 소스 공유, 의존 관계, 개발 도구 관리
+#### 2. 소스 공유, 의존 관계, 개발 도구 관리
 
 ["Why Google Stores Billions of Lines of Code in a Single Repository"](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext) 논문에서는 개발자에게 가장 도움이 된 영역으로 가시성, 종속성 관리, 개발 도구를 꼽습니다.
 
@@ -118,7 +118,7 @@ Capers Jones의 ["Applied Software Measurement"](https://www.amazon.com/Applied-
 - **의존 관계 관리**: 단일 버전 규칙(One-Version Rule)으로 라이브러리 충돌, 빌드 리드 타임 증가, 프로젝트 간 커뮤니케이션 비용을 절감합니다.
 - **개발 도구**: 사용 가능한 개발 도구를 정리해두면 아키텍처 선택, 개발 환경 설정, 개발자 이동 시 학습 비용을 줄일 수 있습니다.
 
-#### 3) 팀 역량 강화
+#### 3. 팀 역량 강화
 
 팀 퍼포먼스가 기업 역량의 핵심입니다. 개인 역량을 위해 교육(세미나, 기술 공유)과 코드 리뷰·페어 프로그래밍 기회를 제공하고, 조직 역량을 위해 팀 간 협업·커뮤니케이션·리스크 분산을 관리하는 프로세스를 갖추는 것이 중요합니다.
 
@@ -139,7 +139,7 @@ Capers Jones의 ["Applied Software Measurement"](https://www.amazon.com/Applied-
 - 배경 지식 정보([Work Item 링크](https://learn.microsoft.com/en-us/azure/devops/boards/work-items/about-work-items?view=azure-devops&tabs=agile-process))
 - 우려사항과 타협점 제시
 
-#### 4) 기술 부채를 지속적으로 해결하는 습관
+#### 4. 기술 부채를 지속적으로 해결하는 습관
 
 스타트업에서 기술 부채는 속도를 위해 품질이 희생되면서 발생합니다. 대부분 Invisible 영역(아키텍처, 수작업 운영 등)에서 생겨 고객 피해가 없다는 이유로 개발 우선순위에서 밀려 쌓이게 됩니다.
 
@@ -150,7 +150,7 @@ Capers Jones의 ["Applied Software Measurement"](https://www.amazon.com/Applied-
 - 오버 엔지니어링을 피합니다. 필요 이상의 기술은 적용 시간이 더 걸리고 새로운 문제를 만듭니다. 비즈니스와 조직 수준에 맞는 기술을 선택하세요.
 - 시스템 결합 관계와 변경 영향 범위를 문서화합니다. 버그 발생 빈도를 줄이고 리팩토링·최적화 시 영향 범위를 명확히 파악할 수 있으며 테스트 커버리지 향상에도 도움이 됩니다.
 
-#### 5) 머리가 아닌 습관, 일머리
+#### 5. 머리가 아닌 습관, 일머리
 
 KentBeck은 말합니다.
 
@@ -158,15 +158,15 @@ KentBeck은 말합니다.
 
 일을 단순화하고 프로그램을 단순화하는 사고 습관이 생산성을 높입니다. 크게 생각하지 말고 작은 단위로 쪼개어 실행하고 디버깅하며 조금씩 이해하는 스텝을 반복하세요. 이런 습관이 쌓이면 무엇이든 이해가 빨라집니다.
 
-#### 6) 질문 자체가 비용이다
+#### 6. 질문 자체가 비용이다
 
 질문은 동기식으로 이루어지기 때문에 상대방에게 컨텍스트 스위칭을 유발합니다. 학습을 통해 이해도를 높이는 노력이 필요합니다. 모르면 질문을 정확하게 할 수 없게 되어 커뮤니케이션 비용이 증가하고, 관련 문서가 없으면 커뮤니케이션이 필수가 됩니다.
 
-또한 **Ask culture(묻는 문화) vs Guess culture(눈치 보는 문화)**의 충돌을 인식하고 관리하는 것도 중요합니다. 2007년 Metafilter 사용자 tangerine이 [공유한 개념](https://ask.metafilter.com/55153/Whats-the-middle-ground-between-FU-and-Welcome#830421)으로, 두 유형이 조직 내에 공존할 때 커뮤니케이션 충돌이 생길 수 있습니다. 양쪽 관점을 이해하는 것이 갈등 해결의 실마리가 됩니다.
+또한 **Ask culture(묻는 문화) vs Guess culture(눈치 보는 문화)** 의 충돌을 인식하고 관리하는 것도 중요합니다. 2007년 Metafilter 사용자 tangerine이 [공유한 개념](https://ask.metafilter.com/55153/Whats-the-middle-ground-between-FU-and-Welcome#830421)으로, 두 유형이 조직 내에 공존할 때 커뮤니케이션 충돌이 생길 수 있습니다. 양쪽 관점을 이해하는 것이 갈등 해결의 실마리가 됩니다.
 
 충실한 학습과 문서화로 커뮤니케이션 비용을 구조적으로 줄여야 합니다.
 
-#### 7) 컨텍스트 스위칭을 피하자
+#### 7. 컨텍스트 스위칭을 피하자
 
 [마이크로소프트 리서치 연구('A Diary Study of Task Switching and Interruptions', 2004)](https://dl.acm.org/doi/10.1145/985692.985715)에 따르면, 중단된 작업을 재개하는 데 평균 25분 26초가 소요되고 집중력이 40% 감소합니다.
 
