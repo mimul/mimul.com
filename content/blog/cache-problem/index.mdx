@@ -1,21 +1,21 @@
 ---
-title: 캐시 설계에서 발생하는 문제들
-description: 아키텍처에서 캐시 설계를 하면서 일어날 수 있는 문제와 해결책들을 정리함.
+title: 캐시 설계에서 빠지기 쉬운 Penetration, Breakdown, Avalanche 문제 해결
+description: 분산 시스템에서 자주 발생하는 Cache Penetration, Cache Breakdown, Cache Avalanche 문제의 원인과 블룸 필터, 분산 락, 만료 시간 분산 등 실전 해결책을 코드와 함께 설명합니다.
 author: Mimul
 date: "2020-04-17T23:10:01.000Z"
-lastModificationTime: "2020-04-18T01:10:51.000Z"
+lastModificationTime: "2026-04-05T00:00:00.000Z"
 image: "./cache_no.png"
 tags:
   - cache
   - redis
 ---
-분산 시스템의 설계에서 캐시는 성능 향상을 위해 매우 중요한 요소지만, 캐시를 설계함에 있어서 여러 문제점들을 고려하지 않는다면 오히려 성능상의 단점이나 가용성에 문제에 직면할 수 있다. 이 글에서는 자주 발생하는 캐시 설계의 문제와 해결 방법에 대해 정리해 본다.
+분산 시스템의 설계에서 캐시는 성능 향상을 위해 매우 중요한 요소지만, 캐시를 설계함에 있어서 여러 문제점들을 고려하지 않는다면 오히려 성능상의 단점이나 가용성 문제에 직면할 수 있다. 백엔드 개발자나 분산 시스템을 설계하는 엔지니어라면 반드시 알아야 할 세 가지 대표적인 캐시 문제 — Cache Penetration, Cache Breakdown, Cache Avalanche — 의 원인과 해결 방법을 정리해 본다.
 
-### Cache penetration
+### Cache Penetration
 
 DB에 존재하지 않는 값을 검색할 때 DB에서 반환된 빈 결과를 캐시하지 않을 때 발생하는 시나리오를 말한다. 이 경우 DB에 존재하지 않는 값을 반복적으로 검색하면 해당 값이 캐시되지 않기 때문에 각 검색에 대해 DB에 대한 액세스가 필요하다. 악의적인 사용자가 이러한 키를 사용하여 많은 수의 검색을 시도해 공격을 시도하면 DB 레이어가 자주 히트하여 결국 다운될 수 있게 된다.
 
-아래는 cache penetration 현상에 대한 두가지 해결책에 대해 기술해 본다.
+아래는 Cache Penetration 현상에 대한 두 가지 해결책에 대해 기술해 본다.
 
 **해결책 1) Empty 결과 캐싱**
 
@@ -27,10 +27,10 @@ DB에 존재하지 않는 값을 검색할 때 DB에서 반환된 빈 결과를 
 
 "Empty 결과 캐싱" 방법을 사용하는 경우는 검색 키의 반복률이 높은 경우에 사용하면 좋다.
 
-```
+```python
 def get_data(key):
     # 기본 expire 시간(1시간)
-    cache_time = 3600 
+    cache_time = 3600
 
     cache_data = redis_client.get(key)
     if cache_data is not None:
@@ -39,67 +39,67 @@ def get_data(key):
         cache_data = db.get(key)
         if cache_data is None:
             cache_data = ""
-	    # cache expiration time 짧게 설정(30초)
-	    cache_time = 30 
+            # cache expiration time 짧게 설정(30초)
+            cache_time = 30
         redis_client.set(key, cache_data, cache_time)
         return cache_data
 ```
 
 **해결책 2) 블룸 필터 사용**
 
-데이터를 검색하기 전에 Bloom 필터를 사용하여 DB에 데이터가 없는지 여부를 결정한다. 존재하지 않는 데이터에 대해서는 조기 리턴을 실시해, 캐쉬나 데이타베이스에의 액세스가 발생하지 않게 한다.
+데이터를 검색하기 전에 Bloom 필터를 사용하여 DB에 데이터가 없는지 여부를 결정한다. 존재하지 않는 데이터에 대해서는 조기 리턴을 실시해, 캐시나 데이터베이스에의 액세스가 발생하지 않게 한다.
 
 ![bloomfilter](./cache_penetration_ans2.png)
 
-이 경우는 존재할 수 있는 데이터의 경우 먼저 캐시를 검색하고 데이터가 없으면 DB에 액세스하여 결과를 fetch 한다. 검색 키의 반복률이 낮고 검색 키의 종류가 매우 많은 경우에는 블룸 필터를 사용하는 것이 효과적이다. 블룸필터를 알려면 [Bloom Filter 소개](https://www.mimul.com/blog/bloom-filter/)라는 글을 보면 좋을 것 같다.
+이 경우는 존재할 수 있는 데이터의 경우 먼저 캐시를 검색하고 데이터가 없으면 DB에 액세스하여 결과를 fetch 한다. 검색 키의 반복률이 낮고 검색 키의 종류가 매우 많은 경우에는 블룸 필터를 사용하는 것이 효과적이다. 블룸 필터를 알려면 [Bloom Filter 소개](https://www.mimul.com/blog/bloom-filter/)라는 글을 보면 좋을 것 같다.
 
-```
+```python
 def get_data(key):
     if not bloomfilter.might_contain(key):
         return None
-	
+
     cache_data = redis_client.get(key)
-    if cache_data is None: 
-		cache_data = db.get(key)
-		cache_time = 3600 
-		redis_client.set(key, cache_data, cache_time)
+    if cache_data is None:
+        cache_data = db.get(key)
+        cache_time = 3600
+        redis_client.set(key, cache_data, cache_time)
     return cache_data
 ```
 
-### Cache breakdown
+### Cache Breakdown
 
 다중 스레드 환경에서 발생하는 시나리오며 캐시 데이터가 만료 되었을 때, 만료된 데이터에 대한 액세스가 병렬로 발생하면 데이터베이스에 대한 쿼리가 동시에 여러번 발생하므로 부하가 급증하게 되는 시나리오를 말한다.
 
-**해결책 1) 검색 키를 잠금****
+**해결책 1) 검색 키를 잠금**
 
 다른 스레드는 데이터베이스를 쿼리하는 스레드가 실행을 마치고 데이터를 다시 캐시에 추가하고 락을 해제하기를 기다린다. 해당 키의 락이 해제가 되면 다른 스레드는 캐시에서 데이터를 검색할 수 있게 된다.
 
 ![검색키잠금](./cache_breakdown_ans1.png)
 
-이 방법은 간단하지만, 데이터베이스 액세스 중에 잠금을 얻어야 한다.
+이 방법은 구현이 단순하지만, 락 경쟁으로 인한 대기 시간이 발생할 수 있어 고트래픽 환경에서는 병목이 될 수 있다.
 
-```
+```python
 def get_data(key):
     cache_data = redis_client.get(key)
-    if cache_data is None: 
-        if lock.acquire(): 
+    if cache_data is None:
+        if lock.acquire():
             cache_data = db.get(key)
             if cache_data is not None:
-            	cache_time = 3600
+                cache_time = 3600
                 redis_client.set(key, cache_data, cache_time)
             lock.release()
-        else:  
+        else:
             time.sleep(0.1)
             cache_data = redis_client.get(key)
     return cache_data
 
 ```
 
-**해결책 2) 자주 액세스 되는 데이터가 캐시에서 expire 되지 않도록 하기**
+**해결책 2) 논리적 만료(Logical Expiry) 활용**
 
 캐시의 유효기간을 redis와는 별도로 데이터 자체에도 갖게 해, 별도의 데이터가 기한이 지났을 때에 백그라운드의 비동기 thread로 캐시를 갱신시킨다. 이렇게 하면 자주 액세스되는 데이터가 캐시에서 expire 되지 않는다.
 
-```
+```python
 def get_data(key):
     cache_data = redis_client.get(key)
     value = cache_data.get('value')
@@ -123,7 +123,7 @@ def get_data(key):
 
 이 방법은 성능상 이점은 있지만 캐시 업데이트 중에 다른 스레드가 이전 데이터에 액세스할 수 있으므로 캐시 일관성을 엄격하게 보장하기가 어려울 수 있다. 보장해야 할 일관성 수준에 따라 선택을 해야 한다.
 
-### Cache avalenche
+### Cache Avalanche
 
 대량의 캐시 데이터가 동시에 만료되거나 캐시 서비스가 다운되어 갑자기 모든 데이터 검색이 DB로 향해 DB 레이어에 과부하가 걸려 성능에 영향을 미치는 시나리오를 말한다.
 
@@ -131,7 +131,7 @@ def get_data(key):
 
 캐시 만료 시간을 같은 값으로 설정하는 것은 피하고 무작위 값을 설정하여 만료되는 시간을 균등하게 분산시킨다. 이렇게 하면 각 캐시의 만료 기간의 반복률이 줄어들고 동시에 많은 양의 캐시가 만료되는 것을 피할 수 있다.
 
-```
+```python
 def random_expiry(original_expiry, deviation_percentage = 15):
     deviation = original_expiry * (deviation_percentage / 100)
 
@@ -152,6 +152,10 @@ def random_expiry(original_expiry, deviation_percentage = 15):
 
 **해결책 3) Rate Limit**
 
-지정된 시간 프레임 내에서 캐시 재생성을 트리거 할 수 있는 요청 수에 상한을 설정하여 서버에 대한 부하 급증을 방지한다. 데이터베이스에 대한 액세스 요청의 급증이 방지되어 서버 리소스가 고갈되는 것을 예방하게 된다. 
+지정된 시간 프레임 내에서 캐시 재생성을 트리거 할 수 있는 요청 수에 상한을 설정하여 서버에 대한 부하 급증을 방지한다. 데이터베이스에 대한 액세스 요청의 급증이 방지되어 서버 리소스가 고갈되는 것을 예방하게 된다.
 
 이렇게 되면 시스템의 안정성과 성능을 유지할 수 있다. Rate Limit 알고리즘을 알고 싶으면 [서비스 가용성 확보에 필요한 Rate Limiting Algorithm에 대해](https://www.mimul.com/blog/about-rate-limit-algorithm/) 글을 보면 된다.
+
+### 마치며
+
+Cache Penetration은 존재하지 않는 키에 대한 반복 조회로 DB가 직접 타격을 받는 문제로, 빈 결과 캐싱이나 블룸 필터로 대응한다. Cache Breakdown은 인기 키의 만료 순간에 동시 요청이 몰리는 문제로, 분산 락이나 논리적 만료로 DB 부하를 분산한다. Cache Avalanche는 대규모 캐시가 동시에 만료되거나 캐시 서버 자체가 다운될 때 발생하며, 만료 시간 분산, 클러스터 구성, Rate Limit을 조합해 방어한다. 세 가지 문제는 각각 발생 맥락이 다르므로 시스템의 트래픽 패턴과 일관성 요구 수준에 맞게 해결책을 선택하는 것이 중요하다.
