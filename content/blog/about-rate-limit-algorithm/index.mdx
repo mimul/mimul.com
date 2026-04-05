@@ -1,9 +1,9 @@
 ---
 title: 서비스 가용성 확보에 필요한 Rate Limiting Algorithm에 대해
-description: Rate Limit 알고리즘(Leaky bucket, Token bucket, Fixed window counter, Sliding window log, Sliding window counter)과 주요 서비스들의 Rate Limit 정책 등에 정리한 글.
+description: Leaky Bucket, Token Bucket, Fixed Window Counter, Sliding Window Log, Sliding Window Counter 등 5가지 Rate Limit 알고리즘의 원리와 구현 예제, 주요 서비스 적용 사례를 설명합니다.
 author: Mimul
 date: "2020-01-18T21:23:58.000Z"
-lastModificationTime: "2020-01-18T23:12:41.000Z"
+lastModificationTime: "2026-04-05T00:00:00.000Z"
 image: "./algorithm.png"
 tags:
   - rate-limit-algorithm
@@ -14,18 +14,18 @@ tags:
 ---
 서비스를 운영하다보면 의도적이든 의도적이지 않던간에 서비스의 가용성(API레벨, 네트워크 레벨, 컨테이너 레벨, CPU 레벨이든)을 유지하기 위해서 클라이언트의 과도한 사용에 대해 스스로를 보호해야 합니다. 간과하기 쉽지만, 서비스의 가용성을 유지하기 위한 노력은 클라이언트 측(앱/웹))에도 같이 설계를 해주는 것이 바람직합니다. 서비스를 보호해주는 수단으로 Rate Limit 알고리즘 적용하는데, 이를 효과적으로 적용하기 위해서는 알고리즘에 대한 이해도를 높일 필요가 있고 또, 서비스의 트래픽 특성도 파악해 둘 필요가 있습니다. 여기에서는 Rate Limit 알고리즘 정리하는 것을 목표로 하고 간단한 알고리즘을 구현함으로써 이해도를 높이도록 하겠습니다.
 
-#### 왜 Rate Limit 알고리즘이 필요한가?
+## 왜 Rate Limit 알고리즘이 필요한가?
 
 - 과도한 트래픽으로부터 서비스를 보호.
 - Resource 사용에 대한 공정성과 합리성 유도.
 - 트래픽 비용이 서비스 예산을 넘는 것을 방지.
 - Rate에 대해 과금을 부과하는 Business Model로 활용.
 
-#### Rate Limit 알고리즘 종류
+## Rate Limit 알고리즘 종류
 
 아래의 5가지 알고리즘을 잘 알고, 자신의 트래픽 패턴도 파악해 자사 서비스의 가용성에 문제가 되기전에 적절한 알고리즘을 선택해서 트래픽 제어를 할 필요가 있습니다. 알고리즘과 관련된 소스는 [Github](https://github.com/mimul/algorithm/tree/master/java/src/main/java/com/mimul/ratelimit)에 올려놨고 기본 window 단위는 초 기반으로 되어있으니 참고하세요.
 
-##### 1. Leaky Bucket
+### 1. Leaky Bucket
 
 네트워크로의 데이터 주입 속도의 상한을 정해 제어하고 네트워크에서 트래픽 체증을 일정하게 유지한다. 일정한 유출 속도(유출 속도는 고정된 값)를 제한하여 버스트 유입 속도를 부드럽게 한다.
 
@@ -86,13 +86,13 @@ public class LeakyBucket extends RateLimiter {
 
 **1.2 채용 플랫폼**
 
-- [Amazon MWS(Maketplace WEb Service)](https://docs.developer.amazonservices.com/en_IT/dev_guide/DG_Throttling.html)
+- [Amazon MWS(Marketplace Web Service)](https://docs.developer.amazonservices.com/en_IT/dev_guide/DG_Throttling.html)
 - [NGINX](https://www.nginx.com/blog/rate-limiting-nginx/)
 - [Uber-go rate limiter](https://github.com/uber-go/ratelimit)
 - [Shopify](https://help.shopify.com/en/api/reference/rest-admin-api-rate-limits)
 - [Guava RateLimiter](https://github.com/google/guava/blob/master/guava/src/com/google/common/util/concurrent/SmoothRateLimiter.java)
 
-##### 2. Token Bucket
+### 2. Token Bucket
 
 일시적으로 많은 트래픽이 와도 토큰이 있다면 처리가 가능하면서 토큰 손실 처리를 통해 평균 처리 속도를 제한할 수 있다. 즉, 평균 유입 속도를 제한하고 처리 패킷 손실없이 특정 수준의 버스트 요청 허용할 수 있다.
 
@@ -156,7 +156,7 @@ public class TokenBucket extends RateLimiter {
 - [Twitch](https://dev.twitch.tv/docs/api/guide#twitch-rate-limits)
 - [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j)
 
-##### 3. Fixed Window Counter
+### 3. Fixed Window Counter
 
 정해진 시간 단위로 window가 만들어지고 요청 건수가 기록되어 해당 window의 요청 건수가 정해진 건수보다 크면 해당 요청은 처리가 거부된다. 이 알고리즘을 사용하면 경계의 시간대(12:59, 13:01초에 몰리면)에 요청이 오면 두배의 부하를 받게 된다. 즉, 구현은 쉽지만, 기간 경계의 트래픽 편향 문제가 발생된다.
 
@@ -200,18 +200,18 @@ public class FixedWindowCounter extends RateLimiter {
 }
 ```
 
-##### 4. Sliding Window Log
+### 4. Sliding Window Log
 
 Fixed window counter의 단점인 기간 경계의 편향에 대응하기 위한 알고리즘이다. 하지만, window의 요청건에 대한 로그를 관리해야하기 때문에 구현과 메모리 비용이 높은 문제점이 있다.
 
 ![Sliding Window Log](./rate_sliding-window-log.png)
 
 - 분당 2건의 요청을 처리한다면 12초와 24초에 온 요청은 허용이 되고 36초에 온 요청 분당 2건처리 원칙에 의해 거부되고
-- 1분 25초의 요청이 들어오면 12초와 14초에 온 요청 로그를 pop해서 꺼내 없애고 남은 건 바로 전 요청인 36초에 온거 하나만 있어서 1분 25초에 들어온 요청은 처리가 된다.
+- 1분 25초의 요청이 들어오면 12초와 24초에 온 요청 로그를 pop해서 꺼내 없애고 남은 건 바로 전 요청인 36초에 온거 하나만 있어서 1분 25초에 들어온 요청은 처리가 된다.
 
 아래는 Sliding Window Log를 구현한 샘플 소스이다.
 
-**4.1 생플소스**
+**4.1 샘플 소스**
 
 ```java
 public class SlidingWindowLog extends RateLimiter {
@@ -237,13 +237,13 @@ public class SlidingWindowLog extends RateLimiter {
 }
 ```
 
-##### 5. Sliding Window Counter
+### 5. Sliding Window Counter
 
 Fixed window counter의 경계 문제와 Sliding window log의 로그 보관 비용 등의 문제점을 보완할 수 있는 알고리즘이다.
 
 ![Sliding Window Counter](./rate_sliding-window.png)
 
-- 분당 10건 처리한다면 1분안에 9건의 요청이 오고 1분과 2분 사이에는 5건이 요청온다고 가정.
+- 분당 10건 처리한다면 1분 안에 9건의 요청이 오고 1분과 2분 사이에는 5건이 요청온다고 가정.
 - 1분 15초에 요청이 왔는데 1분 15초 지점은 1분과 2분 사이에서 25% 지점, 이전 기간은 1 - 0.25 = 75% 비율로 계산해서 9 * 0.75 + 5 = 14.75 > 10으로 한도를 초과했기 때문에 요청은 거부된다. 즉, 이전 window와 현재 window의 비율값으로 계산된 합이 처리 건수를 초과하면 거부된다.
 - 1분 30초 시점에 요청이 온다면 이전 기간은 50%, 9 * 0.5 + 5 = 9.5 < 10이므로 해당 요청은 처리된다.
 
@@ -282,7 +282,7 @@ public class SlidingWindow extends RateLimiter {
 
 - [RateLimitJ](https://github.com/mokies/ratelimitj)
 
-#### 주요 서비스들의 Rate Limit 정보
+## 주요 서비스들의 Rate Limit 정보
 
 Rate Limit이 적용하려면 [RFC 6585](http://tools.ietf.org/html/rfc6585)에 [429 Too Many Request](http://tools.ietf.org/html/rfc6585#section-4) HTTP 상태 코드가 제시되어 있고 [RateLimit Header Fields for HTTP](https://tools.ietf.org/id/draft-polli-ratelimit-headers-00.html) RFC 초안에도 나와 있듯이 RateLimit-Limit(허용되는 요청의 최대수), RateLimit-Remaining(남은 요청 수), RateLimit-Reset(요청 최대값이 재설정될 때까지의 시간) 정보를 Header에 같이 보내주면 좋다.
 
@@ -294,13 +294,13 @@ Rate Limit이 적용하려면 [RFC 6585](http://tools.ietf.org/html/rfc6585)에 
 | ![Facebook](./icon-facebook.png)| Applications은 시간당 유저수 * 200 | 403 Forbidden | call_count, total_cputime, total_time | [Facebook Rate Limits](https://developers.facebook.com/docs/graph-api/overview/rate-limiting/) |
 | ![Shopify](./icon-shopify.png)| 40 Bucket size는 초당 2건, 80 Bucket size는 초당 4건 | 429 Too Many Requests | X-Shopify-Shop-Api-Call-Limit: 40/40, Retry-After: 2.0 | [Shopify Rate Limits](https://help.shopify.com/en/api/reference/rest-admin-api-rate-limits)|
 
-#### Rate Limit 모범 사례
+## Rate Limit 모범 사례
 
-- Rate Limit 알고리즘은 트래픽 패턴을 잘 분석한 다음 적합한 알고리즘을 선택해야 한다. 유료 서비스가 트래픽 체증에 민감해하지 않다면(관대한) Token Bucket 알고리즘을 선택하고 그 외에는 Fixed Wondow나 Sliding Window 알고리즘을 선택한다.
+- Rate Limit 알고리즘은 트래픽 패턴을 잘 분석한 다음 적합한 알고리즘을 선택해야 한다. 버스트 트래픽을 허용해야 한다면 Token Bucket을, 경계 트래픽 편향이 허용 가능하다면 Fixed Window를, 정밀도가 중요하다면 Sliding Window 계열을 선택한다.
 - 기본적으로 서비스 인프라 트래픽을 수용할 수 없는 시점에 도달했을 때 Rate Limit을 적용해야하며, 외부 서비스에 영향을 최소화하는 노력(Common한 API는 Rate Limit에 걸리지 않을 정도로 상한값을 높게 잡음 등)을 한 다음 Rate Limit을 적용하는게 좋다.
 - 외부 개발자들에게 Rate Limit 정보를 명확하게 알려야하고, API 응답에도 요청 정보와 남은 정보 등 트래픽이 초과했을때 오류값 등을 명확히 정의해야 한다.
 
-#### Rate Limit 알고리즘 구현체(오픈 소스)
+## Rate Limit 알고리즘 구현체(오픈 소스)
 
 - [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j)
 - [Resilience4j](https://github.com/resilience4j/resilience4j/tree/master/resilience4j-ratelimiter)
@@ -313,7 +313,11 @@ Rate Limit이 적용하려면 [RFC 6585](http://tools.ietf.org/html/rfc6585)에 
 - [Flask-Limiter](https://github.com/alisaifee/flask-limiter)
 - [Smyte RateLimit](https://github.com/smyte/ratelimit)
 
-#### 참조 사이트
+## 마치며
+
+5가지 알고리즘 모두 트레이드오프가 있다. Leaky Bucket과 Token Bucket은 구현이 단순하지만 각각 버스트 처리 방식이 다르고, Fixed Window는 경계 편향 문제를 가지며, Sliding Window Log는 정밀하지만 메모리 비용이 높고, Sliding Window Counter는 그 중간점을 취한다. 어떤 알고리즘을 선택하든 자신의 서비스 트래픽 패턴을 먼저 파악하는 것이 선행되어야 한다.
+
+## 참조 사이트
 
 - [RateLimit Header Fields for HTTP](https://tools.ietf.org/html/draft-polli-ratelimit-headers-01)
 - [Leaky bucket](https://en.wikipedia.org/wiki/Leaky_bucket)
