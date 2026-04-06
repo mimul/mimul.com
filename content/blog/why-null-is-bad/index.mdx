@@ -1,15 +1,14 @@
 ---
-title: 왜 Null이 나쁜가?
-description: 객체지향 프로그래밍(OOP) 환경에서 NULL 값의 사용은 설계적 결함이며, 가능한 한 피해야 하고, 코드의 가독성, 안정성, 유지보수성 모두를 해친다고 보고, 대안으로 Null Object 패턴 혹은 예외(Exception) 던지기 방식을 제시함.
+title: NULL 반환이 나쁜 이유와 OOP에서의 올바른 대안
+description: 객체지향 프로그래밍(OOP) 환경에서 NULL 값의 사용은 설계적 결함이며, 가능한 한 피해야 하고, 코드의 가독성, 안정성, 유지보수성 모두를 해친다고 보고, 대안으로 Null Object 패턴 혹은 예외(Exception) 던지기 방식을 제시합니다.
 author: Mimul
 date: "2014-05-20T05:21:03.000Z"
-lastModificationTime: "2014-05-20T05:21:03.000Z"
+lastModificationTime: "2026-04-06T00:00:00.000Z"
 image: "./null.png"
 tags:
   - programming
 ---
-우리가 개발을 하면서 항상 마주하는게 NULL 체크인데(잊고 있을수도 있지만), NULL 체크를 해야하는지 말아야하는지 등의 부담을 개발자에게 전가시키는 것은 안좋은 방법이라고 알고 있다. 그래서 왜 Null의 반환이 안좋은지를 잘 이해시킨 포스트가 있어 소개한다.
-[Why NULL is Bad?](https://www.yegor256.com/2014/05/13/why-null-is-bad.html).
+개발하면서 항상 마주치는 것이 NULL 체크다. NULL을 반환할지 말지의 판단을 개발자에게 전가하는 것은 좋지 않은 설계다. [Why NULL is Bad?](https://www.yegor256.com/2014/05/13/why-null-is-bad.html)를 번역하며 그 이유를 정리한다.
 
 Java에서 NULL을 사용하는 아주 단순한 예이다.
 ```java
@@ -59,7 +58,7 @@ public Employee getByName(String name) {
 - John Sonmez의 [Say "No" to "Null"](https://elegantcode.com/2010/05/01/say-no-to-null/)
 - StackOverflow의 [Is returning null bad design?](https://stackoverflow.com/questions/1274792/is-returning-null-bad-design)
 
-### Ad-hoc(임기응변적인) 오류 처리
+### 임기응변적 오류 처리 (Ad-hoc Error Handling)
 
 입력으로 객체를 받은 경우는 항상 그것이 NULL 아닌지, 또한 유효한 객체 참조 여부를 확인하지 않으면 안된다.
 그것을 확인하는 것을 잊어버리면 NullPointerException(NPE)으로 인해 런타임때 실행을 중지시켜 버릴 우려가 있다.
@@ -76,7 +75,7 @@ if (employee == null) {
 ```
 
 이것은 C나 다른 명령문을 늘어 놓는 절차형 언어에 있어서 예외적인 상황에 대응하는 방법이다.
-OOP는 주로 이런 임시 오류 처리의 블록을 없앨 목적으로 예외 처리를 도입했다. OOP에서는 예외 처리를 어플리케이션 레벨에서
+OOP는 주로 이런 임시 오류 처리의 블록을 없앨 목적으로 예외 처리를 도입했다. OOP에서는 예외 처리를 애플리케이션 레벨에서
 에러 핸들러에 맡기는 것으로, 코드를 매우 깨끗하고 간결하게 해준다.
 ```java
 dept.getByName("Jeffrey").transferTo(dept2);
@@ -84,7 +83,7 @@ dept.getByName("Jeffrey").transferTo(dept2);
 
 NULL 참조는 절차적 언어에서 계승된 것이라고 인식하고 Null 객체 또는 예외를 대신에 사용한다.
 
-### Ambiguous Semantic(모호한 의도)
+### 모호한 의도 (Ambiguous Semantic)
 
 위 메소드의 목적을 분명하게 전달하기 위해서 getByName()은 getByNameOrNullIfNotFound()라고 명명되어져야 한다.
 이와 같은 이름을 가진 객체 또는 NULL을 반환하는 모든 함수가 있어야 된다. 그렇지 않다면 누군가가 모호한 코드를 읽게 된다.
@@ -209,11 +208,11 @@ public class Department {
 
 캐시는 employee(직원)이 사무실에서 하는 일이 아니지 않나?
 
-해결책? 지연로드는 위의 예 같은 원시적인 방법으로는 사용하지 마라. 대신 캐시 문제를 어플리케이션의 다른 레이어에 옮겨라.
+해결책? 지연로드는 위의 예 같은 원시적인 방법으로는 사용하지 마라. 대신 캐시 문제를 애플리케이션의 다른 레이어에 옮겨라.
 
 예를 들어, Java라면, AOP를 사용할 수 있다. 예를 들어, jcabi-aspects는 ```@Cacheable``` 어노테이션이 메소드의 반환 값을 캐쉬하고 있다.
 ```java
-import com.jcabi.aspects.Cacheable;           q
+import com.jcabi.aspects.Cacheable;
 public class Department {
   @Cacheable(forever = true)
   public Employee manager() {
@@ -222,4 +221,4 @@ public class Department {
 }
 ```
 
-나의 이 분석에 납득하고 더이상 NULL을 쓰기를 끝내길 바란다.
+이 분석이 설득력이 있었다면, 이제부터라도 NULL 사용을 멀리하길 권한다.
