@@ -1,17 +1,17 @@
 ---
-title: Javascript Promise
-description: Javascript를 사용하다보면 비동기 call 요소들이 많아서 로직의 가독성과 오류 디버깅 문제등이 복잡하게 얽히게 되(이를 헬이라고도 표현하는데), 이를 회피하기 위한 방법중에 하나가 Promise를 사용하는 것입니다. 대부분 경우 라이브러리로 제공하고 있어, 그 내용을 잘 모르고 사용하는 경우가 많아 오용되는 사례를 경험하게 됩니다. 그래서 내부를 좀 더 이해하는데 도움이 되는 좋은 아티클이 있어서 번역함.
+title: JavaScript Promise 동작 원리를 코드로 이해하기
+description: JavaScript Promise의 내부 동작을 직접 구현하며 이해합니다. pending/resolved/rejected 상태 전환, then() 메소드 체이닝, 오류 처리까지 단계별로 구현 원리를 설명합니다.
 author: Mimul
 date: "2014-12-17T23:50:09.000Z"
-lastModificationTime: "2014-12-17T23:50:09.000Z"
+lastModificationTime: "2026-04-06T00:00:00.000Z"
 image: "./typescript.png"
 tags:
   - javascript
   - promise
 ---
-Javascript를 사용하다보면 비동기 call 요소들이 많아서 로직의 가독성과 오류 디버깅 문제등이 복잡하게 얽히게 되(이를 헬이라고도 표현하는데), 이를 회피하기 위한 방법중에 하나가 Promise를 사용하는 것입니다. 대부분 경우 라이브러리로 제공하고 있어, 그 내용을 잘 모르고 사용하는 경우가 많아 오용되는 사례를 경험하게 됩니다. 그래서 내부를 좀 더 이해하는데 도움이 되는 좋은 아티클이 있어서 번역을 해보았습니다.
+JavaScript에서 비동기 처리가 많아지면 콜백이 중첩되어 가독성과 디버깅이 어려워진다. 이를 해결하는 방법 중 하나가 Promise다. 대부분 라이브러리 형태로 제공되어 내부 동작을 모르고 사용하다 오용하는 경우가 생긴다. 이 글은 Promise 내부를 직접 구현하며 동작 원리를 파악하는 데 초점을 맞춘다.
 
-소개 아티클은 [JavaScript Promises ... In Wicked Detail](http://www.mattgreer.org/articles/promises-in-wicked-detail/) 입니다. 상세한 내용은 아래를 따라가 보시면 될 거 같네요.
+소개 원문은 [JavaScript Promises ... In Wicked Detail](http://www.mattgreer.org/articles/promises-in-wicked-detail/) 이다.
 
 #### 왜 Promise가 필요한가?
 
@@ -55,9 +55,9 @@ function doSomething() {
 
 [실행 화면 : Fiddle](http://jsfiddle.net/city41/zdgrC/1/)
 
-이 구현은 Callback 패턴의 단순한 대체이며, 이것만으로는 큰 의미가 되지 않는다. 그러나 아주 간단한 구현이었지만, Promise의 핵심적인 아이디어를 이미 이해했다고 볼 수 있다.
+이 구현은 Callback 패턴의 단순한 대체이며, 이것만으로는 큰 의미를 갖지 않는다. 그러나 아주 간단한 구현이었지만, Promise의 핵심적인 아이디어를 이미 이해했다고 볼 수 있다.
 
-Promise는 객체안에 궁극적으로 처리 결과값를 수집한다.
+Promise는 객체안에 궁극적으로 처리 결과값을 수집한다.
 
 이점에서 Promise가 매우 흥미롭다고 생각하는 큰 이유이다. 일단 Promise 내에 처리 결과가 수집되면, 그 다음은 매우 강력하게 일을 진행할 수 있다. 이 점에 대해서는 좀 더 나중에 설명한다.
 
@@ -169,7 +169,7 @@ function Promise(fn) {
 
 주목할 것은 setTimeout의 구현체는 없어졌지만, 그것은 일시적이고 나중에 다시 나타난다. 자세한 내용은 그 때 설명한다.
 
-Promise를 사용하면 then()과 resolve()의 호출 순서를 고려하지 않아도 된다. then()과 resolve()는 우리의 이용 목적에 따라 언제라도 호출할 수 있다. 이것은 Promise 처리 결과값를 객체에 저장하는 데 아주 큰 장점 중에 하나다.
+Promise를 사용하면 then()과 resolve()의 호출 순서를 고려하지 않아도 된다. then()과 resolve()는 우리의 이용 목적에 따라 언제라도 호출할 수 있다. 이것은 Promise 처리 결과값을 객체에 저장하는 데 아주 큰 장점 중에 하나다.
 
 우리가 구현해야 할 스펙안에는 아주 많은 일이 있지만, 우리의 Promise 이미 파워풀하다. 이 구현체를 사용하면 then()를 원하는 만큼 여러 번 호출해도 항상 같은 값을 돌려받을 수 있다.
 ```javascript
@@ -305,7 +305,7 @@ doSomething().then(function(result) {
 
 만약 위의 코드에서 마지막에서 모든 처리의 결과를 받고 싶은 경우에는 어떻게하면 될까? 메소드 체인을 사용하여 필요에 따라 우리 스스로가 결과를 매뉴얼하게 전달할 필요가 있다.
 
-```
+```javascript
 doSomething().then(function(result) {
   var results = [result];
   results.push(88);
@@ -320,7 +320,7 @@ doSomething().then(function(result) {
 
 Promise는 항상 하나의 값을 해결한다. 만약 두 개 이상의 값을 전달하려면 여러 값을 처리할 수 있는 것들(배열, 객체, 결합된 문자열 등)을 이용해야 한다.
 
-Promise를 더 잘 사용하는 방법으로는 Promise 라이브러리의 all() 메소드나, 많은 다른 Utility 메소드를 사용하면 Promise의 유용성을 더 좋아진다. 무엇을 사용 하는가는 독자 여러분의 취향에 맞게 선택하면 된다.
+Promise를 더 잘 활용하려면 라이브러리의 all() 메소드나 다양한 유틸리티 메소드를 사용하면 유용성이 더욱 높아진다. 무엇을 사용 하는가는 독자 여러분의 취향에 맞게 선택하면 된다.
 
 **Callback은 선택사항이다.**
 
@@ -583,7 +583,7 @@ getSomeJson().then(function(json) {
 
 **done()을 구제용으로 사용하자**
 
-(전부는 아니지만) 대부분의 Promise 라이브러리들은 done() 메소드를 가지고 있다. 이것은 then()과 매우 비슷하지만, done()을 사용하는 것으로 위에서 말한것처럼 then()의 함정을 피할 수 있다. done()은 then()이 호출되는 곳에서는 언제라도 호출 할 수 있다. 가장 큰 차이는 done()은 Promise를 반환하지 않는다는 것이다. 또한 done()내에서 발생한 어떠한 예외도 Promise 구현체에서 캐치되지 않는다. 다른한편으로, done()은 Promise 체인이 모두 resolved되었을 때 호출하는 것이다. getSomeJson() 예제는 done()을 사용해 좀 더 완전한 구현체가 될 수 있다.
+(전부는 아니지만) 대부분의 Promise 라이브러리들은 done() 메소드를 가지고 있다. 이것은 then()과 매우 비슷하지만, done()을 사용하는 것으로 위에서 말한것처럼 then()의 함정을 피할 수 있다. done()은 then()이 호출되는 곳에서는 언제라도 호출 할 수 있다. 가장 큰 차이는 done()은 Promise를 반환하지 않는다는 것이다. 또한 done()내에서 발생한 어떠한 예외도 Promise 구현체에서 캐치되지 않는다. 다른한편으로, done()은 Promise 체인이 모두 resolved되었을 때 호출하는 것이다. getSomeJson() 예제는 done()을 사용해 보다 안전한 구현이 가능하다.
 ```javascript
 getSomeJson().done(function(json) {
   // when this throws, it won't be swallowed
