@@ -1,14 +1,16 @@
 ---
-title: Bayes Theorem과 Mahout를 활용한 스팸 필터링
-description: Naive Bayes Classification 소개, Bayes Theorem의 수학적 이론을 설명하고 Naive Bayes Classification에 의한 Mahout 샘플 실행하고 웹에 SpamFilter를 적용하는 방법 등을 정리함.
+title: Bayes Theorem과 Mahout로 구현하는 스팸 필터링 원리와 실습
+description: Naive Bayes 분류의 수학적 원리부터 Apache Mahout를 이용한 20-Newsgroups 학습, Java 서블릿 기반 스팸 필터 구현까지 단계별로 설명합니다.
 author: Mimul
 date: "2012-04-02T23:13:47.000Z"
-lastModificationTime: "2012-04-02T23:13:47.000Z"
+lastModificationTime: "2026-04-07T00:00:00.000Z"
 image: "./naive_bayes.png"
 tags:
   - bayes
   - mahout
 ---
+스팸 필터는 단순히 특정 단어가 포함되어 있다고 차단하면 오탐이 너무 많다. Bayesian 분류는 여러 단어의 조건부 확률을 결합해 보다 정확하게 스팸 여부를 판단한다. 이 글에서는 Bayes Theorem의 수학적 원리를 이해하고, Apache Mahout로 분류 모델을 훈련한 뒤, Java 서블릿으로 실제 스팸 필터 서비스에 연결하는 end-to-end 흐름을 다룬다.
+
 #### Naive Bayes Classification 소개
 
 Bayes Theorem에 근거한 분류법이며, Bayes Theorem은 조건부 확률에서는 새로운 정보를 알았을 때 확률의 개선이 일어나게 된다. 어떤 실험결과에서 나온 정보를 이용하여 어떤 사건의 처음 확률을 개선시킬 수 있는데, 여기서 처음 확률은 사전확률 (prior probability) 이라 하고, 개선된 확률을 사후확률 (posterior probability) 이라고 하며, 이러한 확률의 개선을 이루는 것이 베이즈의 정리 (Bayes Theorem) 이다.
@@ -44,17 +46,17 @@ A:spam, B:penis라면 아래처럼 Bayesian 알고리즘에 의해서 P(A|B) = P
 **2. Naive Bayes Classification 방식**
 
 위의 예제에 이어서
-- viagra가 포한됨 이메일이 25개.
+- viagra가 포함된 이메일이 25개.
 - 그중 24 이메일은 스팸으로 분류됨.
 - 그럼 "viagra"와 "penis"가 포함된 이메일의 스팸일 확률은? 아래는 공식.
 
 ![Bayes Theorem 3](./spam-multiple-bayes.png)
 
-풀어쓰면.. 메일에 viagra 포함 확률 : 25/74, 메일이 스팸이라는 가정하게 vigra가 포함될 확률 : 24/30.
+풀어쓰면.. 메일에 viagra 포함 확률 : 25/74, 메일이 스팸이라는 가정 하에 viagra가 포함될 확률 : 24/30.
 
 ![Bayes Theorem 3](./spam-multiple-bayes-naive.png)
 
-그래서 확률은 0.928.결국 단어 하나가지고 스팸이라고 판단하는 건 오류일 확률이 높고 조건 확률이 추가되어 연관 확률이 높아지(개선되어 지)는 형태로 판단해서 스팸으로 분류를 함.
+그래서 확률은 0.928. 결국 단어 하나만으로 스팸을 판단하면 오류일 확률이 높고, 조건 확률이 추가될수록 연관 확률이 높아지는 형태로 개선되어 스팸으로 분류된다.
 
 #### Naive Bayes Classification에 의한 Mahout 샘플 실행
 
@@ -107,11 +109,14 @@ k2 sg 0 /mahout-work-k2/20news-bydate/bayes-model/trainer-thetaNormalizer
 k2 sg 0 /mahout-work-k2/20news-bydate/bayes-model/trainer-weights
 ```
 
-위 결과 파일은 bayers-model 데이터로 나중에 스팸 필터의 근거 데이터로 활용한다.
+위 결과 파일은 bayes-model 데이터로 나중에 스팸 필터의 근거 데이터로 활용한다.
 
 #### SpamFilter용 웹 테스트 서블릿 작성
 
 **1. Antispam.java**
+
+HTTP POST 요청을 받아 메일 본문을 `SpamClassifier`에 넘기고, 분류 결과와 처리 시간을 JSON으로 응답하는 서블릿이다.
+
 ```java
 public class Antispam extends HttpServlet
 {
@@ -157,6 +162,9 @@ public class Antispam extends HttpServlet
 ```
 
 **2. SpamClassifier.java**
+
+Mahout의 `BayesAlgorithm`과 `InMemoryBayesDatastore`를 초기화하고, 메일 텍스트를 분석해 카테고리 레이블을 반환하는 분류기다. `init()`에서 모델 디렉터리를 로드하고, `classify()`에서 실제 분류를 수행한다.
+
 ```java
 public class SpamClassifier {
 	private static final Charset DEFAULT_CHARSET =
@@ -220,7 +228,10 @@ public class SpamClassifier {
 ```
 
 **3. web.xml**
-```
+
+`Antispam` 서블릿을 `/*` 경로에 매핑한다.
+
+```xml
 <display-name>mahout-spamfilter</display-name>
 
 <servlet>
@@ -237,8 +248,8 @@ public class SpamClassifier {
 
 **1. ham/spam 다운로드**
 
-- [http://spamassassin.apache.org/publiccorpus/20030228_easy_ham_2.tar.bz2](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham_2.tar.bz2)
-- [http://spamassassin.apache.org/publiccorpus/20030228_spam_2.tar.bz2](http://spamassassin.apache.org/publiccorpus/20030228_spam_2.tar.bz2)
+- [20030228_easy_ham_2.tar.bz2](http://spamassassin.apache.org/publiccorpus/20030228_easy_ham_2.tar.bz2)
+- [20030228_spam_2.tar.bz2](http://spamassassin.apache.org/publiccorpus/20030228_spam_2.tar.bz2)
 
 **2. 웹 서블릿 스팸 필터 테스트**
 ```bash
@@ -249,7 +260,8 @@ public class SpamClassifier {
 ```
 
 **3. 서블릿 구동되면서 model 데이터 로드 됨**
-```
+
+```text
 bayes.SequenceFileModelReader: Read 50000 feature weights
 bayes.SequenceFileModelReader: Read 100000 feature weights
 bayes.SequenceFileModelReader: 193370.88331085682
@@ -274,6 +286,8 @@ bayes:comp.graphics -166882.18654471828 531784.7805631821 -0.31381527568114
 bayes:talk.politics.misc -165196.8278523 531784.731821 -0.31064635303
 bayes:sci.med -192698.5183245711 531784.7805631821 -0.36236185270382393
 ```
+
+각 줄은 `bayes:<카테고리> <카테고리 점수> <전체 가중치 합> <정규화 점수>` 형식이다. 정규화 점수가 0에 가까울수록 해당 카테고리로 분류될 확률이 높으며, `-1.0`에 가까울수록 낮다. `comp.os.ms-windows.misc`의 점수가 `-1.0`으로 나타난 것은 학습 데이터 분포에 따른 결과다.
 
 #### 참조 사이트
 
