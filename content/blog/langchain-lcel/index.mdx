@@ -12,8 +12,8 @@ tags:
 ---
 LangChain과 LangGraph를 이용하여 Deep Research와 같은 LLM 애플리케이션을 만드는 방법에 대한 두 번째 글로, LCEL(LangChain Expression Language) 기반 LLM 애플리케이션 개발 기초에 대한 내용을 기술합니다. LangChain이나 LCEL, LLM에 대한 이해도가 초보인 분들을 대상으로 하니 중급 이상의 분들은 참고 수준으로 보시기 바랍니다. 이 글을 완독하신 분은 아래 링크에서 세 번째 글을 읽기를 권장합니다.
 
-- [LangChain 기반 LLM 어플리케이션 개발 기초](https://www.mimul.com/blog/langchain-fundamental/)
-- [LLM 어플리케이션의 개발 기초](https://www.mimul.com/blog/llm-fundamental/)
+- [LangChain 기반 LLM 애플리케이션 개발 기초 — 프롬프트, 모델 정의, 실행 (1)](https://www.mimul.com/blog/langchain-fundamental/)
+- [LangGraph와 Tool Calling으로 구현하는 LLM 애플리케이션 개발 기초 (3)](https://www.mimul.com/blog/llm-fundamental/)
 
 단일 Chain뿐만 아니라 **복수의 Chain을 연계시켜 보다 복잡한 처리 플로우를 실현하는 방법**으로서, LangChain Expression Language(LCEL)이 가지고 있는 강력한 기능을 다룬다. LCEL의 다양한 요소 기술(`Chain`, `RunnableParallel`, `RunnableLambda`, `RunnableBranch`, `with_structured_output` 등)의 기본적인 내용과 조합 방법들을 알아보고 LCEL을 기반으로 LLM 애플리케이션 개발에 필요한 사항들을 다룬다. 파이프("|")와 Sequential Chain은 유연성이 부족하기 때문에 좀 더 유연한 RunnableParallel, RunnableLambda, RunnableBranch 등을 활용해 유연하고 가독성 있게 대처하는 방법들도 기억하면서 이 글을 보면 도움이 될 것이다.
 
