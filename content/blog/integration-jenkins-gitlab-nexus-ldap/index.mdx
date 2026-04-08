@@ -1,9 +1,9 @@
 ---
-title: LDAP 설치 및 설정부터 Jenkins, Gitlab, Nexus 연동까지
-description: LDAP 서버를 구축해 Gitlab, Jenkins, Nexus, 그리고 자체 B2B 기업 소프트웨어 인증 및 권한 플러그인 개발 등에 활용함.
+title: OpenLDAP 설치·설정부터 Jenkins, Gitlab 연동까지
+description: OpenLDAP 서버를 구축하고 메일 스키마 설계, 사용자 데이터 등록, Gitlab·Jenkins LDAP 연동 설정까지 단계별로 정리합니다.
 author: Mimul
 date: "2010-02-05T01:00:17.000Z"
-lastModificationTime: "2010-02-05T01:00:17.000Z"
+lastModificationTime: "2026-04-08T00:00:00.000Z"
 image: "./ldap_gitlab.png"
 tags:
   - ldap
@@ -11,14 +11,14 @@ tags:
   - gitlab
   - nexus
 ---
-Google이 3rd Party용 무료 이메일을 지원하지 않은 이유로 자체 LDAP(Open LDAP)기반의 메일 서버를 운영하는 스타트업이 있을 것입니다. 저희도 내부 시스템 정비 차원에서 LDAP을 도입했습니다. 그리고 B2B 소프트웨어를 만들어서 기업에 포팅하다보면 기존 기업의 사내 LDAP 연동을 통해 인증과 권한 관리 기능을 자체 제품에 녹아내려면 LDAP 기반의 메일 및 사내 직원 인증 서버를 구축해서 테스트하기에도 용이합니다.
+Google이 3rd Party용 무료 이메일을 지원하지 않는 이유로 자체 LDAP(OpenLDAP) 기반의 메일 서버를 운영하는 스타트업이 있을 것이다. 내부 시스템 정비 차원에서 LDAP을 도입하는 경우도 많다. 그리고 B2B 소프트웨어를 만들어서 기업에 포팅하다 보면 기존 기업의 사내 LDAP 연동을 통해 인증과 권한 관리 기능을 자체 제품에 녹아내려면 LDAP 기반의 메일 및 사내 직원 인증 서버를 구축해서 테스트하기에도 용이하다.
 
-LDAP은 메일(Postfix + Dovecot) 발송/수신/인증 서버, Gitlab(소스 저장소), Jenkins(빌드), Nexus 등의 시스템과 인증 부분을 연동해서 사용하고 있습니다.
-이후부터는 LDAP을 사용하기 위한 설치 및 설정 방법을 기술합니다.
+LDAP은 메일(Postfix + Dovecot) 발송/수신/인증 서버, Gitlab(소스 저장소), Jenkins(빌드), Nexus 등의 시스템과 인증 부분을 연동해서 사용한다.
+이후부터는 LDAP을 사용하기 위한 설치 및 설정 방법을 기술한다.
 
-#### OpenLDAP 설치
+### OpenLDAP 설치
 
-**1.  패키지를 설치**
+**1. 패키지를 설치**
 
 ```bash
 $ yum install openldap-servers openldap-clients
@@ -63,9 +63,9 @@ $ service slapd start
 $ ldapsearch -x -b 'dc=mail,dc=wiseeco,dc=local'
 ```
 
-#### 스키마 정의(mail.schema)
+### 스키마 정의(mail.schema)
 
-```bash
+```text
 $ cd /etc/openldap/schema
 $ vi mail.schema
 attributetype (1.1.2.1.1.1 NAME 'mailForward'
@@ -115,7 +115,7 @@ objectClass (1.1.2.2.1.2 NAME 'mailGroup'
    MUST ( accountActive $ domainName $ mailDrop ))
 ```
 
-#### mail.schema 설명
+### mail.schema 설명
 
 **1. 스키마의 데이터 속성(attributetype)**
 
@@ -136,18 +136,18 @@ objectClass (1.1.2.2.1.2 NAME 'mailGroup'
 
 **3. OpenLDAP 설정**
 
-OpenLDAP의 slapd.conf에서 mail.schema의 include한다.
+OpenLDAP의 slapd.conf에서 mail.schema를 include한다.
 
 ```bash
 $ vi slapd.conf
 include  /etc/openldap/schema/mail.schema
 ```
 
-#### 데이터 준비
+### 데이터 준비
 
 **1. TOP 트리 데이터 작성(top.ldif)**
 
-```bash
+```text
 dn: dc=wiseeco,dc=local
 dc: wiseeco
 objectClass: dcObject
@@ -163,7 +163,7 @@ o: mail
 
 **2. 도메인의 데이터 작성(domain.ldif)**
 
-```bash
+```text
 dn: ou=wiseeco.com,dc=mail,dc=wiseeco,dc=local
 ou: wiseeco.com
 objectClass: organizationalUnit
@@ -180,18 +180,18 @@ objectClass: organizationalUnit
 | cn            | 전체 이름                             | 홍길동                                  |
 | sn            | 성                                  | 홍                                     |
 | uid           | 사용자 ID                             | mimul                                 |
-| userPassword  | 패스워드                               | ```{SSHA}kb5KrdmDd0ZREoIIfz6BAe94pJvBuQeG```|
+| userPassword  | 패스워드                               | `{SSHA}kb5KrdmDd0ZREoIIfz6BAe94pJvBuQeG` |
 | homeDirectory | 사용자 홈 디렉토리                       | /home/mailbox/wiseeco.com/mimul       |
 | mail          | 사용자의 이메일 주소                      | mimul@wiseeco.com                     |
-| mailForword   | 이메일 포워딩 주소                       | hahojin@gmail.com                     |
+| mailForward   | 이메일 포워딩 주소                       | hahojin@gmail.com                     |
 | mailAlias     | 이메일 별칭                            | webmaster@wiseeco.com                 |
-| accountActiv  | 계정의 활성화/비활성화를 TRUE/FALSE로 지정	| TRUE                                  |
+| accountActive | 계정의 활성화/비활성화를 TRUE/FALSE로 지정  | TRUE                                  |
 | domainName    | 소속 도메인 이름(dn의 dc값)              | wiseeco.com                           |
 | mailQuota     | 메일 Quota 용량 설정(M단위)              | 100                                   |
 | transport     | transport 기본적으로 dovecot 고정       | dovecot                               |
 | mobile        | 핸드폰 번호                            | 010-2224-3333                          |
 
-```bash
+```text
 $ vi user.ldif
 dn: uid=mimul@wiseeco.com,ou=wiseeco.com,dc=mail,dc=wiseeco,dc=local
 objectClass: mailUser
@@ -237,7 +237,7 @@ transport: dovecot
 mobile: 010-222-3333
 ```
 
-#### 작성 데이터 등록
+### 작성 데이터 등록
 
 데이터 등록은 ldapadd 커맨드를 통해 진행한다.
 
@@ -259,9 +259,9 @@ adding new entry "uid=sjune,ou=wiseeco.com,dc=mail,dc=wiseeco,dc=local"
 adding new entry "uid=pepsi,ou=mimul.com,dc=mail,dc=wiseeco,dc=local"
 ```
 
-#### 등록 데이터 검색
+### 등록 데이터 검색
 
-**1. Ldap 커맨드에 의핸 사용자 조회**
+**1. LDAP 커맨드에 의한 사용자 조회**
 
 ```bash
 $ ldapsearch -p 389 -h 127.0.0.1 -D "cn=manager,dc=wiseeco,dc=local"
@@ -299,13 +299,13 @@ result: 0 Success
 
 **2. Apache LDAP Studio 툴로 조회**
 
-LDAP툴은 Apache Directory Studio 제일 좋아 보이니 다운받아서 사용하세요. 맥용, 윈도우용 다 있습니다.
+LDAP 툴은 Apache Directory Studio가 가장 좋아 보이니 다운받아서 사용하면 된다. 맥용, 윈도우용 모두 있다.
 
-#### 외부 시스템 연동
+### 외부 시스템 연동
 
 **1. Gitlab LDAP 연동(gitlab.yml)**
 
-```bash
+```yaml
 ldap:
   enabled: true
   host: 'localhost'
@@ -320,9 +320,9 @@ ldap:
 
 **2. Jenkins LDAP 연동**
 
-```Configure Global Security>Access Control>Security Realm>LDAP``` 선택하고 설정 정보는 아래와 같다.
+`Configure Global Security > Access Control > Security Realm > LDAP` 을 선택하고 설정 정보는 아래와 같다.
 
-```bash
+```text
 서버 : ldap://localhost
 root DN : dc=wiseeco,dc=local
 User search filter : uid={0}
@@ -331,3 +331,5 @@ Manager Password : password
 Display Name LDAP attribute : cn
 Email Address LDAP attribute : mail
 ```
+
+OpenLDAP 기반의 인증 서버를 구축하면 Gitlab, Jenkins 등 다양한 내부 시스템의 계정을 단일 디렉토리로 일원화할 수 있다. 계정 추가·삭제·비밀번호 변경을 LDAP에서 한 번만 처리하면 연동된 모든 시스템에 즉시 반영되므로, 계정 관리 부담을 크게 줄일 수 있다.
