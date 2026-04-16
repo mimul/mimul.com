@@ -494,26 +494,26 @@ description: >
 더 자세한 내용은 [SKILL.md](https://github.com/mimul/axum-rusty/blob/main/.claude/skills/code-review-feedback-rust/SKILL.md)를 보기 바란다. 
 
 ```
-⏺ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📋  지적 목록 — 총 6건
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  [A-RV-01] mimul | controller/tests/api_test.rs:13
-    지적: unique_email() subsec_nanos 기반 — 병렬 테스트 시 충돌 가능, AtomicU64 권장
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋  지적 목록 — 총 6건
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[A-RV-01] mimul | controller/tests/api_test.rs:13
+  지적: unique_email() subsec_nanos 기반 — 병렬 테스트 시 충돌 가능, AtomicU64 권장
 
-  [A-RV-02] mimul | usecase/tests/user_usecase_integration_test.rs:23
-    지적: unique_username() 동일 문제 — subsec_nanos → AtomicU64 권장
+[A-RV-02] mimul | usecase/tests/user_usecase_integration_test.rs:23
+  지적: unique_username() 동일 문제 — subsec_nanos → AtomicU64 권장
 
-  [A-RV-03] mimul | controller/tests/common/mod.rs:23
-    지적: build_test_app() 매 호출마다 풀 생성+마이그레이션, OnceCell로 공유 권장
+[A-RV-03] mimul | controller/tests/common/mod.rs:23
+  지적: build_test_app() 매 호출마다 풀 생성+마이그레이션, OnceCell로 공유 권장
 
-  [A-RV-04] mimul | controller/tests/api_test.rs:34
-    지적: create_user_and_login() create 응답 미검증 — 셋업 실패 시 원인 불명확
+[A-RV-04] mimul | controller/tests/api_test.rs:34
+  지적: create_user_and_login() create 응답 미검증 — 셋업 실패 시 원인 불명확
 
-  [A-RV-05] mimul | controller/tests/api_test.rs:18
-    지적: body_json() unwrap에 설명 없어 실패 진단 어려움
+[A-RV-05] mimul | controller/tests/api_test.rs:18
+  지적: body_json() unwrap에 설명 없어 실패 진단 어려움
 
-  [A-RV-06] mimul | controller/src/startup/mod.rs:37
-    지적: build_router를 pub(crate)로 제한 가능
+[A-RV-06] mimul | controller/src/startup/mod.rs:37
+  지적: build_router를 pub(crate)로 제한 가능
 ```
 
 **2. /address-review-rust**
@@ -623,30 +623,15 @@ description: >
 더 자세한 내용은 [SKILL.md](https://github.com/mimul/axum-rusty/blob/main/.claude/skills/reply-review-rust/SKILL.md)를 보기 바란다. 다음은 전체 리뷰의 지적사항별로 코멘트를 달아주고 난 후의 결과를 요약해 주는 정보이다.
 
 
-```
-  ─── #7  전체 리뷰 회신 ──────────────────────
-  📍 위치:   전체 리뷰 본문 (review_id: 4110151812)
-  👤 리뷰어: mimul
-  🔖 대응:   전체 요약
+| 지적 | 결과 |
+|:---|:---|
+| `unique_email()` subsec_nanos → AtomicU64 | timestamp + AtomicU64 카운터로 교체 |
+| `unique_username()` 동일 문제 | 동일 패턴 적용 |
+| `build_test_app()` 풀 공유 | OnceCell 시도했으나 병렬 테스트 불안정 → 현상 유지 + 주석 추가 |
+| `create_user_and_login()` 응답 미검증 | `assert_eq` 검증 추가 |
+| `body_json()` `unwrap` → `expect` | `expect` 메시지 추가 |
+| `build_router` `pub` → `pub(crate)` | 통합 테스트는 별도 크레이트 → `pub(crate)` 시 컴파일 오류 |
 
-  리뷰 감사합니다. 아래와 같이 대응했습니다.
-
-  ┌─────────────────────────────────────────┬───────────────────────────────────────────────────────────────────┐
-  │                  지적                    │                               결과                                 │
-  ├─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────┤
-  │ unique_email() subsec_nanos → AtomicU64 │  timestamp+AtomicU64 카운터로 교체                                   │
-  ├─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────┤
-  │ unique_username() 동일 문제               │   동일 패턴 적용                                                     │
-  ├─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────┤
-  │ build_test_app() 풀 공유                  │  OnceCell 시도했으나 병렬 테스트 불안정 → 현상 유지 + 주석 추가               │
-  ├─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────┤
-  │ create_user_and_login() 응답 미검증        │  assert_eq 검증 추가                                                │
-  ├─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────┤
-  │ body_json() unwrap → expect             │  expect 메시지 추가                                                  │
-  ├─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────┤
-  │ build_router pub → pub(crate)           │  통합 테스트는 별도 크레이트 → pub(crate) 시 컴파일 오류                    │
-  └─────────────────────────────────────────┴───────────────────────────────────────────────────────────────────┘
-```
 
 ### Claude Code가 동일한 리뷰 지적을 반복하지 않는 실패 학습 루프
 
