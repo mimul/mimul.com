@@ -52,19 +52,22 @@ tags:
 flowchart TD
     subgraph INPUT["입력 컨텍스트"]
         direction LR
-        A1["프롬프트"] ~~~ A2["CLAUDE.md"] ~~~ A3["rules/"] ~~~ A4["MEMORY.md(자동 로드)"] ~~~ A5["system prompt + 대화 히스토리"]
+        A1["프롬프트"] ~~~ A2["CLAUDE.md"] ~~~ A3["rules/"] 
+        A3 ~~~ A4["MEMORY.md(자동 로드)"] ~~~ A5["system prompt + 대화 히스토리"]
     end
 
     subgraph LLM["Claude Code（LLM）"]
         direction LR
-        B1["추론"] --> B2["도구 선택"] --> B3["PreToolUse 훅"] --> B4["사용자 승인(필요시)"] --> B5["도구 실행"] --> B6["PostToolUse 훅"] --> B7["결과 반영"]
-        B7 -.-> B1
+        B1["추론"] --> B2["도구 선택"] --> B3["PreToolUse 훅"] --> B4["사용자 승인(필요시)"] 
+        B4 --> B5["도구 실행"] --> B6["PostToolUse 훅"] --> B7["결과 반영"]
+        B7 --> B1
         B8["도구: Read/Write/Edit/Bash/Grep/Glob"] ~~~ B9["MCP: Context7·GitHub·Serena"] ~~~ B10["스킬/서브에이전트: planner·code-reviewer 등"]
     end
 
     subgraph OUTPUT["출력"]
         direction LR
-        C1["코드 생성 및 편집"] ~~~ C2["명령 실행 결과"] ~~~ C3["설명·제안"] ~~~ C4["memory/ 기록(실패·피드백 자동 저장)"]
+        C1["코드 생성 및 편집"] ~~~ C2["명령 실행 결과"] ~~~ C3["설명·제안"]
+        C3 ~~~ C4["memory/ 기록(실패·피드백 자동 저장)"]
     end
 
     INPUT --> LLM
