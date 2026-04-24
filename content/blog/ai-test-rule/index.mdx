@@ -171,33 +171,33 @@ side-effect 자체가 요구사항일 때는 결과 상태만으로 검증하기
 
 **나쁜 이름 — 구현 중심:**
 
-```
-test_findUnique_called_once()
-test_calls_upsert_then_emits_event()
-should_work()
+```typescript
+it('findUnique called once', ...)
+it('calls upsert then emits event', ...)
+it('should work', ...)
 ```
 
 **좋은 이름 — 행동 중심:**
 
-```
-returns_cached_result_when_fetched_within_ttl()
-rejects_login_when_password_is_expired()
-charges_full_price_for_non_vip_users()
+```typescript
+it('returns cached result when fetched within TTL', ...)
+it('rejects login when password is expired', ...)
+it('charges full price for non-VIP users', ...)
 ```
 
 권장 템플릿:
 
 ```
-<action>_<expected_behavior>_when_<condition>
+<action> <expected_behavior> when <condition>
 ```
 
 예시:
-- `create_todo_succeeds_when_input_is_valid`
-- `create_todo_fails_when_title_is_empty`
-- `login_rejects_when_password_is_incorrect`
-- `get_user_returns_none_when_not_found`
+- `it('creates todo when input is valid', ...)`
+- `it('fails to create todo when title is empty', ...)`
+- `it('rejects login when password is incorrect', ...)`
+- `it('returns null when user is not found', ...)`
 
-동사는 일관되게 사용한다 (`create`, `get`, `update`, `delete`, `returns`, `fails`, `rejects`). `works`, `handles`, `processes` 같은 모호한 표현은 피한다.
+동사는 일관되게 사용한다 (`creates`, `returns`, `fails`, `rejects`, `updates`, `deletes`). `works`, `handles`, `processes` 같은 모호한 표현은 피한다.
 
 이 템플릿의 또 다른 장점은, 테스트 이름을 먼저 쓰면 무엇을 테스트할지 명확해진다는 점이다. "어떤 조건에서 어떤 행동이 어떤 결과를 낳는가"를 한 문장으로 표현하지 못한다면, 테스트 대상 자체가 불분명한 것이다.
 
