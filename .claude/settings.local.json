@@ -6,7 +6,9 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(gh pr:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(gh api *)",
+      "Bash(curl -s https://raw.githubusercontent.com/mimul/axum-rusty/main/.claude/rules/test.md)"
     ]
   }
 }
