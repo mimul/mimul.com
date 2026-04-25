@@ -3,7 +3,7 @@ title: 소프트웨어 보안은 기능이 아니라 태도다
 description: Microsoft SDL, OWASP, KISA 등 실무 표준을 바탕으로 보안 설계 철학과 Threat Modeling, Trust Boundary, Defense in Depth 등 소프트웨어 개발 관점의 핵심 원칙을 정리합니다.
 author: Mimul
 date: "2026-04-25T09:00:00.000Z"
-lastModificationTime: "2026-04-25T12:00:00.000Z"
+lastModificationTime: "2026-04-26T09:00:00.000Z"
 image: "./thumbnail.png"
 tags:
   - security
@@ -26,6 +26,8 @@ Microsoft SDL(Security Development Lifecycle)의 핵심 명제는 단순하다.
 비용 문제만이 아니다. 설계 단계에서 잘못 정의된 신뢰 경계나 인가 모델은 구현 패치만으로는 근본적으로 고치기 어렵다. OWASP **A06 - Insecure Design**이 이를 독립 항목으로 분류하는 이유다. 잘못된 설계에서 비롯된 취약점은 코드 수준의 수정이 아니라 설계 재검토가 필요하다.
 
 SDL Practice 3는 Threat Modeling을 "어떻게 동작하는가(how products should work)"에서 "어떻게 악용될 수 있는가(how products might be abused)"로 시각을 전환하는 과정으로 정의한다. 기능 명세와 함께 악용 명세를 작성하는 습관이 보안 설계의 출발점이다.
+
+Business Logic Vulnerabilities는 이 관점이 실질적으로 요구되는 이유다. 기능 자체는 정상적으로 동작하지만 공격자가 그 흐름을 예상치 못한 순서로 조합해 악용하는 취약점으로, SAST·DAST로는 탐지할 수 없다. 할인 코드 중복 적용, 결제 단계 우회, 권한 확인 없는 다단계 처리 같은 공격은 코드 결함이 아니라 설계 단계에서 악용 시나리오를 검토하지 않은 결과다.
 
 ---
 
