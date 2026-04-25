@@ -8,7 +8,9 @@
       "Bash(gh pr:*)",
       "Bash(git:*)",
       "Bash(gh api *)",
-      "Bash(curl -s https://raw.githubusercontent.com/mimul/axum-rusty/main/.claude/rules/test.md)"
+      "Bash(curl -s https://raw.githubusercontent.com/mimul/axum-rusty/main/.claude/rules/test.md)",
+      "WebFetch(domain:owasp.org)",
+      "WebFetch(domain:github.blog)"
     ]
   }
 }
