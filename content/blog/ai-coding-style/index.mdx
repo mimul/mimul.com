@@ -13,7 +13,7 @@ tags:
   - software-design
 ---
 
-코딩 스타일 가이드는 보통 언어별로 존재한다. Python에는 PEP 8이 있고, Go에는 Effective Go가 있다. Rust 프로젝트를 시작하면 `rustfmt`와 Clippy가 스타일을 잡아준다. 이렇게 언어별 컨벤션은 잘 정비되어 있지만, 막상 여러 언어를 오가며 작업할 때 일관된 설계 철학이 없으면 코드는 언어만 다를 뿐 같은 문제를 반복한다.
+코딩 스타일 가이드는 보통 언어별로 존재한다. Python에는 PEP 8이 있고, Java에는 [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)가 있으며, Go에는 Effective Go가 있다. Rust 프로젝트를 시작하면 `rustfmt`와 Clippy가 스타일을 잡아준다. 이렇게 언어별 컨벤션은 잘 정비되어 있지만, 막상 여러 언어를 오가며 작업할 때 일관된 설계 철학이 없으면 코드는 언어만 다를 뿐 같은 문제를 반복한다.
 
 LLM를 활용해 Java, Rust, TypeScript, Python, Go 등 여러 언어로 동시에 작업하면서 이 문제가 더 선명해졌다. AI가 코드를 생성할 때 적용할 수 있는 **언어 독립적인 설계 원칙**이 필요했다. 단순히 "중첩을 줄여라", "이름을 명확히 해라" 수준이 아니라, 왜 그렇게 해야 하는지 근거가 있는 원칙을 기술한다.
 
@@ -427,6 +427,18 @@ Donald Knuth의 말은 지금도 유효하다. "Premature optimization is the ro
 ## 이 기준을 공통으로 쓰는 이유
 
 이 코딩 스타일은 특정 언어의 컨벤션이 아니다. Java, Rust, TypeScript, Python, Go — 어떤 언어로 작업하더라도 적용 가능한 설계 철학이다.
+
+언어별 공식 스타일 가이드는 별도로 존재한다. 이 글의 원칙과 함께 참조하면 언어 특유의 관용구와 포매팅 기준을 맞출 수 있다.
+
+| 언어 | 공식 스타일 가이드 | 핵심 도구 |
+|---|---|---|
+| Java | [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) | Checkstyle, google-java-format |
+| Python | [PEP 8](https://peps.python.org/pep-0008/) | Black, Flake8, Ruff |
+| Go | [Effective Go](https://go.dev/doc/effective_go) | gofmt (빌드에 내장) |
+| Rust | [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/) | rustfmt, Clippy |
+| TypeScript | [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html) | ESLint, Prettier |
+
+Google Java Style Guide의 핵심만 짚으면: 클래스명은 `UpperCamelCase`, 메서드·변수는 `lowerCamelCase`, 상수는 `UPPER_SNAKE_CASE`, 들여쓰기는 2칸, 줄 길이는 100자다. 재정의 메서드에는 `@Override`를 항상 붙이고, 잡은 예외를 조용히 무시할 때는 반드시 주석으로 이유를 남긴다.
 
 LLM을 통해 AI와 함께 코드를 작성할 때, AI가 코드를 생성하는 기준이 명확해야 한다. "좋은 코드"의 정의가 모호하면 AI는 매번 다른 스타일의 코드를 만들어낸다. 이 기준을 `~/.claude/rules/coding-style.md`에 두고 모든 프로젝트에 공통으로 적용하면, AI와의 협업에서도 일관된 설계 판단이 나온다.
 
