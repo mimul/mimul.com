@@ -10,7 +10,8 @@
       "Bash(gh api *)",
       "Bash(curl -s https://raw.githubusercontent.com/mimul/axum-rusty/main/.claude/rules/test.md)",
       "WebFetch(domain:owasp.org)",
-      "WebFetch(domain:github.blog)"
+      "WebFetch(domain:github.blog)",
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\" && head -10 /Users/mimul/Project/2019/mimul.com/content/blog/{}/index.mdx 2>/dev/null || true')"
     ]
   }
 }
