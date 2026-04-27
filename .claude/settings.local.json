@@ -10,7 +10,9 @@
       "Bash(gh api *)",
       "WebFetch(domain:owasp.org)",
       "WebFetch(domain:github.blog)",
-      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\" && head -10 /Users/mimul/Project/2019/mimul.com/content/blog/{}/index.mdx 2>/dev/null || true')"
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\" && head -10 /Users/mimul/Project/2019/mimul.com/content/blog/{}/index.mdx 2>/dev/null || true')",
+      "WebFetch(domain:testing.googleblog.com)",
+      "WebFetch(domain:martinfowler.com)"
     ]
   }
 }
