@@ -83,20 +83,17 @@ AI 도구는 기능을 빠르게 생성하지만, 내부 구현의 형태를 자
 
 #### Mock, Stub, Fake — 제대로 구분하자
 
-- **Mock** — 상호작용 검증(Interaction Verification)에 특화  
-  “이 메서드가 정확히 이 인자로 몇 번 호출되었는가?”를 확인합니다.  
-  과도하게 사용하면 **over-specification**이 발생해 리팩토링 내성을 떨어뜨립니다.
+- **Mock** — 상호작용 검증(Interaction Verification)에 특화. “이 메서드가 정확히 이 인자로 몇 번 호출되었는가?”를 확인합니다. 과도하게 사용하면 **over-specification**이 발생해 리팩토링 내성을 떨어뜨립니다.
 
 - **Stub** — 단순히 고정된 응답을 반환합니다. 호출 여부는 검증하지 않습니다.
 
-- **Fake** — 실제로 동작하는 간단한 구현체 (예: in-memory Repository)  
-  호출 횟수를 검증하지 않고, **실행 후 결과 상태**를 확인하는 방식으로 테스트합니다.  
-  상태 기반 검증(State-based verification)과 가장 잘 어울립니다.
+- **Fake** — 실제로 동작하는 간단한 구현체.(예: in-memory Repository) 호출 횟수를 검증하지 않고, **실행 후 결과 상태**를 확인하는 방식으로 테스트합니다. 상태 기반 검증(State-based verification)과 가장 잘 어울립니다.
 
 **권장 방향**:  
 **Mock을 최대한 줄이고, Fake와 실제 구현을 늘리는 것**입니다. Mock은 테스트를 깨지기 쉽게 만들고, Fake는 테스트를 더 현실적이고 신뢰할 수 있게 만듭니다.
 
 #### 대체해야 할 대상 vs 피해야 할 대상
+실제 구현체(Real Implementation)를 Test Double(Mock, Stub, Fake 등)로 교체해야 하는지를 판단하는 기준을 말합니다.
 
 **반드시 대체해야 하는 것**
 - 서드파티 HTTP API (결제, OAuth, 외부 알림) → **HTTP 레벨 Fake 서버** (WireMock, MSW, Nock 등) 추천
