@@ -32,7 +32,6 @@ tags:
 |**MCP servers**|`~/.claude.json`|`.mcp.json`|`.claude/settings.local.json`|
 |**Plugins**|`~/.claude/settings.json`|`.claude/settings.json`|`.claude/settings.local.json`|
 
-
 ```
 .claude/
 ├── settings.json        # 프로젝트 설정
@@ -814,6 +813,33 @@ description: >
 | `create_user_and_login()` 응답 미검증 | `assert_eq` 검증 추가 |
 | `body_json()` `unwrap` → `expect` | `expect` 메시지 추가 |
 | `build_router` `pub` → `pub(crate)` | 통합 테스트는 별도 크레이트 → `pub(crate)` 시 컴파일 오류 |
+
+### 코드 리뷰 자동화
+
+PR이 Github에 올라오면 즉시 아래 셀프 병합 가이드 라인을 기준으로 해 One-Way Door인 경우 인간 리뷰 요청을 리뷰 담당자 슬랙으로 보내고, Two-Way Door인 경우는 코드 리뷰 프롬프트를 정의하면 그대로 자동으로 리뷰/소스 수정까지 하고 난 다음 PR 병합(머지)까지 한다. 자동화는 [Claude Code Action](https://github.com/anthropics/claude-code-action)을 가이드라인을 읽고 판정하는 로직과 코드리뷰 로직을 넣고,  Two-Way Door로 판정이 나면 자동으로 코드 리뷰와 병합을 진행한다.
+
+코드 리뷰 자동화 부분에 One-Way Door/Two-Way Door 용어는 [Jeff Bezos 의 2015 주주에게 편지 에 표시된 의사 결정 프레임](https://s2.q4cdn.com/299287126/files/doc_financials/annual/2015-Letter-to-Shareholders.PDF)에서 따왔다. 아래 "셀프(자동) 병합 가이드라인"의 내용을 보면 알겠지만, One-Way Door는 돌아갈 수 없는 결정을 말하고 이번 적용한 PR이 문제가 되어 롤백이 불가능한 경우를 뜻한다. 그리고 Two-Way Door는 돌아갈 수 있는 결정을 뜻하는데, PR이 문제가 되어도 롤백이 가능해 원복을 할 수 있다는 의미이다. 참고로 아래는 One-Way Door/Two-Way Door 판정의 기준을 나타낸다.
+
+```
+## 셀프(자동) 병합 가이드라인
+
+기준은 돌아갈 수 없는 결정(One-Way Door)과 돌아갈 수 있는 결정(Two-Way Door)으로 판단을 한다. 변경 사항들이 Two-Way Door일 경우 자동 병합을 하고 One-Way Door일 경우는 자동 병합을 하지 않고 인간 검토(확인)를 해야한다.
+
+1. One-Way Door인 경우(revert해도 피해가 남는 경우)
+
+- DB 스키마 마이그레이션 (컬럼 삭제 및 유형 변경에는 데이터 손실이 수반되며 프로덕션 적용 후 DDL 롤백도 어렵습니다)
+- Row-Level Security (RLS) 정책
+- 인증·인가(인증 바이패스나 세션 누설은 revert해도 피해가 남는다)
+- 인프라(IaC)/CI/CD 배포 시스템 워크플로우
+- AI 기반 설정, 릴리스 제어 및 종속성에 대한 Major 업데이트
+- 기반(외부) 라이브러리 추가 및 교체(프레임워크, ORM, AI 기반, 인증 기반, 기타 오픈소스 등)
+- 아키텍처 변경(모노 리포 구성 변경, 마이크로 아키텍처)
+- 미들웨어 구성, 에러 핸들링 전략, 로깅 기반 등의 횡단적 관심사
+
+2. Two-Way Door인 경우
+
+- One-Way Door가 아닌 경우
+```
 
 ### Claude Code가 동일한 리뷰 지적을 반복하지 않도록 하는 실패 학습 루프
 
