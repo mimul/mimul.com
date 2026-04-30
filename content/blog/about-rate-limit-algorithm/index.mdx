@@ -300,6 +300,15 @@ Rate Limit이 적용하려면 [RFC 6585](http://tools.ietf.org/html/rfc6585)에 
 - 기본적으로 서비스 인프라 트래픽을 수용할 수 없는 시점에 도달했을 때 Rate Limit을 적용해야하며, 외부 서비스에 영향을 최소화하는 노력(Common한 API는 Rate Limit에 걸리지 않을 정도로 상한값을 높게 잡음 등)을 한 다음 Rate Limit을 적용하는게 좋다.
 - 외부 개발자들에게 Rate Limit 정보를 명확하게 알려야하고, API 응답에도 요청 정보와 남은 정보 등 트래픽이 초과했을때 오류값 등을 명확히 정의해야 한다.
 
+| 알고리즘           | 버스트 특성    | 메모리  | 복잡도 | 적합한 용도    | 
+| --------------- | ------------ | ----- | ---- | ------------ | 
+| Fixed window    | 경계 버스트 위험 | O(1)  | 쉬움   | 내부 API      |  
+| Sliding log     | 정확          | O(N)  | 중간   | 감사/컴플라이언스 | 
+| Sliding counter | 완화됨         | O(1)  | 중간   | 마이크로서비스   | 
+| Token bucket    | 설정 가능       | O(1)  | 높음  | 일반 API       |  
+| Leaky bucket    | 없음(엄격)      | O(1)  | 높음  | 결제/인프라 보호 | 
+  
+
 ## Rate Limit 알고리즘 구현체(오픈 소스)
 
 - [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j)
