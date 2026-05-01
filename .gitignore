@@ -9,3 +9,4 @@ node_modules/
 static/admin/*.bundle.*
 .DS_Store
 yarn-error.log
+settings.local.json
