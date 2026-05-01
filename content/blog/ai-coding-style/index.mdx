@@ -1,9 +1,9 @@
 ---
-title: 언어에 의존하지 않는 도메인 중심 코딩 원칙과 실천법
-description: Kent Beck, Martin Fowler, Eric Evans의 철학을 기반으로 언어에 의존하지 않는 코딩 스타일 기준을 정리합니다. 변경 용이성, 의도 중심 설계, 지속적 리팩토링의 근거와 실천법을 설명합니다.
+title: 언어에 독립적인 도메인 중심 코딩 원칙과 실천법
+description: Kent Beck, Martin Fowler, Eric Evans의 철학을 기반으로 변경 용이성·의도 명확성·도메인 중심 설계 등 언어에 의존하지 않는 코딩 원칙과 실천법을 정리합니다.
 author: Mimul
 date: "2026-01-29T10:00:00.000Z"
-lastModificationTime: "2026-04-25T10:00:00.000Z"
+lastModificationTime: "2026-05-01T10:00:00.000Z"
 image: "./style_guide.jpeg"
 tags:
   - coding-style
@@ -15,7 +15,7 @@ tags:
 
 코딩 스타일 가이드는 보통 언어별로 존재한다. Python에는 PEP 8이 있고, Java에는 [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)가 있으며, Go에는 Effective Go가 있다. Rust 프로젝트를 시작하면 `rustfmt`와 Clippy가 스타일을 잡아준다. 이렇게 언어별 컨벤션은 잘 정비되어 있지만, 막상 여러 언어를 오가며 작업할 때 일관된 설계 철학이 없으면 코드는 언어만 다를 뿐 같은 문제를 반복한다.
 
-LLM를 활용해 Java, Rust, TypeScript, Python, Go 등 여러 언어로 동시에 작업하면서 이 문제가 더 선명해졌다. AI가 코드를 생성할 때 적용할 수 있는 **언어 독립적인 설계 원칙**이 필요했다. 단순히 "중첩을 줄여라", "이름을 명확히 해라" 수준이 아니라, 왜 그렇게 해야 하는지 근거가 있는 원칙을 기술한다.
+LLM을 활용해 Java, Rust, TypeScript, Python, Go 등 여러 언어로 동시에 작업하면서 이 문제가 더 선명해졌다. AI가 코드를 생성할 때 적용할 수 있는 **언어 독립적인 설계 원칙**이 필요했다. 단순히 "중첩을 줄여라", "이름을 명확히 해라" 수준이 아니라, 왜 그렇게 해야 하는지 근거가 있는 원칙을 기술한다.
 
 ## 철학적 뿌리
 
@@ -165,21 +165,22 @@ def approve_order(order: Order) -> Result:
 
 ```
 
-**3. 추상화와 일반화는 중복이 실제로 드러난 후에 한다**
+### 3. 추상화와 일반화는 중복이 실제로 드러난 후에 한다
 
-미래의 가능성을 예측해서 미리 복잡한 추상화를 도입하는 것은 대부분 후회로 이어진다. 동일한 패턴이나 로직이 실제로 3번 이상 반복될 때(Rule of Three) 비로소 추상화를 고려하는 것이 안전하다.
-처음부터 Strategy 패턴이나 Factory를 적용해 다양한 결제 방식을 추상화하려고 하면 코드가 불필요하게 복잡해진다. 반대로 처음에는 단순한 함수로 각각 구현하다가, 비슷한 로직이 반복되어 명확한 중복이 확인된 후에 추상 클래스를 도입하면, 실제 필요에 기반한 적절한 추상화가 된다. 조급한 일반화는 오히려 유지보수성을 해칠 수 있다. 이렇게 함으로써 불필요한 복잡도를 피하고, 실제 필요에 기반한 유연한 구조를 만든다.
+미래의 가능성을 예측해서 미리 복잡한 추상화를 도입하는 것은 대부분 후회로 이어진다. 동일한 패턴이나 로직이 실제로 3번 이상 반복될 때(Rule of Three) 비로소 추상화를 고려하는 것이 안전하다. 조급한 일반화는 오히려 유지보수성을 해칠 수 있다.
 
 ```typescript
-// 나쁜 예 - 첫 번째부터 Strategy + Factory 적용
+// 나쁜 예: 구현이 하나뿐인데 처음부터 Strategy + Factory 적용
 const validator = PaymentValidatorFactory.create(payment.type);
 validator.validate(payment);
+```
 
-// 처음에는 단순 구현
+```typescript
+// 좋은 예 1 - 처음에는 각각 단순 구현
 function validateCreditCardPayment(payment) { ... }
 function validateBankTransferPayment(payment) { ... }
 
-// 중복이 3회 반복된 후
+// 좋은 예 2 - 비슷한 로직이 3회 이상 반복된 후 추상화 도입
 abstract class PaymentValidator {
   abstract validate(payment: Payment): Result;
 }
@@ -240,52 +241,46 @@ function applyDiscountToOrder(order: Order, newRate: number) {
 기술적으로 가장 멋있어 보이는 선택이 항상 최선은 아니다. 우리 팀의 현재 기술 역량, 운영 부담, 인프라 환경, 스케줄 등의 현실적인 제약을 충분히 고려해야 한다.
 분산 시스템 경험이 거의 없는 팀이 첫 프로젝트부터 Event Sourcing, CQRS, Kafka를 전부 도입하려는 것은 전형적인 실패 패턴이다. 대신 현재 팀이 안정적으로 다룰 수 있는 단순한 구조로 시작한 뒤, 역량이 성장함에 따라 점진적으로 고도화하는 접근이 훨씬 현실적이고 지속 가능하다. 기술 선택은 항상 조직의 실현 가능성과 균형을 맞춰야 한다.
 
-```
-// 나쁜 예 (팀 역량을 초과하는 과도한 기술 도입)
+나쁜 예 — 초기 스타트업(팀 규모 6명, MSA 경험 거의 없음)에서 리더가 "확장성을 위해" 결정한 구조:
 
-// 초기 스타트업 (팀 규모 6명, MSA 경험 거의 없음)
-// 리더가 "확장성을 위해" 결정한 구조
+- 서비스 1: User Service (NestJS + TypeORM + Kafka)
+- 서비스 2: Order Service (Spring Boot + Event Sourcing + CQRS + PostgreSQL + Redis)
+- 서비스 3: Payment Service (Go + gRPC + Saga Pattern)
+- 공통: Docker + Kubernetes + Istio + Jaeger + Prometheus 풀스택
 
-// 서비스 1: User Service (NestJS + TypeORM + Kafka)
- // 서비스 2: Order Service (Spring Boot + Event Sourcing + CQRS + PostgreSQL + Redis)
- // 서비스 3: Payment Service (Go + gRPC + Saga Pattern)
+좋은 예 — 팀 역량과 제약을 현실적으로 반영한 선택:
 
-// 공통: Docker + Kubernetes + Istio + Jaeger + Prometheus 풀스택
--------------------------------------------------------------------------
-// 좋은 예 (팀 역량과 제약을 현실적으로 반영한 선택)
+- 단일 모놀리스 애플리케이션 (NestJS 또는 Spring Boot)
+- 내부적으로는 Layered Architecture 또는 Modular Monolith 구조 적용
+- 데이터베이스는 단일 PostgreSQL
+- 배포는 Docker + 간단한 CI/CD (GitHub Actions)
+- 필요 시 내부 모듈을 명확한 경계(Bounded Context)로 분리하되, 별도 프로세스로 분리하지 않음
 
-// 단일 모놀리스 애플리케이션 (NestJS 또는 Spring Boot)
-// 내부적으로는 Layered Architecture 또는 Modular Monolith 구조 적용
-// 데이터베이스는 단일 PostgreSQL
-// 배포는 Docker + 간단한 CI/CD (GitHub Actions)
-// 필요 시 내부 모듈을 명확한 경계(Bounded Context)로 분리하되, 별도 프로세스로 분리하지 않음
+## 설계 의사결정 원칙
 
-```
+설계 원칙이 코드 구조와 표현에 관한 것이라면, 설계 의사결정 원칙은 팀이 함께 판단하고 실행하는 방식에 관한 것이다.
 
-### 6. 평가기준을 의식하고 트레이드오프를 명시적으로 관리하라
+### 트레이드오프를 명시적으로 관리하라
 
-설계나 코드 리뷰, 리팩토링 판단 결정을 내릴 때마다 “이번 결정에서 가장 중요한 평가 기준(지배축)은 무엇인가?”를 먼저 명확히 선언하는 것이 중요하다. 그리고 어떤 가치를 우선하고, 어떤 가치를 양보하는지 트레이드오프를 명시적으로 기록해야 한다.
-예를 들어 “장기 유지보수성을 최우선으로 한다”고 결정했다면, 초기 개발 속도가 다소 느려지더라도 이를 받아들이고 그 이유를 팀과 공유해야 한다. 반대로 모든 평가축을 동시에 만족시키려다 모호한 타협을 하면, 나중에 누구도 책임지지 않는 애매한 코드가 만들어지기 쉽다. 트레이드오프를 명확히 하면 팀의 판단 기준이 일관되어 의사결정의 품질이 높아진다.
+설계나 코드 리뷰, 리팩토링 판단을 내릴 때마다 “이번 결정에서 가장 중요한 평가 기준(지배축)은 무엇인가?”를 먼저 명확히 선언하는 것이 중요하다. 그리고 어떤 가치를 우선하고, 어떤 가치를 양보하는지 트레이드오프를 명시적으로 기록해야 한다.
+예를 들어 “장기 유지보수성을 최우선으로 한다”고 결정했다면, 초기 개발 속도가 다소 느려지더라도 이를 받아들이고 그 이유를 팀과 공유해야 한다. 반대로 모든 평가축을 동시에 만족시키려다 모호한 타협을 하면, 나중에 누구도 책임지지 않는 애매한 코드가 만들어지기 쉽다.
 
-8개 평가 기준은 목적 적합성, 제약 적합성, 실현 가능성(기술/조직), 품질 영향, 시간 효과, 위험·불확실성, 무결성, 합의 가능성으로 정의했다. 이것은 설계 리뷰, 코드 리뷰, 리팩토링 판단 등에서 체크리스트나 가중치 평가 기준으로 충분히 활용할 가치가 있다.
+설계 판단 시 내가 참조하는 8개 평가축은 다음과 같다.
 
-8개 평가축별 근거는 아래와 같다. 
+| 평가축 | 주요 근거 및 출처 | 설명 |
+|--------|------------------|------|
+| **목적 적합성** | [Value-Focused Thinking (Ralph L. Keeney, 1992)](https://www.hup.harvard.edu/catalog.php?isbn=9780674931985) | 결정의 출발점인 “진짜 가치와 목적”을 최우선으로 삼아야 한다는 Keeney의 핵심 사상 |
+| **제약 적합성** | Requirements Engineering (기능/비기능 요구사항), Systems Engineering | Functional & Non-functional requirements를 체계적으로 고려하는 전통적 접근 |
+| **실현 가능성** | [INCOSE Systems Engineering Handbook의 Feasibility Analysis](https://www.incose.org/resources-publications/technical-publications/se-handbook/) | 기술적·경제적·운영적·스케줄 feasibility를 기술적·조직적 관점으로 압축 |
+| **품질 영향** | [ISO/IEC 25019:2023 (Product Quality Model)](https://www.iso.org/standard/78177.html) | Maintainability, Reliability, Security, Performance 등 소프트웨어 품질 국제 표준 |
+| **시간 효과** | [Technical Debt (Ward Cunningham, 1992)](https://c2.com/doc/oopsla92.html) | 단기 vs 장기 관점에서의 비용·가치 트레이드오프 |
+| **위험 및 불확실성** | Decision Analysis / Decision Quality의 Uncertainty 평가 | 불확실성에 대한 명시적 체크 |
+| **무결성** | [Architecture Decision Records (ADR, Michael Nygard)](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) | 아키텍처 결정의 일관성과 장기적 무결성을 유지하기 위한 기록 수단 |
+| **합의 가능성** | [Decision Quality의 Commitment to Action + Stakeholder Buy-in](https://sdg.com/decision-quality/) | 좋은 결정이라도 실행 의지와 합의가 없으면 실패한다 |
 
-| 평가축                  | 주요 근거 및 출처                                                                 | 설명 |
-|-------------------------|----------------------------------------------------------------------------------|------|
-| **목적 적합성**        | [Value-Focused Thinking (Ralph L. Keeney, 1992)](https://www.hup.harvard.edu/catalog.php?isbn=9780674931985) | 결정의 출발점인 “진짜 가치와 목적”을 최우선으로 삼아야 한다는 Keeney의 핵심 사상|
-| **제약 적합성**        | [Requirements Engineering (기능/비기능 요구사항), Systems Engineering]() | Functional & Non-functional requirements를 체계적으로 고려하는 전통적 접근. |
-| **실현 가능성 (기술/조직)** | [INCOSE Systems Engineering Handbook의 **Feasibility Analysis** (기술적, 경제적, 운영적, 스케줄, 법적 feasibility)](https://www.incose.org/resources-publications/technical-publications/se-handbook/) | INCOSE에서 시스템 설계 시 반드시 수행하는 feasibility를 기술적·조직적 관점으로 압축한 형태 |
-| **품질 영향**          | [**ISO/IEC 25019:2023** (Product Quality Model)](https://www.iso.org/standard/78177.html) | 소프트웨어 품질을 평가하는 국제 표준. Maintainability, Reliability, Security, Performance 등 |
-| **시간 효과**          | [**Technical Debt** (Ward Cunningham, 1992)](https://c2.com/doc/oopsla92.html)<br />[Real Options (Matts & Maassen)](https://www.infoq.com/articles/real-options-enhance-agility/) | 단기 vs 장기 관점에서의 비용·가치 트레이드오프를 다룸. 소프트웨어 분야에서 가장 널리 사용되는 메타포. |
-| **위험 및 불확실성**   | Decision Analysis / Decision Quality의 **Uncertainty** 평가 | 불확실성에 대한 체크 |
-| **무결성**             | [Architecture Decision Records (**ADR**, Michael Nygard)<br />Architecture Integrity](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) | 아키텍처 결정의 일관성과 장기적인 무결성을 유지하기 위한 실무적 기록 수단|
-| **합의 가능성**        | [Decision Quality의 **Commitment to Action** + Stakeholder Buy-in](https://sdg.com/decision-quality/) | 좋은 결정이라도 실행 의지와 합의가 없으면 실패한다 |
+### 결정은 기록하고 점진적으로 실행하라
 
-### 7. 실행 의지와 무결성을 확보하라
-
-아무리 좋은 설계 판단을 내려도 실제로 실행되지 않거나, 시간이 지나면서 일관성이 깨지면 그 결정은 의미가 없다. 중요한 결정은 ADR(Architecture Decision Record)로 기록하고, 팀 내 합의를 명확히 한 뒤 구체적인 실행 계획(담당자, 범위, 일정, 마이그레이션 전략)을 세워야 한다.
-새로운 스타일을 도입하기로 결정했다면, 한 번에 모든 코드를 바꾸려 하지 말고 점진적으로 적용할 수 있는 전략을 함께 마련하는 것이 좋다. 결정 후 실행 의지가 약하거나 기존 관례를 무시한 채 방치하면, 결국 아키텍처가 산만해지고 기술 부채만 늘어나는 결과를 초래한다.
+아무리 좋은 설계 판단을 내려도 실제로 실행되지 않거나 시간이 지나면서 일관성이 깨지면 그 결정은 의미가 없다. 중요한 결정은 ADR(Architecture Decision Record)로 기록하고, 팀 내 합의를 명확히 한 뒤 구체적인 실행 계획(담당자, 범위, 일정, 마이그레이션 전략)을 세워야 한다. 새로운 스타일을 도입하기로 결정했다면, 한 번에 모든 코드를 바꾸려 하지 말고 점진적으로 적용할 수 있는 전략을 함께 마련하는 것이 좋다.
 
 ## 리팩토링은 개발의 자연스러운 호흡이다
 
@@ -511,13 +506,13 @@ def find_user(user_id: str) -> User:
 
 ## 실패 패턴들
 
-**1. 바퀴의 재발명**
+### 1. 바퀴의 재발명
 
 - 인증(Spring Security, JWT 등), 로깅(Logback, Log4j, SLF4J, Winston, Serilog), 캐시(Redis, Ehcache, Caffeine, Guava Cache), 날짜, 알림, 국제화, 페이징, 유효성 검사, 상태관리 등은 라이브러리가 있는데 자체적으로 구현하는 것.
 - DB 제약 조건으로 충분히 해결할 수 있는 것을 애플리케이션 코드에서 if문으로 검증하는 것.
 - 기존에 참조하고 있는 라이브러리 등에서 사용중인 상수가 있는지 확인안하고 매직 숫자, 문자열을 남발하는 것.
 
-**2. Over Engineering**
+### 2. Over Engineering
 
 - DBA가 없는 팀에 복잡한 샤딩 + 멀티마스터 DB 구성을 처음부터 설계하는 것.
 - 24시간 온콜 체계가 없는 팀인데 멀티 리전 고가용성 아키텍처를 도입하는 것.
@@ -527,7 +522,7 @@ def find_user(user_id: str) -> User:
 - 간단한 입력 검증(필수, 자리수, 정규식)에 Drools 같은 룰 엔진을 도입하는 것.
 - SRE 전담 인력이 없는 팀에 SLO, Error Budget, Chaos Engineering을 도입하는 것.
 
-**3. 땜방식 대응**
+### 3. 땜방식 대응
 
 - 에러가 발생해도 그냥 삼켜서 화면은 동작하게 만드는 것.
 - Controller나 Service에 도메인 로직을 직접 추가하는 것.
@@ -535,7 +530,7 @@ def find_user(user_id: str) -> User:
 - NullPointerException만 피하려고 if (x != null)을 마구 추가하는 것.
 - 테스트가 깨지면 기대값을 실제 구현에 맞춰 수정하는 것.
 
-**4. 준비 안된 출발**
+### 4. 준비 안된 출발
 
 - 요구사항이 아직 불명확한데 화면, API, DB를 먼저 만드는 것.
 - 에러 발생 시 업무 처리가 정해지지 않았는데 예외 처리 코드를 먼저 작성하는 것.
@@ -543,27 +538,27 @@ def find_user(user_id: str) -> User:
 - 데이터 이관 방침이 결정되기 전에 이관 스크립트를 먼저 작성하는 것.
 - 성능 요구사항(건수, 응답시간)이 정해지지 않았는데 Redis 캐시를 처음부터 도입하는 것.
 
-**5. 너무 이른 추상화**
+### 5. 너무 이른 추상화
 
 - 구현이 아직 하나밖에 없는데 Strategy 패턴을 도입하는 것.
 - 검색 조건이 name과 status 두 개뿐인데 독자 DSL을 설계하는 것.
 - 설정 항목이 거의 변하지 않을 것 같은데 미리 DB 기반 설정 관리 화면을 만드는 것.
 
-**6. 핵심 제약을 사후에 추가하는 역순 개발 관행**
+### 6. 핵심 제약을 사후에 추가하는 역순 개발 관행
 
 - CRUD 기능을 먼저 만든 뒤, 나중에 권한 체크를 추가하는 것.
 - 데이터 갱신 기능을 만든 뒤에 감사 로그를 뒤늦게 추가하는 것.
 - 삭제 기능을 만든 후에 “이력 관리(만원 대응)가 필요하다”는 요구를 받고 대응하는 것.
 - 동기 연동을 만든 후 재시도·멱등성(idempotency) 처리를 나중에 붙이는 것
 
-**7. "한 번 데였다고 다 금지하는"" 반지성적 규칙**
+### 7. "한 번 데였다고 다 금지하는" 반지성적 규칙
 
 - TypeScript 도입을 “타입 관리할 사람이 없다”며 거부하고 계속 JavaScript로 개발하는 것.
 - 과거에 빌드 자동화가 실패한 경험이 있다고 해서 CI/CD를 포기하고 수동 빌드·배포를 유지하는 것
 - 과거 Lambda/Stream API로 버그가 난 적이 있다고 해서, 모든 반복문을 확장 for문으로 강제하는 것.
 - Optional 사용을 금지하고, null 체크를 호출하는 쪽에 모두 떠넘기는 것.
 
-**8. 과거에 대한 과도한 배려**
+### 8. 과거에 대한 과도한 배려
 
 - 기존 API를 깨뜨리지 않으려고 신규 API와 기존 API를 병렬로 계속 유지하는 것.
 - 오류 거부감 때문에 is_deleted, is_archived, is_suspended 같은 DB 칼럼이 계속 쌓이는 것.
