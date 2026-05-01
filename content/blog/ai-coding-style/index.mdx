@@ -119,84 +119,185 @@ if total >= 1000:
 
 핵심 원칙이 작업 태도와 의사결정 기준이라면, 설계 원칙은 실제 코드 구조와 표현에 관한 것이다. 내가 실제로 코드를 설계하고 작성할 때 가장 중요하게 생각하는 원칙들이며, 코드의 장기적인 건강 상태를 결정짓는 기반이 된다.
 
-### 1. 작고 조합 가능한 구조
+### 1. 목적과 도메인에 집중하라
 
-함수는 하나의 책임만 가져야 한다. 조건문과 중첩의 깊이는 최대 2단계로 제한한다. 이 두 가지는 서로 밀접하게 연결되어 있다. 함수가 여러 책임을 가지면 자연스럽게 중첩이 깊어지고, 중첩이 깊어지면 흐름을 이해하기 어려워진다.
-
-복잡한 조건문이 나오면 바로 의미 있는 메서드로 분리한다. 나는 "Tell, Don't Ask" 원칙을 좋아한다. 객체의 상태를 물어서 외부에서 결정하는 대신, 객체에게 직접 행동을 요청하는 방식이다.
+코드의 모든 설계는 “우리가 진짜 풀고자 하는 비즈니스 문제와 가치”로부터 출발해야 한다. 데이터만 모아놓은 빈약한 모델을 피하고, 도메인 개념에 필요한 행동까지 함께 캡슐화하는 것이 핵심이다.
+조건 판단과 상태 변경 로직이 서비스나 컨트롤러에 흩어져 있으면 로직 파악과 유지보수가 어려워진다. 도메인 객체 내부에 메서드를 만들어 의도를 명확하게 표현하고, 비즈니스 규칙을 보호하는 형태가 좋다. 이렇게 하면 코드의 의도가 잘 드러나고, 나중에 규칙이 변경되더라도 수정 범위가 좁아진다.
 
 ```typescript
-// Ask 방식: 외부에서 상태를 물어 결정
-if (order.status === 'pending' && order.items.length > 0) {
+// 나쁜 예((데이터만 있고 행동은 외부에 있는 경우))
+if (order.status === 'pending' && order.total > 0 && !order.isCancelled) {
   order.status = 'confirmed';
+  order.confirmedAt = new Date();
 }
 
-// Tell 방식: 객체에게 행동을 위임
-order.confirm();
+// 좋은 예(도메인 객체가 스스로 행동을 수행)
+class Order {
+  confirm(): Result<void> {
+    if (!this.canBeConfirmed()) {
+      return failure(new Error('주문 확인 조건을 만족하지 않습니다.'));
+    }
+    this.status = 'confirmed';
+    this.confirmedAt = new Date();
+    this.recordEvent(new OrderConfirmedEvent(this.id));
+    return success();
+  }
+
+  private canBeConfirmed(): boolean {
+    return this.status === 'pending' && this.total > 0 && !this.isCancelled;
+  }
+}
 ```
 
-조건식이 복잡하다면, 메서드로 분리하기 전이라도 의미 있는 이름의 임시 변수로 먼저 분해한다. 이름을 붙이는 것만으로도 코드의 의도가 크게 개선된다.
+### 2. 작고 조합 가능하며 의도가 명확한 구조를 우선하라
+
+함수나 메서드는 가능한 한 작고 단일 책임을 가져야 하며, 중첩 깊이를 최소화하는 것이 좋다. 복잡한 조건이나 로직은 의미 있는 이름의 작은 함수로 분리하여 코드 자체로 의도를 명확하게 표현해야 한다. 그래야 코드 읽기가 쉬워지고, 테스트하기도 쉬워지며 재사용성이 높아진다. 한편 과잉 엔지니어링, 책임 경계 위반은 조심한다.
 
 ```python
-# 나쁜 예: 조건식이 무엇을 판단하는지 한눈에 들어오지 않는다
-if (file.open(path, "w") is not None) and is_valid(path) or is_cached(path):
-    process(file)
+# 나쁜 예 (한 함수에 너무 많은 로직과 중첩)
+def approve_order(order):
+    if order.status == 'pending' and len(order.items) > 0 and not order.is_cancelled:
+        if not is_fraud_suspected(order) and calculate_total(order) > 10000:
+            if user_has_permission(order.user_id):
+                order.status = 'approved'
+                send_notification(order)
 
-# 좋은 예: 임시 변수로 의도를 명시한다
-file_is_accessible = (file.open(path, "w") is not None) and is_valid(path)
-result_is_cached = is_cached(path)
-if file_is_accessible or result_is_cached:
-    process(file)
+//좋은 예 (작고 명확한 함수로 분리)
+def approve_order(order: Order) -> Result:
+    if not order.is_eligible_for_approval():
+        return failure("승인 조건을 만족하지 않습니다.")
+    
+    if order.is_fraud_suspected():
+        return failure("사기 의심 주문입니다.")
+    
+    order.approve()
+    notify_approval(order)
+    return success()
+
 ```
 
-### 2. 도메인 모델에 행동을 담는다
+**3. 추상화와 일반화는 중복이 실제로 드러난 후에 한다**
 
-빈약한 도메인 모델(Anemic Domain Model)은 초기에는 단순해 보이지만, 도메인이 복잡해질수록 큰 문제를 만든다. 데이터는 데이터 클래스에, 로직은 서비스 레이어에 분산되어 로직의 파악과 유지보수가 점점 어려워진다.
-나는 가능한 한 데이터와 행동을 함께 둔다. 도메인 로직은 해당 객체 내부에 캡슐화하는 것을 선호한다. 이렇게 하면 도메인 개념이 코드에서 명확하게 드러나고, 관련된 로직이 한 곳으로 모인다.
+미래의 가능성을 예측해서 미리 복잡한 추상화를 도입하는 것은 대부분 후회로 이어진다. 동일한 패턴이나 로직이 실제로 3번 이상 반복될 때(Rule of Three) 비로소 추상화를 고려하는 것이 안전하다.
+처음부터 Strategy 패턴이나 Factory를 적용해 다양한 결제 방식을 추상화하려고 하면 코드가 불필요하게 복잡해진다. 반대로 처음에는 단순한 함수로 각각 구현하다가, 비슷한 로직이 반복되어 명확한 중복이 확인된 후에 추상 클래스를 도입하면, 실제 필요에 기반한 적절한 추상화가 된다. 조급한 일반화는 오히려 유지보수성을 해칠 수 있다. 이렇게 함으로써 불필요한 복잡도를 피하고, 실제 필요에 기반한 유연한 구조를 만든다.
 
-### 3. 추상화는 중복이 드러난 이후에
+```typescript
+// 나쁜 예 - 첫 번째부터 Strategy + Factory 적용
+const validator = PaymentValidatorFactory.create(payment.type);
+validator.validate(payment);
 
-추상화의 가장 중요한 목적은 중복 제거다. 중복이 명확히 드러나기 전에 추상화를 만들면 오히려 코드 탐색 비용만 증가한다. 미래의 확장을 대비해 미리 인터페이스나 팩토리를 만드는 행위는 지양한다. YAGNI(You Aren't Gonna Need It) 원칙을 철저히 따른다. 지금 필요하지 않은 것은 만들지 않는다.
-같은 이유로 타입은 기본적으로 확장에 닫혀 있어야 한다. 상속이나 확장을 허용하는 것은 API를 공개하는 것과 같다. 필요가 명확해진 후에만 열어야 한다. 처음부터 열어두면 나중에 닫는 것이 훨씬 더 어렵다.
+// 처음에는 단순 구현
+function validateCreditCardPayment(payment) { ... }
+function validateBankTransferPayment(payment) { ... }
 
-### 4. 접근 권한은 최소한으로 정의한다
-
-클래스, 메서드, 변수의 공개 범위는 필요한 최소한으로 제한한다. 한 번 public으로 열어버리면 그것은 외부와의 연결이 된다. 나중에 변경하려면 모든 호출 지점을 확인해야 하는 부담이 생긴다.
-새로운 멤버를 선언할 때는 항상 가장 좁은 범위(private)부터 시작한다. 범위를 넓히는 것은 언제든 가능하지만, 이미 넓게 열어둔 것을 다시 좁히는 것은 매우 어렵다.
-
-### 5. 추상 타입으로 참조한다
-
-변수를 선언할 때 가능한 한 구현 타입이 아닌 추상 타입(인터페이스나 추상 클래스)으로 선언한다. 구체적인 구현은 할당하는 오른쪽에만 드러나게 한다.
-
-```java
-// 나쁜 예: 구현 타입으로 선언하면 구현 교체 시 선언부도 변경해야 한다
-ArrayList<User> users = new ArrayList<>();
-
-// 좋은 예: 추상 타입으로 선언, 구현은 우변에만
-List<User> users = new ArrayList<>();
+// 중복이 3회 반복된 후
+abstract class PaymentValidator {
+  abstract validate(payment: Payment): Result;
+}
 ```
 
-구현을 `LinkedList`나 다른 자료구조로 교체할 때, 선언 타입이 `List`라면 선언부를 건드리지 않아도 된다. 이 습관이 쌓이면 구현 변경의 파급 범위가 자연스럽게 줄어든다. 이는 "변화 용이성"의 작고 구체적인 실천이다.
+### 4. 변화 용이성과 유지보수성을 최우선 가치로 삼아라
 
-### 6. 변수는 사용 직전에 선언한다
+“3개월 후, 1년 후 이 코드를 다른 사람이 수정해야 할 때 얼마나 쉽게 고칠 수 있을까?”를 가장 중요한 판단 기준으로 삼아야 한다. 이를 실현하기 위해 접근 권한은 최소화하고, 변수는 사용 직전에 선언하며, 구현체가 아닌 추상 타입에 의존하는 등의 습관을 들이는 것이 효과적이다.
 
-변수의 선언 위치와 사용 위치가 멀어질수록 코드를 읽는 사람이 더 많은 문맥을 기억해야 한다. 따라서 변수는 처음 사용하는 지점 바로 위에서 선언하는 것을 원칙으로 한다.
+예를 들어 클래스 내부 필드를 public으로 노출하거나, 여러 로직을 하나의 큰 메서드에 몰아넣는 방식은 변경 시 사이드 이펙트가 커지기 쉽다. 반대로 필요한 값만 반환하는 작은 함수로 분리하고, 변수 스코프를 최소화하면 코드 변경이 훨씬 안전하고 빠르게 이루어질 수 있다. 장기적인 변화 용이성을 우선하면 Technical Debt가 쌓이는 속도를 크게 늦출 수 있다.
 
-```python
-# 나쁜 예: 선언과 사용이 멀다
-result = None
-items = fetch_items()
-filtered = [x for x in items if x.active]
-# ... 다른 처리들 ...
-result = calculate(filtered)
+```typescript
+// 나쁜 예 (변경하기 어려운 구조)
+class OrderService {
+    public orderRepository: OrderRepository;   // public 필드
+    public discountPolicy: DiscountPolicy;
 
-# 좋은 예: 필요한 순간에 선언
-items = fetch_items()
-filtered = [x for x in items if x.active]
-result = calculate(filtered)
+    public applyDiscount(orderId: string, discountRate: number) {
+        const order = this.orderRepository.findById(orderId);
+        order.discountRate = discountRate;        // 직접 내부 상태 조작
+        order.totalAmount = order.totalAmount * (1 - discountRate);
+        
+        if (order.status === 'completed') {
+            this.sendCompletionEmail(order);      // 부수 효과가 함께 발생
+        }
+        
+        this.orderRepository.save(order);
+    }
+}
+//좋은 예 (변화에 유연한 구조)
+class Order {
+    private discountRate: number = 0;
+
+    applyDiscount(newRate: number): void {
+        this.discountRate = newRate;
+        this.recalculateTotal();
+    }
+
+    private recalculateTotal(): void {
+        // 할인 계산 로직만 담당
+        this.totalAmount = this.baseAmount * (1 - this.discountRate);
+    }
+
+    getTotalAmount(): number {
+        return this.totalAmount;
+    }
+}
+
+// 사용 측
+function applyDiscountToOrder(order: Order, newRate: number) {
+    order.applyDiscount(newRate);     
+    // 필요 시 별도의 이벤트나 정책으로 알림 처리 분리
+}
 ```
 
-스코프를 최대한 좁게 유지하는 것도 중요하다. 블록 밖에서 사용되지 않는 변수는 블록 안에서 선언한다. 또한 하나의 변수를 여러 용도로 재사용하는 것도 피한다. 같은 이름이라도 의미가 달라지면 독자에게 혼란을 준다.
+### 5. 실현 가능성과 제약을 현실적으로 고려하라
+
+기술적으로 가장 멋있어 보이는 선택이 항상 최선은 아니다. 우리 팀의 현재 기술 역량, 운영 부담, 인프라 환경, 스케줄 등의 현실적인 제약을 충분히 고려해야 한다.
+분산 시스템 경험이 거의 없는 팀이 첫 프로젝트부터 Event Sourcing, CQRS, Kafka를 전부 도입하려는 것은 전형적인 실패 패턴이다. 대신 현재 팀이 안정적으로 다룰 수 있는 단순한 구조로 시작한 뒤, 역량이 성장함에 따라 점진적으로 고도화하는 접근이 훨씬 현실적이고 지속 가능하다. 기술 선택은 항상 조직의 실현 가능성과 균형을 맞춰야 한다.
+
+```
+// 나쁜 예 (팀 역량을 초과하는 과도한 기술 도입)
+
+// 초기 스타트업 (팀 규모 6명, MSA 경험 거의 없음)
+// 리더가 "확장성을 위해" 결정한 구조
+
+// 서비스 1: User Service (NestJS + TypeORM + Kafka)
+ // 서비스 2: Order Service (Spring Boot + Event Sourcing + CQRS + PostgreSQL + Redis)
+ // 서비스 3: Payment Service (Go + gRPC + Saga Pattern)
+
+// 공통: Docker + Kubernetes + Istio + Jaeger + Prometheus 풀스택
+-------------------------------------------------------------------------
+// 좋은 예 (팀 역량과 제약을 현실적으로 반영한 선택)
+
+// 단일 모놀리스 애플리케이션 (NestJS 또는 Spring Boot)
+// 내부적으로는 Layered Architecture 또는 Modular Monolith 구조 적용
+// 데이터베이스는 단일 PostgreSQL
+// 배포는 Docker + 간단한 CI/CD (GitHub Actions)
+// 필요 시 내부 모듈을 명확한 경계(Bounded Context)로 분리하되, 별도 프로세스로 분리하지 않음
+
+```
+
+### 6. 평가기준을 의식하고 트레이드오프를 명시적으로 관리하라
+
+설계나 코드 리뷰, 리팩토링 판단 결정을 내릴 때마다 “이번 결정에서 가장 중요한 평가 기준(지배축)은 무엇인가?”를 먼저 명확히 선언하는 것이 중요하다. 그리고 어떤 가치를 우선하고, 어떤 가치를 양보하는지 트레이드오프를 명시적으로 기록해야 한다.
+예를 들어 “장기 유지보수성을 최우선으로 한다”고 결정했다면, 초기 개발 속도가 다소 느려지더라도 이를 받아들이고 그 이유를 팀과 공유해야 한다. 반대로 모든 평가축을 동시에 만족시키려다 모호한 타협을 하면, 나중에 누구도 책임지지 않는 애매한 코드가 만들어지기 쉽다. 트레이드오프를 명확히 하면 팀의 판단 기준이 일관되어 의사결정의 품질이 높아진다.
+
+8개 평가 기준은 목적 적합성, 제약 적합성, 실현 가능성(기술/조직), 품질 영향, 시간 효과, 위험·불확실성, 무결성, 합의 가능성으로 정의했다. 이것은 설계 리뷰, 코드 리뷰, 리팩토링 판단 등에서 체크리스트나 가중치 평가 기준으로 충분히 활용할 가치가 있다.
+
+8개 평가축별 근거는 아래와 같다. 
+
+| 평가축                  | 주요 근거 및 출처                                                                 | 설명 |
+|-------------------------|----------------------------------------------------------------------------------|------|
+| **목적 적합성**        | [Value-Focused Thinking (Ralph L. Keeney, 1992)](https://www.hup.harvard.edu/catalog.php?isbn=9780674931985) | 결정의 출발점인 “진짜 가치와 목적”을 최우선으로 삼아야 한다는 Keeney의 핵심 사상|
+| **제약 적합성**        | [Requirements Engineering (기능/비기능 요구사항), Systems Engineering]() | Functional & Non-functional requirements를 체계적으로 고려하는 전통적 접근. |
+| **실현 가능성 (기술/조직)** | [INCOSE Systems Engineering Handbook의 **Feasibility Analysis** (기술적, 경제적, 운영적, 스케줄, 법적 feasibility)](https://www.incose.org/resources-publications/technical-publications/se-handbook/) | INCOSE에서 시스템 설계 시 반드시 수행하는 feasibility를 기술적·조직적 관점으로 압축한 형태 |
+| **품질 영향**          | [**ISO/IEC 25019:2023** (Product Quality Model)](https://www.iso.org/standard/78177.html) | 소프트웨어 품질을 평가하는 국제 표준. Maintainability, Reliability, Security, Performance 등 |
+| **시간 효과**          | **Technical Debt** (Ward Cunningham, 1992)<br>**Real Options** (Matts & Maassen) | 단기 vs 장기 관점에서의 비용·가치 트레이드오프를 다룸. 소프트웨어 분야에서 가장 널리 사용되는 메타포. |
+| **위험 및 불확실성**   | Decision Analysis / Decision Quality의 **Uncertainty** 평가 | 불확실성에 대한 체크 |
+| **무결성**             | [Architecture Decision Records (**ADR**, Michael Nygard)<br>Architecture Integrity](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) | 아키텍처 결정의 일관성과 장기적인 무결성을 유지하기 위한 실무적 기록 수단|
+| **합의 가능성**        | [Decision Quality의 **Commitment to Action** + Stakeholder Buy-in](https://sdg.com/decision-quality/) | 좋은 결정이라도 실행 의지와 합의가 없으면 실패한다 |
+
+### 7. 실행 의지와 무결성을 확보하라
+
+아무리 좋은 설계 판단을 내려도 실제로 실행되지 않거나, 시간이 지나면서 일관성이 깨지면 그 결정은 의미가 없다. 중요한 결정은 ADR(Architecture Decision Record)로 기록하고, 팀 내 합의를 명확히 한 뒤 구체적인 실행 계획(담당자, 범위, 일정, 마이그레이션 전략)을 세워야 한다.
+새로운 스타일을 도입하기로 결정했다면, 한 번에 모든 코드를 바꾸려 하지 말고 점진적으로 적용할 수 있는 전략을 함께 마련하는 것이 좋다. 결정 후 실행 의지가 약하거나 기존 관례를 무시한 채 방치하면, 결국 아키텍처가 산만해지고 기술 부채만 늘어나는 결과를 초래한다.
+
 
 ## 리팩토링은 개발의 리듬이다
 
