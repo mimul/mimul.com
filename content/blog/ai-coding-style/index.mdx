@@ -288,9 +288,9 @@ function applyDiscountToOrder(order: Order, newRate: number) {
 | **제약 적합성**        | [Requirements Engineering (기능/비기능 요구사항), Systems Engineering]() | Functional & Non-functional requirements를 체계적으로 고려하는 전통적 접근. |
 | **실현 가능성 (기술/조직)** | [INCOSE Systems Engineering Handbook의 **Feasibility Analysis** (기술적, 경제적, 운영적, 스케줄, 법적 feasibility)](https://www.incose.org/resources-publications/technical-publications/se-handbook/) | INCOSE에서 시스템 설계 시 반드시 수행하는 feasibility를 기술적·조직적 관점으로 압축한 형태 |
 | **품질 영향**          | [**ISO/IEC 25019:2023** (Product Quality Model)](https://www.iso.org/standard/78177.html) | 소프트웨어 품질을 평가하는 국제 표준. Maintainability, Reliability, Security, Performance 등 |
-| **시간 효과**          | **Technical Debt** (Ward Cunningham, 1992)<br>**Real Options** (Matts & Maassen) | 단기 vs 장기 관점에서의 비용·가치 트레이드오프를 다룸. 소프트웨어 분야에서 가장 널리 사용되는 메타포. |
+| **시간 효과**          | [**Technical Debt** (Ward Cunningham, 1992)](https://c2.com/doc/oopsla92.html)<br />[Real Options (Matts & Maassen)](https://www.infoq.com/articles/real-options-enhance-agility/) | 단기 vs 장기 관점에서의 비용·가치 트레이드오프를 다룸. 소프트웨어 분야에서 가장 널리 사용되는 메타포. |
 | **위험 및 불확실성**   | Decision Analysis / Decision Quality의 **Uncertainty** 평가 | 불확실성에 대한 체크 |
-| **무결성**             | [Architecture Decision Records (**ADR**, Michael Nygard)<br>Architecture Integrity](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) | 아키텍처 결정의 일관성과 장기적인 무결성을 유지하기 위한 실무적 기록 수단|
+| **무결성**             | [Architecture Decision Records (**ADR**, Michael Nygard)<br />Architecture Integrity](https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions) | 아키텍처 결정의 일관성과 장기적인 무결성을 유지하기 위한 실무적 기록 수단|
 | **합의 가능성**        | [Decision Quality의 **Commitment to Action** + Stakeholder Buy-in](https://sdg.com/decision-quality/) | 좋은 결정이라도 실행 의지와 합의가 없으면 실패한다 |
 
 ### 7. 실행 의지와 무결성을 확보하라
@@ -299,9 +299,9 @@ function applyDiscountToOrder(order: Order, newRate: number) {
 새로운 스타일을 도입하기로 결정했다면, 한 번에 모든 코드를 바꾸려 하지 말고 점진적으로 적용할 수 있는 전략을 함께 마련하는 것이 좋다. 결정 후 실행 의지가 약하거나 기존 관례를 무시한 채 방치하면, 결국 아키텍처가 산만해지고 기술 부채만 늘어나는 결과를 초래한다.
 
 
-## 리팩토링은 개발의 리듬이다
+## 리팩토링은 개발의 자연스러운 호흡이다
 
-리팩토링을 단순한 청소 작업으로 보지 않는다. 리팩토링은 개발의 자연스러운 리듬이자, 좋은 코드를 유지하기 위한 필수적인 호흡이다.
+리팩토링을 단순한 청소 작업으로 보지 않는다. 리팩토링은 개발의 자연스러운 호흡이자, 좋은 코드를 유지하기 위한 필수적인 호흡이다.
 
 Martin Fowler가 말했듯이, 리팩토링은 **기능 추가와 교대로 이루어져야** 한다. 새로운 기능을 추가하려고 하는데 기존 코드의 구조가 그 기능을 받아들이기 어렵다면, 기능을 넣기 전에 먼저 구조를 개선한다. 이것은 별도의 “리팩토링 스프린트”로 미루는 것이 아니라, 매일의 개발 습관이 되어야 한다.
 
@@ -330,7 +330,7 @@ git이 모든 이력을 안전하게 기록하고 있다는 사실을 잘 알고
 
 결국 좋은 개발자는 코드를 처음 작성하는 능력보다, **기존 코드를 지속적으로 건강하게 유지하는 능력**이 더 중요하다고 생각한다. 리팩토링은 그 건강을 유지하는 가장 강력한 도구 중 하나다.
 
-## 네이밍은 도메인의 번역이다
+## 네이밍은 도메인 언어를 코드로 옮기는 일이다
 
 이름을 짓는 일은 단순한 라벨링이 아니라, 중요한 설계 행위다. 변수, 함수, 클래스에 이름을 붙이는 순간, 나는 그 개념을 어떻게 이해하고 있는지 팀에게 선언하는 것이다. 좋은 이름은 코드를 읽는 사람에게 개념의 본질을 빠르고 정확하게 전달해야 한다. 나쁜 이름은 오히려 이해를 방해하고, 유지보수 비용을 증가시킨다.
 
