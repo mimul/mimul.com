@@ -1,18 +1,16 @@
 ---
-title: Claude로 만드는 멀티 레이어 보안 진단 스킬 claude-security-scan
-description: SAST·DAST를 아우르는 보안 진단 스킬 두 가지를 오픈소스로 공개합니다. Semgrep·Trivy로 정적 분석, OWASP ZAP·Nuclei로 런타임 검증을 수행하며 Claude가 교차 분석으로 False Positive를 줄입니다.
+title: Claude로 만드는 보안 진단 스킬 claude-security-scan 공개
+description: SAST·DAST를 아우르는 보안 진단 스킬 두 가지를 공개합니다. Semgrep·Trivy로 정적 분석, OWASP ZAP·Nuclei로 런타임 검증을 수행하며 Claude가 교차 분석으로 False Positive를 줄입니다.
 author: Mimul
 date: "2026-03-18T19:12:45.000Z"
-lastModificationTime: "2026-05-06T09:00:00.000Z"
+lastModificationTime: "2026-03-21T09:00:00.000Z"
 image: "./security2.png"
 tags:
   - security
-  - threat-modeling
   - owasp
-  - secure-design
-  - zero-trust
+  - claude
 ---
-Claude와 오픈소스 보안 도구를 결합해 코드 정적 분석부터 런타임 검증까지 커버하는 보안 진단 스킬 두 가지를 만들어 공개했다.
+Claude와 오픈소스 보안 도구를 결합해 코드 정적 분석부터 런타임 검증까지 커버하는 보안 진단 스킬 두 가지를 만들어 공개한다.
 
 Python, Rust, Go, Java, TypeScript, Ruby 등 다양한 언어의 프로젝트가 공존하는 경우가 많아졌다. 이런 환경에서 전통적인 보안 도구만으로는 커버리지가 부족하고, 개발 속도와 보안 사이의 trade-off가 문제가 되기도 한다.
 Claude를 보안 도구로 활용해 [Semgrep](https://semgrep.dev/), [Trivy](https://trivy.dev/), [Nuclei](https://github.com/projectdiscovery/nuclei), [ZAP Docker](https://www.zaproxy.org/)를 결합해 보안 진단률을 높였다. 이 접근법은 개발 생산성을 크게 희생하지 않으면서도 프로덕션 수준의 보안성을 확보할 수 있도록 설계했다.
