@@ -113,10 +113,16 @@ claude-security-skills/
 2026년 04월 16일에 GitHub 공식 CLI gh에 기술을 패키지 관리하는 새로운 부속 명령이 [gh skill](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/) 이 추가 되었다. GitHub 리포지토리에 게시된 기술을 gh 를 통해 설치, 업데이트 할 수 있다.
 
 ```bash
-> gh skill install mimul/claude-security-scan
+> gh skill install mimul/claude-security-scan claude-security-scan
 
 > brew install trivy semgrep nuclei  # 사용할 보안 도구 설치
 > brew install --cask zap            # OWASP ZAP 설치
+```
+
+gh skill install 명령어를 하면 하나의 명령으로 여러 에이전트에 동시에 설치할 수 있다 . 스페이스 키로 체크를 전환, 엔터로 결정. 계속해서 설치 위치도 묻는다. Project/Global 선택하고 나면 설치가 완료된다. 플래그로 비대화식으로 실행도 아래처럼 가능하다.
+
+```bash
+gh skill install mimul/claude-security-scan claude-security-scan --scope project --agent claude-code
 ```
 
 업데이트가 필요하다면 아래 커맨드를 실행하면 된다.
@@ -124,6 +130,16 @@ claude-security-skills/
 ```bash
 > gh skill update --dry-run  # 무엇이 업데이트되는지 먼저 확인
 > gh skill update            # 업데이트
+```
+
+마지막으로 자신의 skill 공개도 가능하다. SKILL.md 파일이 Agent Skills의 사양을 준수하고 있는지를 체크해, Git 태그 달고 릴리스 버전을 GitHub상에 공개해 준다.
+
+```bash
+# 먼저 dry-run으로 검증 (skills 디렉토리의 부모에서 실행)
+> gh skill publish --dry-run
+# 문제가 없으면 태그 히고 게시
+> git tag v0.1.0 && git push origin v0.1.0
+> gh skill publish
 ```
 
 **3. 실행방법**
