@@ -1,9 +1,9 @@
 ---
 title: 언어에 독립적인 도메인 중심 코딩 원칙과 실천법
-description: Kent Beck·Fowler·Evans의 사상을 바탕으로, Java·Python·TypeScript 등 어떤 언어에서도 적용할 수 있는 설계 원칙, 실천법, 실패 패턴을 정리합니다.
+description: DDD·Clean Code·Refactoring의 핵심을 통합한 도메인 중심 코딩 원칙 14가지와 조직·프로세스 수준에서 반복되는 실패 패턴을 정리합니다.
 author: Mimul
 date: "2026-01-29T10:00:00.000Z"
-lastModificationTime: "2026-04-25T10:00:00.000Z"
+lastModificationTime: "2026-05-08T10:00:00.000Z"
 image: "./style_guide.jpeg"
 tags:
   - coding-style
@@ -13,7 +13,7 @@ tags:
   - software-design
 ---
 
-이 원칙은 Domain-Driven Design(DDD), Clean Code, Code Complete, Refactoring의 핵심 내용을 통합하여, 비즈니스 도메인을 최우선으로 삼으면서도 읽기 쉽고 유지보수성이 높으며 결함이 적은 코드를 만드는 것을 목표로 한다. AI가 코드를 생성할 때 단순히 "중첩을 줄여라", "이름을 명확히 해라" 수준이 아니라, 왜 그렇게 해야 하는지 근거가 있는 원칙에 준하는 내용을 기술한다. 위임을 잘하려면 기준이 명확해야 한다.
+LLM을 활용해 Java, Rust, TypeScript, Python, Go 등 여러 언어로 동시에 작업하다 보면 언어별 스타일 가이드만으로는 부족하다는 것을 느끼게 된다. AI가 코드를 생성할 때 "중첩을 줄여라", "이름을 명확히 해라" 수준이 아니라, 왜 그렇게 해야 하는지 근거가 있는 원칙이 필요하다. 이 원칙은 Domain-Driven Design(DDD), Clean Code, Code Complete, Refactoring의 핵심 내용을 통합하여, 비즈니스 도메인을 최우선으로 삼으면서도 읽기 쉽고 유지보수성이 높으며 결함이 적은 코드를 만드는 것을 목표로 한다.
 
 ## 1. Primary Directive (최우선 지침)
 **불확실할 때, 도메인 모델을 가장 명확하고 표현력 있게 만드는 선택을 하라.**
@@ -49,48 +49,49 @@ tags:
 - 획득한 모든 리소스(DB 커넥션, 파일, 소켓 등)는 반드시 즉시 해제하여 리소스 누수를 방지한다.
 - 캐시는 “성능 향상 기능”이 아니라 데이터 일관성 시스템으로 취급한다. cache invalidation은 가장 어려운 문제 중 하나다.
 
-## 6. Naming & Intent Revealing
+## 6. Naming & Intent Revealing (네이밍과 의도 표현)
 - 이름은 **의도(intent)**와 목적을 명확하게 드러낸다. (추가 주석이 거의 필요 없어야 함)
 - 클래스/모듈은 명사, 메서드/함수는 동사 형태로 작성한다.
 - 발음 가능하고 검색하기 쉬운 이름을 사용하며, 불필요한 약어·접두사·헝가리안 표기법을 금지한다.
 
-## 7. Function / Method Design
+## 7. Function / Method Design (함수·메서드 설계)
 - 하나의 함수는 **하나의 일**만 수행한다 (Single Responsibility).
 - 함수는 작고, 추상화 수준을 일관되게 유지한다.
 - 매개변수는 최소화하고, boolean flag 대신 별도 메서드로 분리한다.
 - Side-effect는 명확히 하고, Command/Query를 분리한다.
 - 깊은 nesting 대신 Guard Clause와 Early Return을 적극 활용한다.
 
-## 8. Structure & Cohesion
+## 8. Structure & Cohesion (구조와 응집도)
 - High Cohesion, Low Coupling을 추구한다.
 - 관련된 개념은 가까이 배치한다.
 - Composition을 Inheritance보다 우선한다.
 - God Class, Feature Envy, Divergent Change, Shotgun Surgery 등의 코드 스멜을 적극 제거한다.
 
-## 9. Refactoring Discipline
+## 9. Refactoring Discipline (리팩토링 규율)
 - **행동은 유지한 채 구조만 개선**한다.
 - 작은 단계로 안전하게 리팩토링하고, 테스트로 보호한다.
 - 기능 추가 전 **Preparatory Refactoring**을 먼저 수행한다.
 - Boy Scout Rule: “만진 코드는 찾았을 때보다 더 깨끗하게 남긴다.”
 
-## 10. Defensive Programming & Error Handling
-- Trust Boundary(외부 입력 지점)에서는 철저히 검증한다.
-- Assertion(프로그래머 가정), Validation(외부 입력), Domain Error(비즈니스 실패)를 구분한다.
+## 10. Defensive Programming & Boundary Validation (방어적 프로그래밍과 경계 검증)
+- Trust Boundary(외부 입력 지점)에서만 철저히 검증한다. 내부 레이어에서 동일한 검증을 반복하지 않는다.
+- Assertion(프로그래머 가정), Validation(외부 입력), Domain Error(비즈니스 실패)를 명확히 구분한다.
 - Happy Path를 쉽게 읽을 수 있게 하고, 에러 처리 로직은 분리한다.
-- Null 대신 명시적인 Optionality나 Domain-specific 타입을 선호한다.
+- Null 대신 명시적인 Optionality(`Option<T>`, `Maybe<T>`) 또는 Domain-specific 타입을 선호한다.
+- Invalid state는 타입 수준에서 존재할 수 없도록 설계한다. 런타임 방어 코드를 여러 겹 쌓는 것보다 그런 상태 자체가 생성되지 않게 만드는 것이 낫다.
 
-## 11. Testing
+## 11. Testing (테스트)
 - 테스트 코드도 생산 코드와 동일한 수준으로 깨끗하고 읽기 쉽게 작성한다.
 - 테스트 이름과 데이터는 테스트하는 **비즈니스 동작**을 명확히 드러낸다.
 - 가능한 한 TDD를 활용한다.
 - 레거시 코드에는 Characterization Test를 적극 활용한다.
 
-## 12. Layered Architecture & Boundaries
+## 12. Layered Architecture & Boundaries (계층 아키텍처와 경계)
 - Domain Layer는 Application, Infrastructure, Presentation Layer로부터 철저히 보호된다.
 - 외부 의존성(DB, API, 라이브러리)은 Adapter/Port로 격리한다.
 - Domain Model은 기술적 세부사항에 오염되지 않아야 한다.
 
-## 13. Complexity Management
+## 13. Complexity Management (복잡도 관리)
 - 단순함을 추구한다. (Simplicity)
 - Premature Optimization, Speculative Generality, Over-engineering을 피한다.
 - “Make it work → Make it right → Make it fast” 순서를 따른다.
@@ -153,7 +154,7 @@ tags:
 
 **5. 너무 이른 추상화**
 
-설계 원칙 3번("추상화와 일반화는 중복이 실제로 드러난 후에 한다")과 같은 맥락이다. 조직·프로세스 수준에서 반복되는 구체 사례는 다음과 같다.
+조직·프로세스 수준에서 반복되는 구체 사례는 다음과 같다.
 
 - 구현이 아직 하나밖에 없는데 Strategy 패턴을 도입하는 것.
 - 검색 조건이 name과 status 두 개뿐인데 독자 DSL을 설계하는 것.
