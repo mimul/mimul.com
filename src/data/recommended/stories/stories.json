@@ -288,6 +288,33 @@
     ]
   },
   {
+    "title": "I’m a Tech Lead, and nobody listens to me. What should I do?",
+    "description": "Tech Lead가 무시당할 때, 더 크게 말하거나 전략 자료를 더 예쁘게 만들 필요가 없다. 팀이 매일 느끼는 고통을 먼저 해결하고, 사람들이 힘들 때 곁에 있어주는 것부터 시작하라. 영향력은 발표가 아니라, 보이는 임팩트와 일관된 행동으로 쌓인다.",
+    "url": "https://world.hey.com/joaoqalves/i-m-a-tech-lead-and-nobody-listens-to-me-what-should-i-do-e16e454d",
+    "date": "2025-12-22T10:11:48.143Z",
+    "tags": [
+      "tech-leader"
+    ]
+  },
+  {
+    "title": "Traits of a good Tech Lead",
+    "description": "좋은 Tech Lead는 가장 뛰어난 개발자가 아니라, 팀 전체의 판단력과 실행력을 높이는 사람이다.",
+    "url": "https://world.hey.com/joaoqalves/traits-of-a-good-tech-lead-b5cac0ae",
+    "date": "2025-12-13T11:23:11.143Z",
+    "tags": [
+      "tech-leader"
+    ]
+  },
+  {
+    "title": "Code is cheap. Show me the talk.",
+    "description": "LLM으로 코드의 가치가 떨어지면서, 잘 말하는 능력(Talk)이 훨씬 더 중요해졌다는 것이다. 문제를 명확히 정의하고, 아키텍처를 설계하며, 의도를 정확하게 전달하는 인간의 사고력과 경험만이 차별점이 된다.",
+    "url": "https://nadh.in/blog/code-is-cheap/",
+    "date": "2018-04-22T08:38:48.143Z",
+    "tags": [
+      "llm"
+    ]
+  },
+  {
     "title": "Google Style Guides",
     "description": "Google에서 사용되는 프로그래밍 언어별 스타일 가이드.",
     "url": "https://google.github.io/styleguide/",
