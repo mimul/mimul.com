@@ -1,6 +1,6 @@
 ---
 title: 매직 넘버에서 데이터 추상까지
-description: 매직 넘버를 상수화를 넘어 데이터 추상을 목표로 가야하는 이유를 설명합니다.
+description: 매직 넘버에서 상수화, Enum, 데이터 추상으로 이어지는 코드 설계의 진화 과정을 살펴보며, Enum만으로 부족한 이유와 비즈니스 규칙을 캡슐화해야 하는 이유를 Java 예제와 함께 설명합니다.
 author: Mimul
 date: "2015-01-18T21:23:58.000Z"
 lastModificationTime: "2026-06-10T00:00:00.000Z"
@@ -30,13 +30,11 @@ if (memberType == 3) {
 
 이런 코드에 등장하는 `20`, `3` 같은 숫자를 흔히 **매직 넘버(Magic Number)** 라고 부른다. 대부분의 개발자는 이런 코드를 발견하면 반사적으로 상수로 추출하고, 상태값이라면 Enum으로 변경한다. 많은 개발팀에서 여기까지를 "좋은 설계"라고 생각한다. 하지만 정말 그럴까?
 
-이 글에서는
+이 글에서는 아래 네 단계의 진화 과정을 살펴보며, 왜 데이터 추상이 최종 목적지인지 설명한다.
 
 ```text
 매직 넘버 → 상수 → Enum → 데이터 추상
 ```
-
-이라는 진화 과정을 살펴보며, 왜 데이터 추상이 최종 목적지인지 설명한다.
 
 ## 1. 매직 넘버
 
@@ -216,7 +214,7 @@ VIP - 이름(상수화)
 ↓
 MemberGrade - 개념(Enum)
 ↓
-member.canReceiveDiscount()- 행동(데이터 추상화)
+member.canReceiveDiscount() - 행동(데이터 추상화)
 ```
 
 첫 번째는 값이다. 두 번째는 이름이다. 세 번째는 개념이다. 네 번째는 행동이다. 많은 개발자가 세 번째 단계인 `MemberGrade.VIP`를 최종 목적지로 여긴다. 그러나 코드를 호출하는 쪽이 알고 싶은 것은 "회원 등급이 무엇인가"가 아니라 "이 회원이 할인을 받을 수 있는가"이기 때문에, 실제 목적지는 네 번째 단계인 `member.canReceiveDiscount()`다. Enum은 개념을 정확히 모델링했지만, 그 개념을 활용해 판단을 내리는 행동은 여전히 외부에 위임되어 있다. 데이터 추상은 그 판단까지 객체 안으로 흡수한다.
@@ -231,8 +229,8 @@ member.canReceiveDiscount()- 행동(데이터 추상화)
 
 ## 추가로 읽어볼 만한 자료
 
-- [David Parnas, Information Hiding (1972)](https://dl.acm.org/doi/10.1145/361598.361623)
-- [Barbara Liskov & Stephen Zilles, Abstract Data Types (1974)](https://dl.acm.org/doi/10.1145/800233.807045)
-- [Eric Evans, Domain-Driven Design (2003)](https://www.domainlanguage.com/ddd/reference/)
-- [Arlo Belshee, The Naming Process](https://arlobelshee.com/tag/naming-is-a-process/)
-- [An empirical study on bug propagation through code cloning](https://www.sciencedirect.com/science/article/abs/pii/S0164121219301815)
+- [David Parnas, Information Hiding (1972)](https://dl.acm.org/doi/10.1145/361598.361623) — 정보 은닉의 원전. 모듈 분해의 기준으로 "변경 가능성이 있는 설계 결정을 숨기는 것"을 제시한다.
+- [Barbara Liskov & Stephen Zilles, Abstract Data Types (1974)](https://dl.acm.org/doi/10.1145/800233.807045) — 추상 데이터 타입(ADT) 개념의 출발점. 인터페이스와 구현을 분리해야 한다는 원칙을 최초로 정식화했다.
+- [Eric Evans, Domain-Driven Design (2003)](https://www.domainlanguage.com/ddd/reference/) — 유비쿼터스 언어와 도메인 모델링의 핵심 개념을 다룬다.
+- [Arlo Belshee, The Naming Process](https://arlobelshee.com/tag/naming-is-a-process/) — 이름 붙이기를 값 → 이름 → 개념 → 행동의 단계적 과정으로 설명한다.
+- [An empirical study on bug propagation through code cloning](https://www.sciencedirect.com/science/article/abs/pii/S0164121219301815) — 코드 클론의 일부만 수정될 경우 동일한 결함이 여러 위치에서 반복 발생함을 실증적으로 분석한 연구(Juergens et al., 2019).
