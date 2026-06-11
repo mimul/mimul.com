@@ -1,9 +1,9 @@
 ---
-title: 매직 넘버에서 데이터 추상까지, Java로 보는 코드 설계의 진화
+title: 매직 넘버에서 데이터 추상까지
 description: 매직 넘버에서 상수화, Enum, 데이터 추상으로 이어지는 코드 설계의 진화 과정을 살펴보며, Enum만으로 부족한 이유와 비즈니스 규칙을 캡슐화해야 하는 이유를 Java 예제와 함께 설명합니다.
 author: Mimul
 date: "2015-01-18T21:23:58.000Z"
-lastModificationTime: "2026-06-11T00:00:00.000Z"
+lastModificationTime: "2015-01-19T08:00:00.000Z"
 image: "./magic_number.png"
 tags:
   - magic-number
@@ -42,9 +42,7 @@ if (member.getGrade() == MemberGrade.GOLD || member.getGrade() == MemberGrade.VI
 if (member.getGrade() == MemberGrade.GOLD || member.getGrade() == MemberGrade.VIP) { issueCoupon(); }
 ```
 
-새로운 등급이 추가되어 할인 대상이 바뀌면, 이 조건을 시스템 전체에서 찾아 수정해야 한다. Enum은 데이터를 타입으로 묶었지만, 그 타입에 대한 비즈니스 판단은 외부에 흩어진 채다.
-
-이 글에서는 아래 네 단계의 진화 과정을 살펴보며, 왜 데이터 추상이 최종 목적지인지 설명한다.
+새로운 등급이 추가되어 할인 대상이 바뀌면, 이 조건을 시스템 전체에서 찾아 수정해야 한다. Enum은 데이터를 타입으로 묶었지만, 그 타입에 대한 비즈니스 판단은 외부에 흩어진 채 있다. 이 글에서는 아래 네 단계의 진화 과정을 살펴보며, 왜 데이터 추상이 최종 목적지인지 설명한다.
 
 ```text
 매직 넘버 → 상수 → Enum → 데이터 추상
@@ -68,7 +66,7 @@ if (age >= 20) { ... }        // TicketService.java
 if (age >= 20) { ... }        // CouponService.java
 ```
 
-정책이 변경되어 기준 나이가 19세로 바뀌면 세 곳을 모두 찾아 수정해야 한다. 하나라도 놓치면 서비스마다 기준이 달라지는 버그가 발생한다. Juergens et al.의 연구(2019)에서도 코드 클론(Code Clone) 중 일부만 수정될 경우 동일한 결함이 여러 위치에서 반복적으로 발생함을 실증적으로 분석했다. 즉 매직 넘버는 복제될수록 유지보수 비용이 기하급수적으로 늘어난다.
+정책이 변경되어 기준 나이가 19세로 바뀌면 세 곳을 모두 찾아 수정해야 한다. 하나라도 놓치면 서비스마다 기준이 달라지는 버그가 발생한다. [Juergens et al.의 연구(2019)](https://www.sciencedirect.com/science/article/abs/pii/S0164121219301815)에서도 코드 클론(Code Clone) 중 일부만 수정될 경우 동일한 결함이 여러 위치에서 반복적으로 발생함을 실증적으로 분석했다. 즉 매직 넘버는 복제될수록 유지보수 비용이 기하급수적으로 늘어난다.
 
 ## 2. 상수화
 
