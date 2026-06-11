@@ -37,9 +37,9 @@ if (memberType == 3) {
 Enum은 타입 안전성을 추가한다. `MemberGrade.GOLD`처럼 허용되지 않은 값의 침투를 컴파일 단계에서 막는다. 그러나 아래처럼 동일한 판단 규칙이 여러 곳에 복제되는 문제는 Enum이 해결해주지 않는다.
 
 ```java
-if (grade == MemberGrade.GOLD || grade == MemberGrade.VIP) { showDiscountBanner(); }
-if (grade == MemberGrade.GOLD || grade == MemberGrade.VIP) { applyDiscount(); }
-if (grade == MemberGrade.GOLD || grade == MemberGrade.VIP) { issueCoupon(); }
+if (member.getGrade() == MemberGrade.GOLD || member.getGrade() == MemberGrade.VIP) { showDiscountBanner(); }
+if (member.getGrade() == MemberGrade.GOLD || member.getGrade() == MemberGrade.VIP) { applyDiscount(); }
+if (member.getGrade() == MemberGrade.GOLD || member.getGrade() == MemberGrade.VIP) { issueCoupon(); }
 ```
 
 새로운 등급이 추가되어 할인 대상이 바뀌면, 이 조건을 시스템 전체에서 찾아 수정해야 한다. Enum은 데이터를 타입으로 묶었지만, 그 타입에 대한 비즈니스 판단은 외부에 흩어진 채다.
@@ -51,6 +51,12 @@ if (grade == MemberGrade.GOLD || grade == MemberGrade.VIP) { issueCoupon(); }
 ```
 
 ## 1. 매직 넘버
+
+```java
+if (age >= 20) {
+    issueAdultTicket();
+}
+```
 
 `20`이라는 숫자는 존재하지만 그 의미는 코드 어디에도 적혀 있지 않다. 이 코드를 처음 보는 개발자는 추측해야 한다. 성인 기준 나이인가? 회원 가입 가능 연령인가? 주류 구매 가능 연령인가? 이벤트 참여 기준인가? 정답은 오직 해당 코드를 처음 작성한 사람만 알고 있다. 코드 리뷰 과정에서도 문제가 된다. 리뷰어가 `20`이라는 숫자를 마주쳤을 때 이 값이 도메인 정책에서 비롯된 것인지, 기술적 한계값인지, 임시로 하드코딩된 것인지 알 방법이 없다. 의미를 파악하기 위해 커밋 로그를 뒤지거나 해당 코드를 작성한 개발자에게 직접 물어봐야 한다.
 
@@ -197,7 +203,7 @@ if (member.canReceiveDiscount()) {
 
 ### 무엇이 달라지는가
 
-데이터 추상으로 가장 크게 달라지는 것은 변경의 국소화와 정보 은닉이다.
+데이터 추상으로 달라지는 것은 크게 네 가지다. 변경의 국소화, 정보 은닉, 중복 지식 제거, 도메인 언어와의 일치.
 
 상수화가 해결한 것은 `20 → 19`처럼 값(Value)의 변경이다. 데이터 추상은 한 단계 더 나아가 "어떤 회원이 할인 대상인가?"라는 정책(Policy)의 변경까지 한 곳에서 처리한다. `PREMIUM` 등급이 추가되어 할인 대상에 포함되어야 한다면 `canReceiveDiscount()` 메서드 하나만 수정하면 된다. 이 메서드를 호출하는 코드는 아무것도 바꾸지 않아도 된다. 변경 범위가 객체 경계 안으로 완전히 들어온 것이다.
 
