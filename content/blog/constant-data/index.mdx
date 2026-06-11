@@ -32,6 +32,18 @@ if (memberType == 3) {
 
 이런 코드에 등장하는 `20`, `3` 같은 숫자를 흔히 **매직 넘버(Magic Number)** 라고 부른다. 대부분의 개발자는 이런 코드를 발견하면 반사적으로 상수로 추출하고, 상태값이라면 Enum으로 변경한다. 많은 개발팀에서 여기까지를 "좋은 설계"라고 생각한다. 하지만 정말 그럴까?
 
+상수화는 `if (age >= 20)`을 `if (age >= ADULT_AGE)`로 바꾸어 가독성과 변경 용이성을 얻는다. 하지만 이 코드를 읽는 사람은 여전히 "성인 판정 규칙이 있다", "나이로 비교한다", "기준은 ADULT_AGE다"라는 세 가지 사실을 직접 파악해야 한다. 값에는 이름이 생겼지만, 그 값을 이용해 판단하는 규칙 자체는 코드 바깥에 노출된 채다.
+
+Enum은 타입 안전성을 추가한다. `MemberGrade.GOLD`처럼 허용되지 않은 값의 침투를 컴파일 단계에서 막는다. 그러나 아래처럼 동일한 판단 규칙이 여러 곳에 복제되는 문제는 Enum이 해결해주지 않는다.
+
+```java
+if (grade == MemberGrade.GOLD || grade == MemberGrade.VIP) { showDiscountBanner(); }
+if (grade == MemberGrade.GOLD || grade == MemberGrade.VIP) { applyDiscount(); }
+if (grade == MemberGrade.GOLD || grade == MemberGrade.VIP) { issueCoupon(); }
+```
+
+새로운 등급이 추가되어 할인 대상이 바뀌면, 이 조건을 시스템 전체에서 찾아 수정해야 한다. Enum은 데이터를 타입으로 묶었지만, 그 타입에 대한 비즈니스 판단은 외부에 흩어진 채다.
+
 이 글에서는 아래 네 단계의 진화 과정을 살펴보며, 왜 데이터 추상이 최종 목적지인지 설명한다.
 
 ```text
