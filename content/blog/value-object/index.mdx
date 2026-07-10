@@ -1,0 +1,312 @@
+---
+title: 값으로 다루는 객체, Value Object 이해하기
+description: DDD에서 Value Object의 불변성, 값 동등성, Smart Constructor, Anti-Corruption Layer를 Java 예시로 설명하고, Parse don't validate와 Make Illegal States Unrepresentable 원칙을 소개합니다.
+author: Mimul
+date: "2018-05-05T10:10:13.000Z"
+lastModificationTime: "2026-07-10T10:00:00.000Z"
+image: "./value_object.png"
+tags:
+  - ddd
+  - value-object
+  - domain-driven-design
+  - java
+---
+
+프리미티브 타입으로 도메인 개념을 표현하다 보면 흔히 부딪히는 문제가 있다.
+
+```java
+void createUser(String email, int age, String postalCode) { ... }
+```
+
+이 시그니처만 보고는 `email`이 올바른 형식인지, `age`가 음수가 아닌지, `postalCode`가 특정 형식을 따르는지 알 방법이 없다. 검증 로직은 메서드 본문에 흩어지고, 같은 검사가 여러 곳에 중복된다. Value Object는 이 문제를 타입 수준에서 해결한다. 이 글은 Value Object가 무엇인지, Entity와 어떻게 다른지, 왜 생성자에서 검증해야 하는지를 순서대로 정리한다.
+
+## Value Object란
+
+Martin Fowler는 Value Object를 "프로퍼티의 값에 따라 동등성이 결정되는 객체"라고 정의한다. 메모리 주소나 식별자가 아닌, 객체가 보유한 값 자체로 같은지를 판단하는 것이 핵심이다. 예를 들어 2D 좌표 `(1, 2)`와 `(1, 2)`는 서로 다른 인스턴스라도 동일하다고 봐야 한다. 반면 두 명의 직원이 이름이 같더라도 사번이 다르면 다른 사람이다. 전자가 Value Object의 사고방식이고, 후자는 Entity의 사고방식이다.
+
+DDD(Domain-Driven Design) 관점에서 Value Object는 "도메인 내의 개념을 수치나 문자로 표현하되, 고유하게 식별해서 변경을 관리할 필요가 없는 것"을 가리킨다.
+
+## Entity와 Value Object의 차이
+
+| | Entity | Value Object |
+|---|---|---|
+| **동등성 판정** | 식별자가 같으면 동일 | 보유한 속성이 모두 같으면 동일 |
+| **가변성** | 시간에 따라 속성 변경 가능 | 반드시 불변 |
+| **수명** | 생성부터 소멸까지 연속된 이력을 가짐 | 수명이라는 개념이 없음 |
+
+실생활 예시로 생각해 보면 이렇다. 직원 "김철수"는 부서가 바뀌고 나이가 들어도 같은 직원이다(Entity). 반면 100원짜리 동전은 어느 동전이냐가 아니라 그 가치가 중요하다. 어느 100원이든 같다(Value Object).
+
+불변성의 차이도 직관적으로 이해할 수 있다. 100원짜리 동전에 새겨진 "100"이라는 숫자를 지우고 "500"으로 고치지 않는다. 100원을 500원으로 바꾸고 싶다면, 100원짜리를 버리고 500원짜리를 새로 꺼낸다. Value Object의 값이 바뀔 때는 객체를 수정하는 것이 아니라 새로운 객체로 교체한다.
+
+수명의 차이는 이 두 특성에서 따라 나온다. Entity는 생성부터 소멸까지 연속된 이력을 갖고, 그 변화의 역사(직원의 부서 이동, 승진)가 곧 추적 대상이 된다. 반면 Value Object에는 수명이라는 개념이 없다. 필요할 때 만들고, 쓰고, 버려도 도메인에는 아무 일도 일어나지 않는다.
+
+Entity와 Value Object는 대립 관계가 아니다. Value Object는 수명이 없으므로 단독으로 존재하지 못하고, Entity가 이를 속성으로 보유하는 구조가 일반적이다. `User` Entity가 `Email`, `Age`, `PostalCode`라는 Value Object를 속성으로 갖는 식이다. 역방향도 가능하다. Value Object가 Entity를 참조하는 것은 허용된다. 예를 들어 "배송 이력"이라는 Value Object가 "고객" Entity를 참조할 수 있다. 단, 두 Value Object 사이의 양방향 참조는 의미가 없다. Value Object는 식별자가 없으므로 서로를 가리키는 구조가 필요하지 않다.
+
+중요한 점은 어떤 개념이 VO인지 Entity인지가 고정되지 않는다는 것이다. 우편주소를 예로 들면, 쇼핑몰에서 "배송지 주소"는 값만 같으면 동일하게 취급되므로 VO가 자연스럽다. 하지만 부동산 관리 시스템에서 주소는 각 건물을 고유하게 식별하는 기준이 되므로 Entity가 더 적합하다. 같은 개념이라도 도메인의 맥락과 모델링 목적에 따라 VO가 되기도 하고 Entity가 되기도 한다.
+
+판단이 어려울 때는 Vladimir Khorikov가 제안한 정수 치환 테스트가 유용하다. 그 개념을 정수로 바꿔 놓고 생각해 보는 것이다. 정수 5를 쓸 때 "어느 5인지"는 아무도 신경 쓰지 않는다. 어떤 개념이 이처럼 값만 중요하고 어느 인스턴스인지가 중요하지 않다면 Value Object로 모델링하는 것이 자연스럽다.
+
+## Value Object의 핵심 특성
+
+### 1. 불변성
+
+Value Object는 생성 후 상태가 변하지 않는다. Java에서는 setter를 제공하지 않고 필드를 `final`로 선언하는 방식으로 구현한다.
+
+```java
+final class Money {
+    private final int amount;
+    private final Currency currency;
+
+    public Money(int amount, Currency currency) {
+        if (amount < 0) throw new IllegalArgumentException("금액은 0 이상이어야 합니다.");
+        this.amount = amount;
+        this.currency = currency;
+    }
+
+    public Money add(Money other) {
+        if (!this.currency.equals(other.currency)) {
+            throw new IllegalArgumentException("통화가 일치하지 않습니다.");
+        }
+        return new Money(this.amount + other.amount, this.currency);
+    }
+}
+```
+
+`add()` 메서드는 기존 객체를 수정하지 않고 새로운 `Money` 객체를 반환한다. 이 패턴 덕분에 스레드 안전성이 자동으로 확보되고, 객체를 캐싱하거나 공유해도 부작용이 없다. 상태가 변하지 않으니 예상치 못한 업데이트가 발생할 여지도 없다.
+
+불변성이 필요한 더 근본적인 이유는 **별명 참조 문제(aliasing bugs)** 때문이다. Fowler가 제시한 예시가 직관적이다.
+
+```java
+Date partyDate = retirementDate;
+partyDate.setDate(5);   // retirementDate도 함께 바뀐다
+```
+
+두 변수가 동일한 객체를 가리키므로, 한쪽을 수정하면 다른 쪽도 예상치 못하게 바뀐다. Value Object를 불변으로 만들면 참조를 몇 개나 공유하든 이 문제 자체가 생기지 않는다.
+
+성능상의 이유로 불변성을 유지하기 어려운 경우, DDD Reference는 가변 VO를 조건부로 허용한다. 단 **가변 VO는 절대 공유해서는 안 된다**. 공유된 가변 VO는 aliasing bug의 근원이 된다.
+
+### 2. 값 동등성
+
+두 Value Object는 보유한 값이 같으면 동일하다. Java에서는 `equals()`와 `hashCode()`를 재정의해서 이를 구현한다.
+
+```java
+final class PostalCode {
+    private final String code;
+
+    public PostalCode(String code) {
+        if (!code.matches("\\d{5}")) {
+            throw new IllegalArgumentException("올바르지 않은 우편번호 형식입니다.");
+        }
+        this.code = code;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PostalCode)) return false;
+        return code.equals(((PostalCode) o).code);
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
+}
+```
+
+포커 카드 예시로 생각하면 직관적이다. 서로 다른 두 벌의 카드에서 꺼낸 스페이드 에이스는 같은 카드다. Value Object는 이처럼 "어느 인스턴스냐"가 아닌 "무슨 값이냐"로 동일성을 판단한다.
+
+### 3. 자기 검증 - "Parse, don't validate"
+
+Value Object의 생성자에서 검증을 수행하는 것은 단순한 방어 코딩이 아니다. [Alexis King이 제안한 "Parse, don't validate"](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) 철학과 깊이 연결된다.
+
+이 철학의 출발점은 **부분함수(partial function)** 문제다. 예를 들어 비어있지 않음이 보장된 리스트에서 첫 번째 원소를 꺼내는 상황을 생각해 보자. 이를 안전하게 만드는 방법은 두 가지가 있다.
+
+**접근 1. Optional로 감싸 반환 타입을 약화하기**
+
+```java
+List<String> configDirs = getConfigurationDirectories(); // 내부에서 비어있지 않음을 이미 검증함
+Optional<String> first = configDirs.stream().findFirst();
+if (first.isPresent()) {
+    initializeCache(first.get());
+} else {
+    throw new RuntimeException("should never happen"); // 중복 검증
+}
+```
+
+`getConfigurationDirectories()`에서 이미 비어있지 않음을 확인했지만, `Optional`을 반환하기 때문에 호출 지점에서 또 확인해야 한다. `"should never happen"` 주석이 달린 예외 처리는 이 패턴의 전형적인 신호다. 한 곳에서 확인한 사실을 타입 시스템이 기억하지 못하기 때문에 발생하는 중복이다.
+
+**접근 2. 더 구체적인 타입으로 파싱해 인자 타입을 강화하기**
+
+더 나은 해결책은 "비어있지 않은 리스트"를 별도의 타입으로 표현하는 것이다. 검증을 통과한 사실을 타입에 인코딩하면, 이후 코드는 그 사실을 타입만으로 신뢰할 수 있다. 이것이 파싱이다.
+
+이를 구현하는 대표적인 패턴이 **Smart Constructor** 다. 생성자를 `private`으로 막고, 검증 로직을 포함한 정적 팩토리 메서드를 통해서만 객체를 만들 수 있게 한다.
+
+```java
+final class Email {
+    private final String value;
+
+    private Email(String value) {  // 직접 생성 불가
+        this.value = value;
+    }
+
+    public static Email of(String raw) {  // Smart Constructor
+        if (!raw.contains("@")) throw new IllegalArgumentException("올바르지 않은 이메일 형식입니다.");
+        return new Email(raw);
+    }
+}
+
+void createUser(Email email) {
+    sendWelcomeEmail(email); // 이미 유효하다는 것이 타입으로 보장됨
+}
+```
+
+public 생성자로도 검증은 가능하다. Smart Constructor의 차이는 "검증을 거치지 않고는 이 객체를 만들 수 없다"는 것을 구조적으로 강제한다는 점이다. 호출자가 실수로 `new Email("invalid")`처럼 검증 경로를 우회할 여지 자체를 없앤다. `Email` 타입을 받는 메서드는 검증을 다시 할 필요가 없다. 타입 자체가 "이미 검증된 이메일"임을 보장하기 때문이다.
+
+이와 반대로 검증만 하고 타입을 바꾸지 않으면, 검증 로직이 호출 지점마다 흩어지는 "Shotgun Parsing" 안티패턴이 된다. 입력의 일부가 유효함을 확인한 뒤 다른 부분에서 무효함을 발견하는 상황이 생기고, 그 시점에 프로그램 상태가 얼마나 진행됐는지 추론하기 어려워진다.
+
+**실무 적용 단서**: `void`를 반환하는 검증 메서드가 보이면 파싱으로 전환할 수 있는지 검토할 만하다. `void validateEmail(String email)` 형태는 검증 결과를 버린다. 반환값이 없다는 것은 그 지식이 타입 시스템에 기록되지 않는다는 뜻이고, 호출자가 동일한 검증을 반복할 가능성이 남는다. `Email validateEmail(String email)`처럼 더 구체적인 타입을 반환하도록 바꾸면 그 지식이 보존된다.
+
+### 4. 도메인 로직의 응집
+
+Value Object는 단순히 값을 담는 그릇이 아니다. 그 값과 관련된 도메인 로직도 함께 가질 수 있다.
+
+```java
+final class Age {
+    private final int value;
+
+    private Age(int value) {
+        this.value = value;
+    }
+
+    public static Age of(int value) {
+        if (value < 0 || value > 150) throw new IllegalArgumentException("올바르지 않은 나이입니다.");
+        return new Age(value);
+    }
+
+    public boolean isAdult() {
+        return value >= 19;
+    }
+}
+```
+
+이메일 형식 검증을 `User` Entity에 두는 것보다 `Email` Value Object에 두는 편이 응집도가 높다. 나이의 성인 판정 로직이 `User`에 있는 것보다 `Age`에 있는 것이 더 자연스럽다. 관련 있는 것끼리 묶이므로 관련 없는 곳에서 동일한 로직이 중복될 가능성이 줄어든다.
+
+나이는 단순한 정수가 아니다. 정수에 허용되는 연산이라도 나이에 곱셈이나 나눗셈을 적용하는 것은 도메인적으로 무의미하기 때문이다. 전용 타입으로 묶으면 이런 부적절한 연산이 자연스럽게 차단된다.
+
+### 5. 불가능한 상태를 표현할 수 없게 만들기 - "Make Illegal States Unrepresentable"
+
+Value Object가 궁극적으로 달성하려는 설계 원칙이 있다. 잘못된 상태를 애초에 타입으로 표현할 수 없게 만드는 것이다.
+
+```java
+// 잘못된 상태가 표현 가능한 구조
+class DateRange {
+    public LocalDate start;  // null 가능
+    public LocalDate end;    // null 가능, start 이전일 수도 있음
+}
+
+// 불법 상태를 표현 불가능하게 만든 구조
+final class DateRange {
+    private final LocalDate start;
+    private final LocalDate end;
+
+    private DateRange(LocalDate start, LocalDate end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    public static DateRange of(LocalDate start, LocalDate end) {
+        Objects.requireNonNull(start, "시작일은 null일 수 없습니다.");
+        Objects.requireNonNull(end, "종료일은 null일 수 없습니다.");
+        if (!end.isAfter(start)) throw new IllegalArgumentException("종료일은 시작일 이후여야 합니다.");
+        return new DateRange(start, end);
+    }
+}
+```
+
+`DateRange` 객체가 존재한다는 사실 자체가 "start < end이고, 둘 다 null이 아니다"를 보장한다. 이 객체를 받는 코드는 조건을 다시 확인할 필요가 없다. "이 값이 유효한가?"라고 묻는 것이 아니라, "이 타입의 값은 항상 유효하다"는 구조를 만드는 것이 목표다.
+
+## 흔한 오해: 두 가지 안티패턴
+
+Value Object와 관련해서 반대 방향의 두 가지 안티패턴이 존재한다.
+
+**Primitive Obsession** 은 실제로 복잡한 개념을 프리미티브 타입으로만 다루는 문제다. 겉으로는 단순해 보이지만, 코드가 쌓이면 세 가지 증상이 나타난다.
+
+```java
+// 파라미터 순서를 바꿔도 컴파일러가 잡지 못한다
+void transfer(String fromAccountId, String toAccountId, int amount) { ... }
+transfer(toId, fromId, amount); // 런타임에야 버그 발견
+```
+
+- **타입이 의미를 잃는다**: `String` 파라미터가 이메일인지, 계좌 ID인지, 우편번호인지 시그니처만 봐서는 알 수 없다.
+- **검증이 중복된다**: 같은 이메일 형식 검사가 컨트롤러, 서비스, 리포지토리에 각각 흩어진다.
+- **잘못된 결합이 허용된다**: `transfer(toId, fromId, amount)`처럼 인자 순서가 바뀌어도 컴파일러가 잡지 못한다.
+
+`AccountId`와 `Money` 타입을 도입하면 이 세 가지가 동시에 해소된다. 순서 오류는 컴파일 타임에 잡히고, 검증은 생성자에 모이며, 타입이 곧 의미가 된다.
+
+**Value Object Obsession** 은 반대 극단이다. "Value Object를 쓰면 좋다"는 것을 알게 된 후, 모든 프리미티브 타입을 전용 클래스로 감싸야 한다는 강박에 빠지는 것이다.
+
+```java
+// 과도한 예시
+class CustomerPostalCode { ... }
+class ShippingPostalCode { ... }
+class BillingPostalCode { ... }
+```
+
+실제로는 `PostalCode` 하나로 충분할 수 있다. 개념적으로 다른 우편번호인지, 아니면 단순히 사용 위치만 다른 같은 우편번호인지를 먼저 판단해야 한다.
+
+크기에 대한 오해도 흔하다. "VO는 작아야 한다"고 생각하기 쉽지만, VO의 크기에는 제약이 없다. 여러 필드를 가진 큰 구조라도 개념적 정체성이 필요 없고 참조를 공유할 이유가 없다면 VO로 모델링하는 것이 맞다.
+
+도메인의 복잡성이 커지면서 결과적으로 많은 멤버가 Value Object가 되는 것은 자연스럽다. 하지만 처음부터 그것을 목표로 삼아서는 안 된다. YAGNI(You Aren't Gonna Need It) 원칙에 따라, 진정한 복잡성이 나타날 때 Value Object를 도입하는 것이 낫다. 도입을 정당화하는 기준은 "이 값이 자체적인 검증, 로직, 또는 의미론적 구분을 필요로 하는가"다.
+
+용어 혼동도 주의할 필요가 있다. 2000년대 초 J2EE 문헌에서는 "Value Object"를 Data Transfer Object(DTO)의 의미로 잘못 사용한 사례가 많았다. 지금도 VO를 "DB에서 조회한 데이터를 담는 객체"로 이해하는 경우가 있는데, 이는 DDD에서 말하는 Value Object와 다른 개념이다. DDD의 VO는 전송 컨테이너가 아니라 도메인 개념을 값으로 표현하는 객체다.
+
+## 외부 입력과 내부 도메인의 경계: Anti-Corruption Layer
+
+Value Object는 도메인 내부에서 흐르는 타입이다. 그런데 외부에서 들어오는 데이터(HTTP 요청, DB 조회 결과, 외부 API 응답)는 `String`, `int`, `Map` 같은 프리미티브 타입으로 도착한다. 이것을 도메인 타입으로 변환하는 경계를 **Anti-Corruption Layer(ACL)** 라고 한다.
+
+```java
+// 컨트롤러 - ACL 역할: 외부 표현 → 도메인 타입
+class UserController {
+    void createUser(CreateUserRequest request) {
+        Email email = Email.of(request.getEmail());
+        Age age = Age.of(request.getAge());
+        PostalCode postalCode = PostalCode.of(request.getPostalCode());
+
+        userService.createUser(email, age, postalCode);
+    }
+}
+
+// 도메인 서비스 - 프리미티브 타입을 전혀 다루지 않음
+class UserService {
+    void createUser(Email email, Age age, PostalCode postalCode) {
+        // 이미 유효한 타입만 받으므로 재검증 불필요
+    }
+}
+```
+
+ACL의 역할은 "외부의 언어를 도메인의 언어로 번역"하는 것이다. 잘못된 값은 ACL을 통과하는 순간 Smart Constructor에 의해 예외로 거부된다. 경계 바깥에서는 `String email`이 흐르고, 경계 안쪽에서는 `Email email`만 흐른다. 도메인 계층은 항상 유효한 데이터 위에서만 동작한다.
+
+이것이 Type-driven Design의 핵심이다. 도메인의 불변식을 타입에 표현하면, 그 타입을 사용하는 코드 전체에서 불변식이 자동으로 유지된다. 검증 코드를 "작성"하는 것이 아니라 "작성할 필요가 없는 구조"를 만드는 것이 목표다.
+
+## 정리
+
+Value Object는 "식별할 필요 없이 값 자체로 동일성을 판단하는 객체"다. 핵심은 다음과 같다.
+
+- **불변성**: 생성 후 상태를 변경하지 않고 새 객체로 교체한다.
+- **값 동등성**: 보유한 값이 같으면 같은 것으로 본다.
+- **도메인 로직의 응집**: 값과 관련된 검증과 로직을 그 값의 타입에 함께 둔다.
+- **Smart Constructor**: 검증을 우회한 객체 생성을 구조적으로 차단한다.
+- **Make Illegal States Unrepresentable**: 잘못된 상태를 타입으로 표현할 수 없게 만든다.
+- **Anti-Corruption Layer**: 외부 입력을 경계에서 도메인 타입으로 변환해 내부를 보호한다.
+
+Entity가 시간에 따라 변하는 식별 가능한 사물이라면, Value Object는 특정 순간의 개념을 측정하고 설명하는 값이다. Primitive Obsession을 극복하는 출발점이 Value Object이고, 그 Value Object를 올바르게 쓰는 구조가 ACL이다. 이 흐름이 맞물릴 때 도메인 계층은 검증 코드 없이도 항상 유효한 상태를 유지한다.
+
+## 참고 자료
+
+- [ValueObject — Martin Fowler](https://martinfowler.com/bliki/ValueObject.html)
+- [AliasingBug — Martin Fowler](https://martinfowler.com/bliki/AliasingBug.html)
+- [DDD Reference — Eric Evans](https://www.domainlanguage.com/wp-content/uploads/2016/05/DDD_Reference_2015-03.pdf)
+- [Parse, don't validate — Alexis King](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)
+- [Entity vs Value Object, the ultimate list of differences — Vladimir Khorikov](https://enterprisecraftsmanship.com/posts/entity-vs-value-object-the-ultimate-list-of-differences/)
+- [Value Objects Like a Pro](https://medium.com/@nicolopigna/value-objects-like-a-pro-f1bfc1548c72)
