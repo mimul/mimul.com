@@ -1,0 +1,108 @@
+---
+title: Herdr 설정
+description: 까먹지 않기 위해 Tmux 호환 Herdr 설정을 기록함.
+author: Mimul
+date: "2026-06-22T21:30:26:09.000Z"
+topics:
+  - herdr
+---
+
+[herdr](https://github.com/ogulcancelik/herdr)은 "AI 코딩 에이전트를 위한 터미널 관리자"로 Rust 언어로 개발되고 있다. Claude 등의 에이전트를 여러 창에서 병렬로 실행시켜 그 상태를 관리할 수 있다. tmux와 마찬가지로 prefix 키 방식으로 세션, 윈도우, 페인을 취급할 수 있기 때문에 tmux 사용자라면 바로 익숙해질 수 있다.
+
+**1. 터미널 관리자 비교**
+
+| 비교 기능 | tmux/Zellij | cmux(Agent apps) | Herdr |
+|-----------|-------------|-------------------|-------|
+| 운영 환경 | 터미널 내 | Mac 전용 GUI 데스크톱 앱 | 터미널 내(OS 불문) |
+| 세션 영속성 | 완벽 | 제한적 |  완벽 |
+| 상태(Context) 감지 | 못함 | 가능(앱 내 시각화) | 가능(터미널 출력에서 상태 감지) |
+| 마우스 조작 | 설정 필요 / 제한적 | 전체 지원 | 전체 지원 |
+| 자동 오케스트레이션 | 스크립트로 일부 가능 | 일부 가능 | 네이티브 API로 완전 지원 |
+
+**2. herdr 의 화면 구성**
+
+| 구분         | 설명                                         | 
+| ----------- | ------------------------------------------- |
+| Workspace   | 프로젝트별 컨텍스트. 리포지토리별로 나누는 것이 기본.    |
+| Tab         | Workspace 내의 하위 컨텍스트                     |
+| Pane        | Tab 내의 터미널 분할. 쉘, 에이전트, 서버 등을 각각 실행 |
+
+tmux의 Session > Window > Pane에 해당하는 개념과 비슷하다.
+
+**2. 설치**
+
+```
+> brew install herdr
+```
+
+**3. 설정(~/.config/herdr/config.toml)**
+
+```
+onboarding = false
+
+[keys]
+prefix = "ctrl+t"
+detach = "prefix+d"                       # 세션에서 분리
+new_tab = "prefix+c"
+close_tab = "prefix+&"
+rename_tab = "prefix+,"
+previous_tab = "prefix+p"
+switch_tab = "prefix+1..9"                # 번호(1~9)로 탭을 직접 전환
+split_vertical = "prefix+v"               # 창 세로 분할(좌우)
+split_horizontal = "prefix+s"             # 창을 수평 분할(상하)
+last_pane = "prefix+;"                    # 직전에 조작한 창으로 이동
+close_pane = "prefix+x"                   # 현재 창 닫기
+copy_mode = "prefix+["                    # 복사 모드(스크롤/선택)로 들어가기
+reload_config = ["f5", "prefix+r"]        # 설정 파일 다시 로드
+resize_mode = "prefix+shift+r"            # 창의 크기 조정 모드로 들어가기
+
+focus_pane_left  = ["shift+left",  "prefix+h"]
+focus_pane_down  = ["shift+down",  "prefix+j"]
+focus_pane_up    = ["shift+up",    "prefix+k"]
+focus_pane_right = ["shift+right", "prefix+l"]
+
+[theme]
+name = "terminal"
+auto_switch = true
+dark_name = "dracula"
+light_name = "catppuccin-latte"
+
+[session]
+resume_agents_on_restore = true           # 세션 복원시 에이전트도 재개
+
+[ui]
+show_agent_labels_on_pane_borders = true  # 창에 에이전트 레이블 표시
+
+agent_panel_sort = "priority"
+[ui.toast]
+delivery = "system"                       # 알림 표시 방법(system = OS 표준 알림 사용)
+
+[ui.sound]
+enabled = false                           # 효과음 비활성화
+
+# herdr 작업공간(spaces)은 tmux session과 유사.
+
+# `prefix w` – 목록 선택기 열기/전환(tmux의 choose-tree와 비슷. 화살표+Enter로 선택)
+#   - `↑`– 이전 작업 공간으로
+#   - `↓`– 다음 작업공간으로
+# `prefix shift+n` – 새로 만들기
+# `prefix shift+w` – 이름 변경
+# `prefix shift+d` – 삭제
+```
+
+**4. AI Agent 상태**
+
+- 🔴 Block – 승인 또는 입력 대기 중 정지 중
+- 🟡 Working - 작업 중
+- 🔵 Done – 완료
+- 🟢 Idle – 대기 중
+- ⚪ Unknown – 일반 쉘과 같은 비 에이전트
+
+**5. 마무리**
+Herdr이 AI Agent 시대에는 잘 맞는 툴인거 같다. IDE에서 CLI로 넘어가면서 자연스럽게 아래 워크플로가 가능해지고 있다.
+
+- 평소에는 Ghostty에서 터미널 중심으로 작업하고,
+- 대규모 코드 리딩이 필요하면 Zed에서 하고,
+- 이동 중에는 Orca IDE에서 같은 Agent를 이어받아 확인하며,
+- 다시 집에 와서는 Ghostty에서 이어서 작업한다.
+
