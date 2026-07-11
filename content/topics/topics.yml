@@ -370,3 +370,7 @@
   slug: webmention
   description: ""
   image: ""
+- title: tool
+  slug: tool
+  description: "AI, 리눅스에서 사용하는 툴"
+  image: "tool_ai.png"
