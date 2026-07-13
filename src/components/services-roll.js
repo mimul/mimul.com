@@ -17,7 +17,7 @@ const ServicesRoll = (props) => {
             <div className="columns">
               <div className="column">
                 <small>{domainFromURL(service.url)}</small>
-                <h4 className="title is-4">
+                <h4 className="post-title">
                   <OutboundLink
                     target="_blank"
                     href={transformURL(service.url)}
