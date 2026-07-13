@@ -16,15 +16,18 @@ const CardPostCss = (p) => css`
     height: 100%;
   }
   .featured-image {
+    position: relative;
     width: 100%;
-    object-fit: cover;
-    margin-right: 50px;
+    aspect-ratio: 16 / 9;
+    background: rgba(0, 0, 0, 0.04);
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
-    img {
+    .gatsby-image-wrapper {
+      position: absolute;
+      inset: 0;
       width: 100%;
-      object-fit: cover;
+      height: 100%;
     }
   }
   a {
@@ -49,9 +52,15 @@ const CardPostCss = (p) => css`
   }
   .content {
     width: 100%;
-    margin-top: 35px;
+    margin-top: 20px;
     .post-title {
       font-size: 18px;
+      line-height: 1.45;
+      min-height: 2.9em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
       text-transform: capitalize;
       font-weight: 500;
       .blog-date {
@@ -138,6 +147,15 @@ const CardPostCss = (p) => css`
   p {
     font-size: 0.9rem;
   }
+  p.ar-subtitle {
+    line-height: 1.6;
+    min-height: 4.8em;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1em;
+  }
 `;
 
 const StyledDiv = styled("div")`
@@ -154,7 +172,11 @@ const BlogCard = ({ post, tag }) => {
         }}
       >
         <div className="featured-image card-image">
-          <GatsbyImage image={post.hero.full} alt={post.title} />
+          <GatsbyImage
+            image={post.hero.full}
+            alt={post.title}
+            objectFit="contain"
+          />
           {tag && (
             <div className="card-content is-overlay is-clipped">
               <span className="tag is-primary">{tag}</span>
