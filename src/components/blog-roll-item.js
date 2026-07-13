@@ -14,18 +14,27 @@ const CardPostCss = (p) => css`
     height: 100%;
   }
   .featured-image {
+    position: relative;
+    flex: 0 0 35%;
     width: 35%;
-    object-fit: cover;
-    margin-right: 50px;
+    aspect-ratio: 4 / 3;
+    background: rgba(0, 0, 0, 0.04);
+    margin-right: 24px;
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
+    .gatsby-image-wrapper {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
   }
   a {
     display: flex;
-    padding: 50px;
+    padding: 24px;
     overflow: hidden;
-    align-items: center;
+    align-items: flex-start;
     font-size: 14px;
     border-radius: 6px;
     margin-bottom: 20px;
@@ -41,8 +50,16 @@ const CardPostCss = (p) => css`
   }
   .content {
     width: 65%;
+    flex: 1;
+    min-width: 0;
     .post-title {
       font-size: 1.2rem;
+      line-height: 1.45;
+      min-height: 2.9em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
       text-transform: capitalize;
       font-weight: 500;
       .blog-date {
@@ -129,6 +146,14 @@ const CardPostCss = (p) => css`
   p {
     font-size: 0.9rem;
   }
+  p.ar-subtitle {
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1em;
+  }
   @media screen and (max-width: 768px) {
     margin: auto;
     a {
@@ -137,7 +162,7 @@ const CardPostCss = (p) => css`
     }
     .content {
       width: 100%;
-      margin-top: 35px;
+      margin-top: 20px;
       .post-title {
         font-size: 18px;
         .blog-date {
@@ -147,10 +172,8 @@ const CardPostCss = (p) => css`
     }
     .featured-image {
       width: 100%;
-      img {
-        width: 100%;
-        object-fit: cover;
-      }
+      aspect-ratio: 16 / 9;
+      margin-right: 0;
     }
   }
 `;
@@ -169,7 +192,11 @@ const BlogRollItem = ({ post }) => {
         }}
       >
         <div className="featured-image">
-          <GatsbyImage image={post.hero.full} alt={post.title} />
+          <GatsbyImage
+            image={post.hero.full}
+            alt={post.title}
+            objectFit="contain"
+          />
         </div>
         <div className="content">
           <div className="post-title">{post.title}</div>

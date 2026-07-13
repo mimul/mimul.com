@@ -88,7 +88,6 @@ function LatestPosts() {
   const lastUpdatedPosts = data.lastUpdatedPosts.edges.map(
     normalize.local.articles
   );
-  console.log('LatestPosts', data);
   //* In order to skip the latest posts repeating in last updated one, we are fetching last four updated posts and selecting the one which is not in the latest posts.
   const lastUpdatedPost = lastUpdatedPosts.find((u) =>
     latestArticles.every((a) => a.id !== u.id)
@@ -126,24 +125,27 @@ function LatestPosts() {
 export default LatestPosts;
 
 const LatestPostsCss = (p) => css`
-  @media screen and (max-width: 1980px) and (min-width: 767px) {
+  @media screen and (min-width: 769px) {
     .blog-post {
       margin: auto;
       a {
         display: block;
         padding: 10px;
       }
+      .featured-image {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        margin-right: 0;
+      }
       .content {
         width: 100%;
+        margin-top: 20px;
         .post-title {
           font-size: 18px;
           .blog-date {
             margin: 0;
           }
         }
-      }
-      .featured-image {
-        display: none;
       }
     }
   }
