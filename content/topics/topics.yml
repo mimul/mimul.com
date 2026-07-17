@@ -370,7 +370,15 @@
   slug: webmention
   description: ""
   image: ""
-- title: tool
+- title: Tool
   slug: tool
   description: "AI, 리눅스에서 사용하는 툴"
   image: "tool_ai.png"
+- title: Yagni
+  slug: yagni
+  description: "YAGNI - You Aren't Gonna Need It"
+  image: "yagni.png"
+- title: Programming
+  slug: programming
+  description: "프로그래밍의 모든 것"
+  image: "programming.png"

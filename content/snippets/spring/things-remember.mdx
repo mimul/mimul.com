@@ -1,0 +1,46 @@
+---
+title: Programming에서 잊기 쉬운 것들 정리
+description: 프로그래밍에서 간헐적 잊음을 메모로 극복한다.
+author: Mimul
+date: "2020-06-18T21:12:31.000Z"
+topics:
+  - programming
+---
+공부를 열심히 해도 잊어지는 건 어쩔 수 없나 보다. 그래서 기록으로 남겨둔다.
+
+**1. ThreadPoolTaskExecutor 설정**
+
+1. corePoolSize 까지 Thread 만들기
+2. corePoolSize 가득 차면 queueCapacity 까지 큐잉
+3. queueCapacity 넘을 때 maxPoolSize까지 Thread 증가
+4. maxPoolSize 넘을 때 거부
+
+```Java
+@Bean
+ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+   ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+   taskExecutor.setCorePoolSize(4);
+   taskExecutor.setQueueCapacity(4);
+   taskExecutor.setMaxPoolSize(40);
+   return taskExecutor;
+}
+
+```
+
+그리고 ThreadPoolTaskExecutor가 위양하고 있는 java.util.concurrent.ThreadPoolExecutor 를 만들 때는 다음과 같은 사용법을 사용하는 경우가 많은데
+
+```Java
+ExecutorService executorService = Executors.newFixedThreadPool(40);
+```
+위의 방법은 아래와 같은 의미이다.
+
+```Java
+@Bean
+ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+   ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+   taskExecutor.setCorePoolSize(40);
+   taskExecutor.setMaxPoolSize(40);
+   return taskExecutor;
+}
+
+```
