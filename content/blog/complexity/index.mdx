@@ -1,9 +1,9 @@
 ---
-title: 소프트웨어 복잡성은 어디서 오고, 어떻게 다스릴 수 있는가
+title: 소프트웨어 복잡성에 대해
 description: State/Control이 만드는 복잡성의 원인, Essential과 Accidental Complexity의 구분, 분류값이 만드는 조건 분기 리팩터링까지 복잡성 이론과 실천을 정리합니다.
 author: Mimul
 date: "2021-08-04T02:07:09.000Z"
-lastModificationTime: "2021-08-1020:22:00.000Z"
+lastModificationTime: "2021-08-10T20:22:00.000Z"
 image: "./complexity_layers.png"
 tags:
   - complexity
@@ -12,6 +12,7 @@ tags:
   - accidental-complexity
   - stratified-design
   - domain-driven-design
+  - programming
 ---
 
 Fred Brooks는 1986년 "No Silver Bullet"에서 소프트웨어를 어렵게 만드는 성질로 복잡성(Complexity), 순응성(Conformity), 변경 용이성(Changeability), 비가시성(Invisibility) 네 가지를 꼽았다. 그런데 2006년 벤 모즐리와 피터 마크스는 논문 "Out of the Tar Pit"에서 이 네 가지 중 진짜 근본 원인은 복잡성 하나뿐이라고 정리한다. 순응성은 기존 시스템의 복잡한 제약에 맞춰야 하는 문제이고, 비가시성은 복잡한 구조를 눈에 보이는 형태로 그려낼 수 없다는 문제이며, 변경 용이성이 어려운 이유도 결국 시스템이 복잡해서 어디를 건드려야 할지 알 수 없기 때문이다. 네 가지 성질은 서로 다른 이름을 달고 있지만 뿌리를 파보면 하나로 수렴한다.
