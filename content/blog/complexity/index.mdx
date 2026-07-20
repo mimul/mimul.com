@@ -1,6 +1,6 @@
 ---
 title: 소프트웨어 복잡성은 어디서 오고, 어떻게 다스릴 수 있는가
-description: State와 Control이 만드는 복잡성의 원인, Essential과 Accidental Complexity의 구분, Unknown Unknowns와 Simple Made Easy, Stratified Design까지 소프트웨어 복잡성 이론과 실천을 하나의 예제로 정리합니다.
+description: State/Control이 만드는 복잡성의 원인, Essential과 Accidental Complexity의 구분, 분류값이 만드는 조건 분기 리팩터링까지 복잡성 이론과 실천을 정리합니다.
 author: Mimul
 date: "2021-08-04T02:07:09.000Z"
 lastModificationTime: "2026-07-20T00:00:00.000Z"
@@ -260,9 +260,210 @@ void charge(UserId userId, long amount) {
 | Obscurity·Dependencies 축소 | 인터페이스 뒤에 지식을 감췄는가? | `IdentityCheck`, `AccountCheck`, `Blacklist` |
 | 인터페이스 깊이 점검 | 복잡성을 호출자와 구현 중 누가 떠안는가? 너무 잘게 쪼개지 않았는가? | 복잡성을 아래로 끌어내리기 / classitis 경계 |
 
+## 분류가 만드는 복잡성과 다스리는 법
+
+위 네 가지 방법은 상태, 제어, 코드량이라는 "Out of the Tar Pit"의 원인들을 겨냥한다. 그런데 실무에서는 이 목록에 없는 원인이 하나 더 자주 부딪힌다. 분류(구분) 값이다. 회원 등급, 결제 수단, 배송 상태처럼 몇 가지 값 중 하나를 갖는 필드는 그 자체로는 무해해 보이지만, 그 값을 검사하는 조건문이 코드베이스 곳곳에 반복해서 나타나면서 복잡성을 만든다.
+
+정기결제 지갑이 계좌이체, 카드, 보유 포인트 세 가지 수단으로 충전할 수 있다고 하자. 수단마다 수수료율과 충전 한도가 다르다.
+
+```java
+long calculateFee(ChargeMethod method, long amount) {
+    if (method == ChargeMethod.CARD) {
+        return (long) (amount * 0.025);
+    } else if (method == ChargeMethod.BANK_TRANSFER) {
+        return 500;
+    } else {
+        return 0;
+    }
+}
+```
+
+문제는 이 분기가 여기 하나로 끝나지 않는다는 데 있다. 충전 한도를 검사하는 메서드에도, 영수증 문구를 만드는 메서드에도 같은 세 갈래 분기가 따로 나타난다. 새로운 충전 수단이 하나 추가되면 이 분기들을 전부 찾아 고쳐야 하고, 하나라도 놓치면 그 수단만 조용히 잘못 동작한다. 앞서 본 변경 전파가 분류값이 만드는 형태로 나타난 것이다.
+
+### 분기의 본문을 메서드로 독립시킨다
+
+가장 먼저 할 일은 각 분기 안의 로직을 이름 붙은 메서드로 뽑아내는 것이다.
+
+```java
+long calculateFee(ChargeMethod method, long amount) {
+    if (method == ChargeMethod.CARD) {
+        return calculateCardFee(amount);
+    } else if (method == ChargeMethod.BANK_TRANSFER) {
+        return calculateBankTransferFee(amount);
+    } else {
+        return calculatePointFee(amount);
+    }
+}
+```
+
+분기 자체는 그대로지만, 각 갈래가 무엇을 하는지 이름으로 드러나고 본문의 세부는 읽지 않아도 된다. 다음 단계들을 위한 준비 작업이다.
+
+### else를 없애면 분기가 단순해진다
+
+else로 이어진 분기는 한 갈래를 읽으면서도 나머지 조건을 함께 의식해야 한다. 조기 반환으로 각 갈래를 독립시키면 그 부담이 사라진다.
+
+```java
+long calculateFee(ChargeMethod method, long amount) {
+    if (method == ChargeMethod.CARD) {
+        return calculateCardFee(amount);
+    }
+    if (method == ChargeMethod.BANK_TRANSFER) {
+        return calculateBankTransferFee(amount);
+    }
+    return calculatePointFee(amount);
+}
+```
+
+각 if문은 자신의 조건과 반환값만 신경 쓰면 되고, 앞의 조건이 거짓이었다는 사실을 기억할 필요가 없다.
+
+### 복문은 단문으로 나눈다
+
+조건 하나에 여러 판단이 들어가면 그 자체가 작은 분기 폭발이 된다.
+
+```java
+if (method == ChargeMethod.CARD && amount > 1_000_000 && !user.isVerified()) {
+    throw new RejectedException();
+}
+```
+
+이 한 줄은 "카드 결제인가", "고액인가", "미인증 사용자인가" 세 가지 판단이 겹친 것이다. 이름 붙은 변수로 쪼개면 각 판단이 무엇을 의미하는지 조건문 밖에서도 읽힌다.
+
+```java
+boolean isLargeCardCharge = method == ChargeMethod.CARD && amount > 1_000_000;
+boolean isUnverifiedUser = !user.isVerified();
+if (isLargeCardCharge && isUnverifiedUser) {
+    throw new RejectedException();
+}
+```
+
+### 분류별 로직을 클래스로 나눈다
+
+메서드 추출은 한 메서드 안의 분기를 정리했을 뿐, 수수료 계산과 한도 검사와 영수증 문구에 흩어진 분기는 그대로 남아 있다. 이 분기들을 한데 모으려면 갈래마다 클래스를 만든다.
+
+```java
+class CardCharge {
+    long calculateFee(long amount) { return (long) (amount * 0.025); }
+    long limit() { return 5_000_000; }
+}
+
+class BankTransferCharge {
+    long calculateFee(long amount) { return 500; }
+    long limit() { return 10_000_000; }
+}
+
+class PointCharge {
+    long calculateFee(long amount) { return 0; }
+    long limit() { return 1_000_000; }
+}
+```
+
+수수료와 한도라는, 수단마다 따로 흩어져 있던 지식이 각 클래스 하나로 모인다.
+
+### 나뉜 클래스를 같은 형으로 다룬다
+
+클래스는 나눴지만 호출하는 쪽에서 여전히 어느 클래스를 쓸지 분기해야 한다면 나눈 보람이 없다. 공통 인터페이스를 두면 이 분기가 사라진다.
+
+```java
+interface Charge {
+    long calculateFee(long amount);
+    long limit();
+}
+
+class CardCharge implements Charge { /* 위와 동일 */ }
+class BankTransferCharge implements Charge { /* 위와 동일 */ }
+class PointCharge implements Charge { /* 위와 동일 */ }
+```
+
+```java
+long calculateFee(Charge charge, long amount) {
+    return charge.calculateFee(amount);
+}
+```
+
+세 갈래이던 분기가 한 줄의 위임으로 줄어든다. 조건 분기를 다형성으로 대체하는 리팩터링이다. Hickey가 짝지은 표에서 본 "switch·패턴 매칭 → 조합 가능한 다형성"이 코드 위에서 실제로 벌어지는 모습이 이것이다.
+
+### 분류별 인스턴스는 어디서 만드는가
+
+인터페이스로 분기는 없앴지만 질문 하나가 남는다. `ChargeMethod.CARD`라는 값을 받아 `CardCharge` 인스턴스를 돌려주는 코드는 어딘가에 있어야 한다. 이 매핑을 호출하는 곳마다 새로 작성하면 분기가 자리만 옮겨 다시 흩어진다. 한 곳에 모아야 한다.
+
+```java
+class ChargeFactory {
+    private static final Map<ChargeMethod, Charge> CHARGES = Map.of(
+        ChargeMethod.CARD, new CardCharge(),
+        ChargeMethod.BANK_TRANSFER, new BankTransferCharge(),
+        ChargeMethod.POINT, new PointCharge()
+    );
+
+    Charge resolve(ChargeMethod method) {
+        return CHARGES.get(method);
+    }
+}
+```
+
+`ChargeMethod`와 구현체 사이의 대응은 이 팩토리 하나만 알면 되고, 나머지 코드는 `Charge` 인터페이스만 상대한다.
+
+### enum에 행동을 직접 실어도 된다
+
+수단마다 의존하는 외부 자원이 없다면, 인터페이스와 팩토리 없이 enum 상수에 행동을 바로 실을 수 있다.
+
+```java
+enum ChargeMethod {
+    CARD {
+        long calculateFee(long amount) { return (long) (amount * 0.025); }
+    },
+    BANK_TRANSFER {
+        long calculateFee(long amount) { return 500; }
+    },
+    POINT {
+        long calculateFee(long amount) { return 0; }
+    };
+
+    abstract long calculateFee(long amount);
+}
+```
+
+`method.calculateFee(amount)` 한 줄로 끝나고, 인터페이스도 팩토리도 필요 없다. 다만 이 방식은 수단마다 카드 결제 대행사 클라이언트처럼 주입받아야 할 협력 객체가 있으면 쓰기 어렵다. enum 상수는 생성자 인자를 정적으로 고정할 수는 있어도, 요청마다 달라지는 의존성을 넘겨받는 구조에는 맞지 않는다. 그런 경우에는 앞의 인터페이스와 팩토리 조합으로 돌아간다.
+
+### 분류값이 아니라 분류 객체를 다룬다
+
+지금까지의 변화를 한 문장으로 요약하면, `ChargeMethod`라는 원시 값을 여기저기서 검사하던 코드가 `Charge`라는 객체를 호출하는 코드로 바뀌었다. 이 차이가 중요하다. 원시 값을 검사하는 방식에서는 새 분기가 필요할 때마다 그 값을 아는 모든 곳을 찾아야 하지만, 객체를 호출하는 방식에서는 새 수단 하나(`Charge` 구현체 하나)를 추가하고 팩토리에 등록하는 것으로 끝난다. 분류값을 사용하는 코드가 아니라 분류 자체를 표현하는 객체를 만드는 것, 이것이 이 절 전체를 관통하는 원칙이다.
+
+### 상태 전이 규칙도 같은 문제를 겪는다
+
+분류값이 종류가 아니라 시간에 따라 바뀌는 상태일 때도 같은 병이 난다. 어떤 상태에서 어떤 상태로 바뀔 수 있는지를 규칙으로 두지 않고 호출부마다 조건으로 확인하면, 그 규칙은 지키는 곳과 놓치는 곳으로 갈린다.
+
+```java
+enum ChargeStatus { PENDING, APPROVED, FAILED, CANCELLED }
+
+// 나쁜 예: 전이 규칙이 호출부에 흩어진다
+if (charge.status() == ChargeStatus.PENDING) {
+    charge.setStatus(ChargeStatus.APPROVED);
+}
+```
+
+규칙을 한곳에 모으면 호출부는 그 규칙을 알 필요가 없어진다.
+
+```java
+private static final Map<ChargeStatus, Set<ChargeStatus>> ALLOWED = Map.of(
+    ChargeStatus.PENDING, Set.of(ChargeStatus.APPROVED, ChargeStatus.FAILED),
+    ChargeStatus.APPROVED, Set.of(ChargeStatus.CANCELLED)
+);
+
+void transitionTo(ChargeStatus next) {
+    if (!ALLOWED.getOrDefault(status, Set.of()).contains(next)) {
+        throw new IllegalStateException(status + "에서 " + next + "로 전이할 수 없다");
+    }
+    status = next;
+}
+```
+
+이 전이 테이블이 지키는 자리는 Immutable Data Model에서 다룬 롱텀 이벤트의 현재상태 컬럼과 같다. 그 글은 데이터 모델 수준에서 상태 하나만 UPDATE로 남기고 나머지는 사실을 INSERT하는 방법을 다뤘는데, 여기서는 그 상태가 바뀔 수 있는 경로 자체를 코드 한 곳에 가두는 방법을 다뤘다. 지향점은 같다. 규칙이 흩어지지 않게 한곳에 모으는 것이다.
+
+이렇게 나눈 `CardCharge`, `BankTransferCharge`, `PointCharge` 세 클래스도 앞서 본 classitis의 경계 대상이다. 이들을 나눈 이유가 셋으로 쪼갰기 때문이 아니라 각각 다른 수수료 정책과 한도라는 서로 무관한 지식을 감추기 때문이라는 점은 `IdentityCheck`, `AccountCheck`, `Blacklist`를 나눈 이유와 같다. 감추는 지식이 다르지 않다면, 여기서도 인터페이스를 쪼개는 것은 깊이가 아니라 인지 부하만 늘릴 뿐이다.
+
 ## Essential Complexity에는 이 도구들이 닿지 않는다
 
-지금까지 다룬 기법을 되짚어 보면 전부 하나의 대상을 겨냥한다. Deep Module도, classitis를 경계하는 것도, 복잡성을 아래로 끌어내리는 것도, Stratified Design의 층 구조도, 결국 코드를 어떻게 배치할 것인가에 관한 도구다. essential complexity는 배치를 아무리 잘 바꿔도 줄어들지 않는다. 코드 구조가 아니라 업무 자체에서 나오는 복잡성이기 때문이다.
+지금까지 다룬 기법을 되짚어 보면 전부 하나의 대상을 겨냥한다. Deep Module도, classitis를 경계하는 것도, 복잡성을 아래로 끌어내리는 것도, 조건 분기를 다형성으로 대체하는 것도, Stratified Design의 층 구조도, 결국 코드를 어떻게 배치할 것인가에 관한 도구다. essential complexity는 배치를 아무리 잘 바꿔도 줄어들지 않는다. 코드 구조가 아니라 업무 자체에서 나오는 복잡성이기 때문이다.
 
 Deep Module이 완전히 무력한 것은 아니다. essential complexity라도 인터페이스 뒤로 감추면 그것을 몰라도 되는 사람의 수는 줄어든다. 다만 그 복잡성을 정말 알아야 하는 사람, 이를테면 등록 가능 여부를 판정하는 규칙 자체를 정해야 하는 사람에게는 그대로 남는다. essential complexity는 감출 수는 있어도 없앨 수는 없다.
 
