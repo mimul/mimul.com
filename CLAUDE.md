@@ -31,7 +31,7 @@ tags:
 
 ## 엄격한 제약 사항
 
-**content/blog/ 디렉토리 하위 파일만 수정할 수 있습니다.**
+**content/blog/ 디렉토리와 src/ 디렉토리 하위 파일만 수정할 수 있습니다.**
 
 절대 수정 금지:
 - `gatsby-*.js`, `gatsby-*.mjs` - Gatsby 설정

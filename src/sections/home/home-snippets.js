@@ -54,6 +54,9 @@ const HomeSnippetsCss = (p) => css`
       width: 100%;
       min-width: 0;
     }
+    .media-content {
+      min-width: 0;
+    }
     .post-title {
       display: block;
       white-space: nowrap;
