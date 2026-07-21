@@ -34,7 +34,6 @@ tags:
 **content/blog/ 디렉토리 하위 파일만 수정할 수 있습니다.**
 
 절대 수정 금지:
-- `src/` - 소스 코드
 - `gatsby-*.js`, `gatsby-*.mjs` - Gatsby 설정
 - `package.json`, `package-lock.json`, `yarn.lock` - 패키지 설정
 - `public/` - 빌드 결과물

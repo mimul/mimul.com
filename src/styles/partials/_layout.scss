@@ -597,6 +597,14 @@ article h6 {
 .ar-pagination-links {
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.ar-pagination-links .ar-pagination-prev,
+.ar-pagination-links .ar-pagination-next {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: normal;
 }
 
 .ar-pagination .button em {

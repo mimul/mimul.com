@@ -48,9 +48,11 @@ const HomeSnippetsCss = (p) => css`
   }
   .column {
     display: flex;
+    min-width: 0;
     .box {
       flex: 1;
       width: 100%;
+      min-width: 0;
     }
     .post-title {
       display: block;
