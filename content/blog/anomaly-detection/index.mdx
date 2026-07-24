@@ -177,11 +177,14 @@ tags:
 3. 1~3편에서 다룬 기법이 이 분류체계 어디에 속하는지 정리
    - 홀텔링 이론·마할라노비스-다구치법·SVM은 밀도 기반, 분포 기반 / GMM은 밀도 기반, 인코딩 기반 / kNN은 거리 기반, 근접 기반 / 회귀·베이지안 회귀는 예측 기반, 예측 오차 기반
 4. 거리 기반 방법 중 시계열에만 있는 것, 불일치 기반 (Matrix Profile, STAMP, STOMP, SCRIMP)
+   - 예제: `series04/distance_based.py`
 5. 거리 기반 방법 중 시계열에만 있는 것, 클러스터링 기반 (NormA, SAND)
 6. 밀도 기반 방법 중 시계열에만 있는 것, 그래프 기반 (Series2Graph, DADS)
 7. 밀도 기반 방법 중 시계열에만 있는 것, 트리 기반 (Isolation Forest 계열)
+   - 예제: `series04/density_based.py`
 8. 밀도 기반 방법 중 시계열에만 있는 것, 인코딩 기반 (PCA, HMM, 베이지안 네트워크, 문법 기반)
 9. 예측 기반 방법의 시계열 특화 모델, 예측 오차 기반 (지수평활, ARIMA, LSTM, GRU, Echo State Network, HTM)
+   - 예제: `series04/prediction_based.py`
 10. 예측 기반 방법의 시계열 특화 모델, 재구성 오차 기반 (Autoencoder, GAN)
 11. 시계열 이상탐지 연구는 10년간 어떻게 바뀌어왔는가 (논문 9장, 메타분석)
 
