@@ -3,7 +3,7 @@ title: 회귀와 베이지안 모델링으로 조건부 정상 범위를 이상�
 description: 선형회귀부터 리지회귀, 감마회귀, 베이지안 선형회귀, MCMC 기반 로지스틱·포아송 회귀까지, 입력값에 따라 달라지는 정상 범위로 이상을 탐지하는 방법을 예제 코드와 함께 정리합니다.
 author: Mimul
 date: "2026-07-22T09:00:00.000Z"
-lastModificationTime: "2026-07-22T09:00:00.000Z"
+lastModificationTime: "2026-07-25T09:00:00.000Z"
 image: "./bayesian-poisson-boundary.png"
 tags:
   - anomaly-detection
@@ -91,7 +91,15 @@ alpha = LAMBDA / 2 / len(y_train)
 res = mod.fit_regularized(alpha=alpha, L1_wt=0)
 ```
 
-리지회귀는 계수를 0 쪽으로 수축시키는 대신, 예측 분산이 개별 데이터 지점의 레버리지(leverage)에 따라 달라진다. 이 레버리지를 반영한 이상 점수 공식은 다변량 선형회귀보다 조금 복잡하지만, 핵심은 같다. 예측값에서 크게 벗어날수록 이상 점수가 커진다.
+리지회귀는 계수를 0 쪽으로 수축시키는 대신, 예측 분산이 개별 데이터 지점의 레버리지(leverage)에 따라 달라진다. 레버리지는 그 지점이 설명변수 공간에서 학습 데이터의 중심으로부터 얼마나 떨어져 있는지를 나타내는 값이다.
+
+$$h(\mathbf{x}) = 1 + \mathbf{x}^\top(\mathbf{X}^\top\mathbf{X} + \lambda I)^{-1}\mathbf{x}$$
+
+이 레버리지로 예측분산 $\hat\sigma^2 h(\mathbf{x})$를 부풀린 정규분포의 음의 로그가능도를 이상 점수로 쓴다.
+
+$$a(\mathbf{x}, y) = \frac{1}{2}\log\left(2\pi\hat\sigma^2 h(\mathbf{x})\right) + \frac{(y-\hat y)^2}{2\hat\sigma^2 h(\mathbf{x})}$$
+
+예측값에서 크게 벗어날수록 이상 점수가 커진다.
 
 ![리지회귀로 학습한 정상 범위(차종별, 연식별)](./ridge-regression-boundary.png)
 
@@ -190,7 +198,7 @@ def metropolis_hastings(log_posterior, init, step, n_iter=8000, burn=2000, seed=
     return samples[burn:]
 ```
 
-이항 로지스틱 회귀 모델에 이 샘플러를 적용하면 채택률(제안이 받아들여지는 비율) 62.9%로 8000개의 표본을 얻는다. 채택률이 너무 낮으면 제안 폭이 너무 넓어 대부분 기각되고, 너무 높으면 제안 폭이 좁아 표본이 좁은 영역에서만 맴돈다. 대략 20~60% 사이가 적절하다고 알려져 있다.
+이항 로지스틱 회귀 모델에 이 샘플러를 적용하면 채택률(제안이 받아들여지는 비율) 62.9%로 8000번 반복하고, 초반 번인(burn-in) 2000개를 제외한 6000개를 사후표본으로 얻는다. 채택률이 너무 낮으면 제안 폭이 너무 넓어 대부분 기각되고, 너무 높으면 제안 폭이 좁아 표본이 좁은 영역에서만 맴돈다. 대략 20~60% 사이가 적절하다고 알려져 있다.
 
 ![MCMC로 얻은 절편(intercept)과 기울기(slope) 파라미터의 표본 궤적](./mcmc-trace.png)
 
