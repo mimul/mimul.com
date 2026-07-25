@@ -76,7 +76,7 @@ $$\text{정확도} = \frac{TP+TN}{TP+TN+FP+FN}, \qquad \text{적합률} = \frac{
 $$F_1 = \frac{2 \cdot \text{적합률} \cdot \text{재현율}}{\text{적합률}+\text{재현율}}$$
 
 ```python
-cm = confusion_matrix(y_true, y_pred, labels=["normal", "anomaly"])
+conf_matrix = confusion_matrix(y_true, y_pred, labels=["normal", "anomaly"])
 accuracy = accuracy_score(y_true, y_pred)
 precision = precision_score(y_true, y_pred, pos_label="anomaly")
 recall = recall_score(y_true, y_pred, pos_label="anomaly")
@@ -98,9 +98,9 @@ $$\text{AIC} = 2k - 2\ell, \qquad \text{BIC} = k\log n - 2\ell$$
 $$k = M + \frac{M(M+1)}{2}$$
 
 ```python
-k = n_features + n_features * (n_features + 1) / 2
-aic = 2 * k - 2 * log_likelihood
-bic = np.log(n) * k - 2 * log_likelihood
+n_params = n_features + n_features * (n_features + 1) / 2
+aic = 2 * n_params - 2 * log_likelihood
+bic = np.log(n_samples) * n_params - 2 * log_likelihood
 ```
 
 AIC와 BIC는 그 자체로는 의미가 없는 숫자다. 같은 데이터, 같은 응답변수에 대해 여러 모델을 견줄 때만 쓸모가 있다. 앞서 변수 선택에서 AIC 기준으로 고른 `temp4`, `temp5` 모델과 F값 기준으로 고른 `temp2`, `temp1` 모델의 AIC를 나란히 놓고 봐야 어느 모델이 정상 데이터에 더 잘 들어맞는지 비교할 수 있다는 뜻이다. 라벨의 예측 정확도와 통계모델 선택의 타당성, 이 두 갈래 지표는 1~4편에서 다룬 어떤 모델(교사 없는 확률분포 모델이든, 회귀든, 베이지안 모델이든)에도 그대로 적용된다. 다만 지도학습 모델은 확률분포를 직접 가정하지 않으므로 로그가능도를 정의할 수 없고, 통계모델 선택의 타당성 지표는 계산할 수 없다.
