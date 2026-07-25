@@ -62,15 +62,15 @@ $$P_i = \min_{j:\,|j-i|>m/2} d(T_i,T_j), \qquad \text{discord} = \arg\max_i P_i$
 STAMP, STOMP, SCRIMP 같은 알고리즘은 이 Matrix Profile을 빠르게 계산하는 방법을 다루는데, 실무 구현은 고속 푸리에 변환(FFT)을 이용한 MASS 알고리즘으로 부분열 하나당 $O(n \log n)$에 계산한다. 아래 예제는 이 가속 없이 슬라이딩 윈도우 사이의 z-정규화 거리를 직접 계산하는 $O(n^2)$ 구현이다.
 
 ```python
-def matrix_profile(y, m):
-    n_sub = len(y) - m + 1
-    subs = np.array([y[i:i + m] for i in range(n_sub)])
-    subs_norm = (subs - subs.mean(axis=1, keepdims=True)) / (subs.std(axis=1, keepdims=True) + 1e-8)
+def matrix_profile(series, window):
+    n_sub = len(series) - window + 1
+    windows = np.array([series[i:i + window] for i in range(n_sub)])
+    windows_norm = (windows - windows.mean(axis=1, keepdims=True)) / (windows.std(axis=1, keepdims=True) + 1e-8)
 
     profile = np.full(n_sub, np.inf)
     for i in range(n_sub):
-        dists = np.sqrt(((subs_norm - subs_norm[i]) ** 2).sum(axis=1))
-        dists[max(0, i - m // 2):min(n_sub, i + m // 2 + 1)] = np.inf  # 자기 자신 근방 제외
+        dists = np.sqrt(((windows_norm - windows_norm[i]) ** 2).sum(axis=1))
+        dists[max(0, i - window // 2):min(n_sub, i + window // 2 + 1)] = np.inf  # 자기 자신 근방 제외
         profile[i] = dists.min()
     return profile
 ```
@@ -100,12 +100,12 @@ Isolation Forest 자체는 시계열의 순서를 직접 다루지 않으므로,
 ```python
 from sklearn.ensemble import IsolationForest
 
-def extract_window_features(y, w):
+def extract_window_features(series, window_len):
     feats = []
-    for i in range(len(y) - w + 1):
-        seg = y[i:i + w]
-        slope = np.polyfit(np.arange(w), seg, 1)[0]
-        feats.append([seg.mean(), seg.std(), seg.max() - seg.min(), slope])
+    for i in range(len(series) - window_len + 1):
+        window_vals = series[i:i + window_len]
+        slope = np.polyfit(np.arange(window_len), window_vals, 1)[0]
+        feats.append([window_vals.mean(), window_vals.std(), window_vals.max() - window_vals.min(), slope])
     return np.array(feats)
 
 clf = IsolationForest(n_estimators=200, contamination=0.05, random_state=42)
@@ -144,22 +144,22 @@ $$a(y_t) = \left(\frac{y_t - \hat{y}_t}{\hat\sigma}\right)^2$$
 
 ```python
 fit = ExponentialSmoothing(
-    train_y, trend="add", seasonal="add", seasonal_periods=m,
+    train_y, trend="add", seasonal="add", seasonal_periods=period,
     initialization_method="estimated",
 ).fit()
 alpha, beta, gamma = fit.params["smoothing_level"], fit.params["smoothing_trend"], fit.params["smoothing_seasonal"]
-sigma = np.std(fit.resid)
+resid_std = np.std(fit.resid)
 
-level, trend, season = fit.level[-1], fit.trend[-1], list(fit.season[-m:])
-for j in range(len(y)):
-    k = j % m
-    yhat[j] = level + trend + season[k]
-    new_level = alpha * (y[j] - season[k]) + (1 - alpha) * (level + trend)
+level, trend, season = fit.level[-1], fit.trend[-1], list(fit.season[-period:])
+for j in range(n_points):
+    phase = j % period
+    forecast[j] = level + trend + season[phase]
+    new_level = alpha * (series[j] - season[phase]) + (1 - alpha) * (level + trend)
     trend = beta * (new_level - level) + (1 - beta) * trend
     level = new_level
-    season[k] = gamma * (y[j] - level) + (1 - gamma) * season[k]
+    season[phase] = gamma * (series[j] - level) + (1 - gamma) * season[phase]
 
-score = ((y - yhat) / sigma) ** 2
+score = ((series - forecast) / resid_std) ** 2
 ```
 
 학습 데이터에 적합한 평활 계수는 alpha, beta, gamma 모두 0.000에 가깝다. 학습 구간이 추세와 계절성만으로 설명되는, 잡음이 적은 데이터이다 보니 지수평활이 매 시점 상태를 새로 갱신하기보다 추세와 계절 성분을 거의 고정한 채 예측하는 쪽을 더 나은 적합으로 판단한 결과다. 임계값은 9.000이고, 전체 400개 시점 중 27개가 이상으로 판정된다.

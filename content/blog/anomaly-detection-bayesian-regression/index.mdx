@@ -34,14 +34,14 @@ import statsmodels.api as sm
 
 X_train_intercept = sm.add_constant(x_train)
 res = sm.OLS(y_train, X_train_intercept).fit()
-w_1, w_0 = res.params[1], res.params[0]
-sigma2 = res.scale * res.df_resid / len(y_train)
+slope, intercept = res.params[1], res.params[0]
+residual_var = res.scale * res.df_resid / len(y_train)
 
-train_score = (y_train - w_1 * x_train - w_0) ** 2 / sigma2
-a_th = np.quantile(train_score, 1 - TARGET_FP_RATE)
+train_score = (y_train - slope * x_train - intercept) ** 2 / residual_var
+anomaly_threshold = np.quantile(train_score, 1 - TARGET_FP_RATE)
 ```
 
-학습 결과 `w_1=-121.400`, `w_0=3890.521`, `sigma2=323433.58`가 나오고, 목표 오탐률 0.27%(정규분포 3시그마에 해당)를 기준으로 한 임계값은 `4.9166`이다.
+학습 결과 `slope=-121.400`, `intercept=3890.521`, `residual_var=323433.58`가 나오고, 목표 오탐률 0.27%(정규분포 3시그마에 해당)를 기준으로 한 임계값은 `4.9166`이다.
 
 ![연식만으로 예측한 가격의 정상 범위와 추론 데이터](./linear-regression-boundary.png)
 
@@ -54,8 +54,8 @@ a_th = np.quantile(train_score, 1 - TARGET_FP_RATE)
 ```python
 from sklearn.preprocessing import OneHotEncoder
 
-enc = OneHotEncoder(drop="first")
-model_cat = enc.fit_transform(df_normal[["model_name"]].to_numpy()).toarray()
+encoder = OneHotEncoder(drop="first")
+onehot_array = encoder.fit_transform(df_normal[["model_name"]].to_numpy()).toarray()
 ```
 
 나머지 학습 절차는 1변수 선형회귀와 같다. 다만 계수 `w`가 벡터가 되어, 이상 점수는 1변수일 때의 식을 그대로 다변량으로 확장한 형태를 갖는다.
@@ -65,13 +65,13 @@ $$a(\mathbf{x}, y) = \frac{(y - \mathbf{w}^\top\mathbf{x} - w_0)^2}{\sigma^2}$$
 학습 결과는 다음과 같다.
 
 ```
-w = [-101.350, -36.108, 461.549, 1382.990]  # year, odometer, compact, suv (sedan 대비)
-w_0 = 3311.344
-sigma2 = 54771.62
-a_th = 7.6331
+coef = [-101.350, -36.108, 461.549, 1382.990]  # year, odometer, compact, suv (sedan 대비)
+intercept = 3311.344
+residual_var = 54771.62
+anomaly_threshold = 7.6331
 ```
 
-가장 눈에 띄는 변화는 잔차 분산이다. 연식만 썼을 때 323433.58이었던 `sigma2`가 54771.62로 6분의 1 가까이 줄었다. 그만큼 주행거리와 차종이 가격 변동의 상당 부분을 설명한다는 뜻이다. 정상 범위도 훨씬 좁아져, 추론 데이터에서 이상으로 판정되는 건수가 15건에서 46건으로 늘어난다.
+가장 눈에 띄는 변화는 잔차 분산이다. 연식만 썼을 때 323433.58이었던 `residual_var`가 54771.62로 6분의 1 가까이 줄었다. 그만큼 주행거리와 차종이 가격 변동의 상당 부분을 설명한다는 뜻이다. 정상 범위도 훨씬 좁아져, 추론 데이터에서 이상으로 판정되는 건수가 15건에서 46건으로 늘어난다.
 
 ![연식·주행거리·차종을 함께 쓴 다변량 선형회귀의 정상 범위(차종별, 연식별)](./multivariate-regression-boundary.png)
 
@@ -95,7 +95,7 @@ res = mod.fit_regularized(alpha=alpha, L1_wt=0)
 
 ![리지회귀로 학습한 정상 범위(차종별, 연식별)](./ridge-regression-boundary.png)
 
-이 데이터셋에서는 리지회귀의 결과가 다변량 선형회귀와 거의 같다(이상 판정 46건으로 동일). 계수(`u`)도 `[-99.277, -35.939, 464.260, 1382.011]`로 다변량 선형회귀의 `[-101.350, -36.108, 461.549, 1382.990]`와 큰 차이가 없다. 이 데이터셋의 설명변수(연식, 주행거리, 차종) 사이에 심한 다중공선성이 없기 때문이다. 리지회귀의 효과는 판정 결과의 차이보다는 계수 추정의 안정성에 있다. 설명변수 사이의 상관관계가 강한 데이터일수록 두 방법의 차이가 벌어진다.
+이 데이터셋에서는 리지회귀의 결과가 다변량 선형회귀와 거의 같다(이상 판정 46건으로 동일). 계수(`ridge_coef`)도 `[-99.277, -35.939, 464.260, 1382.011]`로 다변량 선형회귀의 `[-101.350, -36.108, 461.549, 1382.990]`와 큰 차이가 없다. 이 데이터셋의 설명변수(연식, 주행거리, 차종) 사이에 심한 다중공선성이 없기 때문이다. 리지회귀의 효과는 판정 결과의 차이보다는 계수 추정의 안정성에 있다. 설명변수 사이의 상관관계가 강한 데이터일수록 두 방법의 차이가 벌어진다.
 
 ## 정규분포를 벗어난 응답변수를 감마회귀로 다루기
 
@@ -156,7 +156,7 @@ $$\mathbb{E}[y_*] = \mathbf{x}_*^\top \boldsymbol{\mu}_w, \qquad \mathrm{Var}[y_
 ```
 coef = [-101.624, -35.698, 460.295, 1380.456]
 intercept = 3312.570
-a_th = 7.5547
+anomaly_threshold = 7.5547
 ```
 
 계수와 판정 결과(46/550)가 다변량 선형회귀와 거의 같다. 학습 데이터가 1000건으로 충분히 많고, 사전분포도 특정 값을 강하게 가정하지 않는(무정보에 가까운) 분포를 썼기 때문이다. 데이터가 많고 사전분포가 약할수록 베이지안 추정의 점추정은 최우추정에 수렴한다.
@@ -192,7 +192,7 @@ def metropolis_hastings(log_posterior, init, step, n_iter=8000, burn=2000, seed=
 
 이항 로지스틱 회귀 모델에 이 샘플러를 적용하면 채택률(제안이 받아들여지는 비율) 62.9%로 8000개의 표본을 얻는다. 채택률이 너무 낮으면 제안 폭이 너무 넓어 대부분 기각되고, 너무 높으면 제안 폭이 좁아 표본이 좁은 영역에서만 맴돈다. 대략 20~60% 사이가 적절하다고 알려져 있다.
 
-![MCMC로 얻은 절편(w0)과 기울기(w1) 파라미터의 표본 궤적](./mcmc-trace.png)
+![MCMC로 얻은 절편(intercept)과 기울기(slope) 파라미터의 표본 궤적](./mcmc-trace.png)
 
 두 파라미터 모두 특정 구간 안에서 위아래로 고르게 흔들리며, 표본을 뽑을수록 특정 방향으로 쏠리는 추세가 보이지 않는다. 이런 안정된 궤적은 표본이 사후분포에 수렴했다는 신호다. 반대로 궤적이 한 방향으로 계속 표류하거나 특정 구간에 오래 머문다면, 아직 초기값의 영향이 남아 있거나 제안 폭을 다시 조정해야 한다는 뜻이다.
 
@@ -207,15 +207,15 @@ $$\mu_i = \frac{1}{1+e^{-(w_0 + w_1 x_i)}}, \qquad y_i \sim \text{Binomial}(n_i,
 $$\log p(w_0, w_1 \mid D) \;\propto\; \sum_i \log \text{Binom}(y_i; n_i, \mu_i) + \log\mathcal{N}(w_0; 0, 100^2) + \log\mathcal{N}(w_1; 0, 100^2)$$
 
 ```python
-def log_posterior(w0, w1):
-    rho = w0 + w1 * xc_train
-    mu = 1 / (1 + np.exp(-rho))
-    log_likelihood = np.sum(stats.binom.logpmf(y_train, n_train, mu))
-    log_prior = stats.norm.logpdf(w0, 0, 100) + stats.norm.logpdf(w1, 0, 100)
+def log_posterior(intercept, slope):
+    linear_pred = intercept + slope * x_train_centered
+    success_prob = 1 / (1 + np.exp(-linear_pred))
+    log_likelihood = np.sum(stats.binom.logpmf(y_train, n_train, success_prob))
+    log_prior = stats.norm.logpdf(intercept, 0, 100) + stats.norm.logpdf(slope, 0, 100)
     return log_likelihood + log_prior
 ```
 
-사후평균은 `w0=-0.6063`, `w1=0.0070`(오차는 사후표준편차)이다. 기울기가 양수이므로 나이가 많을수록 3점슛 성공률의 평균이 소폭 높아진다는 뜻이다.
+사후평균은 `intercept=-0.6063`, `slope=0.0070`(오차는 사후표준편차)이다. 기울기가 양수이므로 나이가 많을수록 3점슛 성공률의 평균이 소폭 높아진다는 뜻이다.
 
 ![나이에 따른 3점슛 성공률의 사후평균과 신용구간](./bayesian-logistic-fit.png)
 
@@ -230,8 +230,8 @@ def log_posterior(w0, w1):
 $$\lambda_i = e^{w_0 + w_1 x_i}, \qquad y_i \sim \text{Poisson}(\lambda_i)$$
 
 ```
-w0 = -0.2708 (오차 0.0553)
-w1 = 0.0441 (오차 0.0014)
+intercept = -0.2708 (오차 0.0553)
+slope = 0.0441 (오차 0.0014)
 ```
 
 ![화산 수 대비 지진 발생 수의 정상 범위](./bayesian-poisson-boundary.png)

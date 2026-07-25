@@ -32,7 +32,7 @@ $$\hat{\mu} = \frac{1}{N}\sum_{n=1}^{N} x_n, \qquad \hat{\sigma}^2 = \frac{1}{N}
 ```python
 from scipy import stats
 
-mu, sigma = stats.norm.fit(x)  # mu=400.216, sigma=4.958
+fitted_mean, fitted_std = stats.norm.fit(x)  # fitted_mean=400.216, fitted_std=4.958
 ```
 
 ![temp1 히스토그램과 최우추정으로 적합한 정규분포](./mle-fit.png)
@@ -53,7 +53,7 @@ $$T \sim t_{N-1} \implies T^2 \sim F_{1,\,N-1}$$
 
 ```python
 TARGET_FP_RATE = 0.0027  # 정규분포 3시그마에 해당하는 목표 오탐률
-a_th = stats.chi2.ppf(1 - TARGET_FP_RATE, df=1)
+anomaly_threshold = stats.chi2.ppf(1 - TARGET_FP_RATE, df=1)
 ```
 
 목표 오탐률(false positive rate)은 정상 데이터를 이상으로 잘못 판정할 확률의 상한이다. 이 값을 낮게 잡을수록 임계값이 높아져 오탐은 줄지만 실제 이상을 놓칠 위험은 늘어난다. 이 임계값(9.00)은 목표 오탐률과 자유도로만 정해지므로 어떤 1변량 변수에 적용하든 같은 값이다. `temp2`에 이 임계값을 적용하면, 추론 데이터 510건 중 10건이 이를 넘어 이상으로 판정된다.
@@ -74,7 +74,7 @@ $$p(x; k, \theta) = \frac{1}{\Gamma(k)\,\theta^{k}} x^{k-1} e^{-x/\theta}, \qqua
 
 ```python
 params = stats.gamma.fit(x_train, floc=0)
-k, theta = params[0], params[2]
+gamma_shape, gamma_scale = params[0], params[2]
 ```
 
 ![감마분포를 따르는 데이터와 최우추정으로 적합한 감마분포](./nonnormal-fit.png)
@@ -96,9 +96,9 @@ $$\hat{\mu} = \frac{\sum_i x_i}{\sum_i n_i}$$
 NBA 선수의 시즌별 3점슛 데이터로 이 방법을 시험해본다. 2022시즌 전체 선수의 성공률로 발생률 파라미터를 추정하고, 이 파라미터로 2023시즌 선수들의 성공률이 정상 범위를 벗어나는지 판정한다.
 
 ```python
-mu = np.sum(x_train) / np.sum(n_train)  # 발생률(성공 확률) 파라미터, 0.3536
-th_lower = stats.binom.ppf(TARGET_FP_RATE / 2, n=n_inference, p=mu)
-th_upper = stats.binom.ppf(1 - TARGET_FP_RATE / 2, n=n_inference, p=mu)
+success_rate = np.sum(x_train) / np.sum(n_train)  # 발생률(성공 확률) 파라미터, 0.3536
+th_lower = stats.binom.ppf(TARGET_FP_RATE / 2, n=n_inference, p=success_rate)
+th_upper = stats.binom.ppf(1 - TARGET_FP_RATE / 2, n=n_inference, p=success_rate)
 ```
 
 ![3점슛 시도 수 대비 성공률의 정상 범위와 이상 판정된 선수](./binomial-boundary.png)
@@ -116,9 +116,9 @@ $$\hat{\mu} = \frac{\sum_i x_i}{\sum_i t_i}$$
 기상청이 공개하는 국내 지진 관측 데이터로 시험해본다. 2020~2023년 데이터로 시도별 면적당 연평균 지진 발생률을 추정하고, 2024년 이후 데이터가 이 기준에서 벗어나는지 판정한다.
 
 ```python
-mu = np.sum(x_train) / np.sum(t_train)  # 면적·연 단위당 평균 발생 수, 0.000543
-th_lower = stats.poisson.ppf(TARGET_FP_RATE / 2, mu=mu * t_test)
-th_upper = stats.poisson.ppf(1 - TARGET_FP_RATE / 2, mu=mu * t_test)
+rate_per_exposure = np.sum(x_train) / np.sum(t_train)  # 면적·연 단위당 평균 발생 수, 0.000543
+th_lower = stats.poisson.ppf(TARGET_FP_RATE / 2, mu=rate_per_exposure * t_test)
+th_upper = stats.poisson.ppf(1 - TARGET_FP_RATE / 2, mu=rate_per_exposure * t_test)
 ```
 
 ![지역 면적 대비 지진 밀도의 정상 범위와 이상 판정된 지역](./poisson-boundary.png)
@@ -136,8 +136,8 @@ $$\chi^2_{\text{Pearson}} = \sum_i \frac{(x_i - t_i\hat{\mu})^2}{t_i\hat{\mu}}, 
 이 값이 1보다 훨씬 크면 과분산을 의심해야 한다.
 
 ```python
-chi2 = np.sum((x_train - t_train * mu) ** 2 / (t_train * mu))
-overdispersion_ratio = chi2 / (len(x_train) - 1)  # 7.76
+pearson_chi2 = np.sum((x_train - t_train * rate_per_exposure) ** 2 / (t_train * rate_per_exposure))
+overdispersion_ratio = pearson_chi2 / (len(x_train) - 1)  # 7.76
 ```
 
 지진 데이터의 과분산비는 7.76으로, 포아송분포의 전제를 크게 벗어난다. 지역마다 지진이 나는 이유(단층대 분포, 해역 인접 여부)가 다르므로, 하나의 평균 발생률로는 지역 간 편차를 다 담아내지 못하는 것이다. 이럴 때는 포아송분포 대신 음이항분포(negative binomial distribution)를 쓴다. 음이항분포는 발생률 자체가 감마분포를 따라 지역마다 다르다고 가정해서, 포아송분포보다 넓은 분산을 표현할 수 있다. 형상 파라미터 $k$와 산포 파라미터 $\theta$로 나타낸 확률질량함수는 다음과 같다.
@@ -153,13 +153,13 @@ from scipy.optimize import minimize
 from scipy.stats import nbinom
 
 def neg_log_likelihood(params, x, t):
-    k, theta = params
-    p = 1.0 / (1.0 + theta * t)
-    return -nbinom.logpmf(x, n=k, p=p).sum()
+    nb_shape, nb_theta = params
+    nb_prob = 1.0 / (1.0 + nb_theta * t)
+    return -nbinom.logpmf(x, n=nb_shape, p=nb_prob).sum()
 
 best = None
-for k0 in [0.5, 1.0, 5.0, 10.0]:
-    result = minimize(neg_log_likelihood, x0=(k0, mu), args=(x_train, t_train),
+for shape0 in [0.5, 1.0, 5.0, 10.0]:
+    result = minimize(neg_log_likelihood, x0=(shape0, rate_per_exposure), args=(x_train, t_train),
                        method="L-BFGS-B", bounds=[(1e-5, None), (1e-5, None)])
     if best is None or result.fun < best.fun:
         best = result
@@ -180,10 +180,10 @@ $$a(\mathbf{x}) = (\mathbf{x} - \hat{\boldsymbol{\mu}})^T \hat{\Sigma}^{-1} (\ma
 임계값은 변수 개수 $M$을 자유도로 하는 카이제곱분포에서 구한다.
 
 ```python
-Sigma_inv = np.linalg.inv(Sigma)
-X_dev = X - mu
-anomaly_scores = np.sum((X_dev @ Sigma_inv) * X_dev, axis=1)
-a_th = stats.chi2.ppf(1 - TARGET_FP_RATE, df=n_features)  # 11.829
+cov_inv = np.linalg.inv(cov_matrix)
+centered_X = X - mean_vec
+anomaly_scores = np.sum((centered_X @ cov_inv) * centered_X, axis=1)
+anomaly_threshold = stats.chi2.ppf(1 - TARGET_FP_RATE, df=n_features)  # 11.829
 ```
 
 `temp1`, `temp2` 두 변수로 이 방법을 적용하면 다음과 같은 타원형 결정 경계가 그려진다.
@@ -199,8 +199,8 @@ a_th = stats.chi2.ppf(1 - TARGET_FP_RATE, df=n_features)  # 11.829
 $$\eta_j = 10 \log_{10}\frac{(x_j - \hat{\mu}_j)^2}{\hat{\sigma}_j^2}$$
 
 ```python
-var = np.diag(Sigma)  # 각 변수의 분산
-sn_ratio = 10 * np.log10((x_j - mu_j) ** 2 / var_j)
+variances = np.diag(cov_matrix)  # 각 변수의 분산
+sn_ratio = 10 * np.log10((x_j - mean_vec[j]) ** 2 / variances[j])
 ```
 
 SN비가 클수록 그 변수가 정상 범위에서 크게 벗어났다는 뜻이다. 이상으로 판정된 10건에 대해 `temp1`, `temp2` 각각의 SN비를 그려보면 다음과 같다.
