@@ -2,8 +2,8 @@
 title: 회귀와 베이지안 모델링으로 조건부 정상 범위를 이상탐지에 적용하기
 description: 선형회귀부터 리지회귀, 감마회귀, 베이지안 선형회귀, MCMC 기반 로지스틱·포아송 회귀까지, 입력값에 따라 달라지는 정상 범위로 이상을 탐지하는 방법을 예제 코드와 함께 정리합니다.
 author: Mimul
-date: "2026-07-22T09:00:00.000Z"
-lastModificationTime: "2026-07-25T09:00:00.000Z"
+date: "2024-12-31T09:01:50.000Z"
+lastModificationTime: "2024-12-31T13:34:47.000Z"
 image: "./bayesian-poisson-boundary.png"
 tags:
   - anomaly-detection
@@ -13,7 +13,7 @@ tags:
   - machine-learning
 ---
 
-[2편](/blog/anomaly-detection-unsupervised/)에서 다룬 홀텔링 이론이나 GMM은 정상 데이터가 형성하는 확률분포 하나를 통째로 학습했다. 관측값이 그 분포에서 나올 법한지만 보고 이상 여부를 판정하는 접근이다. 하지만 이 접근은 관측값의 정상 범위 자체가 다른 변수에 따라 달라지는 상황에서는 힘을 잃는다. 이 글은 입력에 대한 출력의 편차로 이상을 정의하는 회귀 기반 접근과, 파라미터의 불확실성까지 반영하는 베이지안 모델링을 다룬다.
+[2편](https://www.mimul.com/blog/anomaly-detection-unsupervised/)에서 다룬 홀텔링 이론이나 GMM은 정상 데이터가 형성하는 확률분포 하나를 통째로 학습했다. 관측값이 그 분포에서 나올 법한지만 보고 이상 여부를 판정하는 접근이다. 하지만 이 접근은 관측값의 정상 범위 자체가 다른 변수에 따라 달라지는 상황에서는 힘을 잃는다. 이 글은 입력에 대한 출력의 편차로 이상을 정의하는 회귀 기반 접근과, 파라미터의 불확실성까지 반영하는 베이지안 모델링을 다룬다.
 
 회귀 기반 이상탐지를 다루려는 개발자와 데이터 엔지니어를 대상으로 하며, 이 글을 읽고 나면 입력과 출력이 있는 데이터에서 왜 회귀가 필요한지, 최우추정과 베이지안 추정이 무엇이 다른지, MCMC가 언제 필요한지 판단할 수 있다. 예제 코드는 [github.com/mimul/anomaly_detection](https://github.com/mimul/anomaly_detection)의 `series03/`에 있다.
 

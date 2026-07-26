@@ -2,8 +2,8 @@
 title: 시계열 이상탐지를 거리·밀도·예측 기반 프로세스 분류체계로 정리하기
 description: 시계열 이상탐지 방법론을 거리 기반, 밀도 기반, 예측 기반이라는 프로세스 중심 분류체계로 정리하고, Matrix Profile과 Isolation Forest, 지수평활 예측 오차 기법을 같은 데이터로 비교합니다.
 author: Mimul
-date: "2026-07-24T09:00:00.000Z"
-lastModificationTime: "2026-07-24T09:00:00.000Z"
+date: "2025-01-14T09:32:33.000Z"
+lastModificationTime: "2025-01-24T19:14:32.000Z"
 image: "./forecast-exponential-smoothing.png"
 tags:
   - anomaly-detection
@@ -13,7 +13,7 @@ tags:
   - deep-learning
 ---
 
-[3편](/blog/anomaly-detection-bayesian-regression/)까지는 정형 데이터, 즉 관측값 사이에 순서가 없는 데이터를 다뤘다. 홀텔링 이론이든 회귀 기반 모델이든, 한 행의 데이터를 다른 행과 독립인 표본으로 보고 그 표본이 정상 분포에서 나올 법한지를 물었다. 시계열 데이터는 다르다. 순서 자체가 정보이므로, 값 하나만 놓고 보면 정상 범위 안에 있어도 그 값이 나온 시점의 맥락과 어긋나면 이상일 수 있고, 값 하나하나는 멀쩡해도 그 값들이 만드는 패턴이 이전에 본 적 없는 모양이면 이상일 수 있다. 이 글은 시계열 이상탐지 방법론을 정리한 논문 "Dive into Time-Series Anomaly Detection: A Decade Review"가 제시하는 프로세스 중심 분류체계를 따라, 1~3편에서 다룬 통계 기법이 이 지도 위 어디에 있는지 다시 확인하고, 시계열에만 있는 기법을 정리한다.
+[3편](https://www.mimul.com/blog/anomaly-detection-bayesian-regression/)까지는 정형 데이터, 즉 관측값 사이에 순서가 없는 데이터를 다뤘다. 홀텔링 이론이든 회귀 기반 모델이든, 한 행의 데이터를 다른 행과 독립인 표본으로 보고 그 표본이 정상 분포에서 나올 법한지를 물었다. 시계열 데이터는 다르다. 순서 자체가 정보이므로, 값 하나만 놓고 보면 정상 범위 안에 있어도 그 값이 나온 시점의 맥락과 어긋나면 이상일 수 있고, 값 하나하나는 멀쩡해도 그 값들이 만드는 패턴이 이전에 본 적 없는 모양이면 이상일 수 있다. 이 글은 시계열 이상탐지 방법론을 정리한 논문 "Dive into Time-Series Anomaly Detection: A Decade Review"가 제시하는 프로세스 중심 분류체계를 따라, 1~3편에서 다룬 통계 기법이 이 지도 위 어디에 있는지 다시 확인하고, 시계열에만 있는 기법을 정리한다.
 
 시계열 데이터에 이상탐지를 적용하려는 개발자와 데이터 엔지니어를 대상으로 하며, 이 글을 읽고 나면 거리 기반·밀도 기반·예측 기반 세 갈래가 각각 어떤 메커니즘으로 이상을 판정하는지, 문제 상황에 따라 어떤 갈래를 먼저 시도할지 판단할 수 있다. 세 갈래를 대표하는 기법(불일치 기반 Matrix Profile, 트리 기반 Isolation Forest, 예측 오차 기반 지수평활)은 같은 데이터로 직접 비교한다. 예제 코드는 [github.com/mimul/anomaly_detection](https://github.com/mimul/anomaly_detection)의 `series04/`에 있다.
 
