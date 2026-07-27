@@ -3,7 +3,7 @@ title: 비지도학습 이상탐지, 확률분포부터 다변량 기법까지 �
 description: 확률분포 최우추정을 기반으로 홀텔링 이론, 계수 데이터의 이항·포아송·음이항분포, 다변량 마할라노비스-다구치법과 GMM, kNN까지 비지도학습 이상탐지 기법을 예제 코드와 함께 정리합니다.
 author: Mimul
 date: "2024-11-20T09:00:00.000Z"
-lastModificationTime: "2024-11-22T09:00:00.000Z"
+lastModificationTime: "2024-11-25T09:30:00.000Z"
 image: "./multivariate-hotelling-boundary.png"
 tags:
   - anomaly-detection
@@ -198,9 +198,11 @@ anomaly_threshold = stats.chi2.ppf(1 - TARGET_FP_RATE, df=n_features)  # 11.829
 
 경계가 원이 아니라 타원인 이유는 두 변수의 분산이 다르고 서로 상관관계를 가지기 때문이다. 두 변수를 따로 단변량 홀텔링 이론으로 봤다면 각각 정상 범위 안에 있는 값이라도, 두 변수의 조합이 정상 데이터의 상관 구조에서 벗어난다면 다변량 홀텔링 이론은 이를 이상으로 잡아낸다.
 
+이 방식은 반도체 파운드리에서 실제로 쓰인다. 대만 국립교통대학(National Chiao Tung University) 연구진은 12인치 웨이퍼 fab의 HDP CVD 장비에 다변량 홀텔링 이론을 적용해, 장비 파라미터의 ±5% 수준 미세 변동까지 감지했다. 기존의 PDCA 기반 정성적 점검보다 이상 탐지 능력이 뛰어났다.
+
 ## 다변량 데이터에 마할라노비스-다구치법 적용하기
 
-다변량 홀텔링 이론은 데이터 전체가 이상인지 아닌지는 판정하지만, 어떤 변수가 그 이상에 기여했는지는 알려주지 않는다. 마할라노비스-다구치법(Mahalanobis-Taguchi method)은 이상으로 판정된 데이터에 대해 변수별 기여도 지표를 계산해 이 문제를 보완한다. MTS 원 논문의 SN비(signal-to-noise ratio)는 여러 이상 샘플에 대한 조화평균을 기반으로 정의되지만, 여기서는 그 발상을 단순화해 변수 $j$의 편차 제곱을 분산으로 나눈 값에 로그를 취해 데시벨 단위로 나타낸다. 이 단순화 지표는 변수 간 상관을 반영하지 않는 단변량 기여도라는 한계가 있다. MTS는 다구치 겐이치가 실제 산업 현장에서 쓰기 위해 고안한 방법으로, 닛산(Nissan)과 후지제록스(Fuji Xerox)를 비롯한 여러 제조업체가 품질 진단에 도입한 사례가 있다.
+다변량 홀텔링 이론은 데이터 전체가 이상인지 아닌지는 판정하지만, 어떤 변수가 그 이상에 기여했는지는 알려주지 않는다. 마할라노비스-다구치법(Mahalanobis-Taguchi method)은 이상으로 판정된 데이터에 대해 변수별 기여도 지표를 계산해 이 문제를 보완한다. MTS 원 논문의 SN비(signal-to-noise ratio)는 여러 이상 샘플에 대한 조화평균을 기반으로 정의되지만, 여기서는 그 발상을 단순화해 변수 $j$의 편차 제곱을 분산으로 나눈 값에 로그를 취해 데시벨 단위로 나타낸다. 이 단순화 지표는 변수 간 상관을 반영하지 않는 단변량 기여도라는 한계가 있다. MTS는 다구치 겐이치가 실제 산업 현장에서 쓰기 위해 고안한 방법으로, 닛산(Nissan)과 후지제록스(Fuji Xerox)를 비롯한 여러 제조업체가 품질 진단에 도입한 사례가 있다. 태블릿 PC 생산공정에서는 MTS로 테스트 항목을 56개에서 14개로 줄이면서도 예측력 98%를 얻어, 같은 데이터에 적용한 로지스틱 회귀(93.3%)와 신경망(94.7%)보다 나은 결과를 보였다.
 
 $$\eta_j = 10 \log_{10}\frac{(x_j - \hat{\mu}_j)^2}{\hat{\sigma}_j^2}$$
 
@@ -277,5 +279,7 @@ k=1일 때는 개별 데이터 하나하나에 민감하게 반응해 경계가 
 ## 참조 사이트
 
 - [Six Sigma](https://en.wikipedia.org/wiki/Six_Sigma)
+- [Increasing detectability in semiconductor foundry by multivariate statistical process control](https://www.tandfonline.com/doi/abs/10.1080/14783360802018079)
 - [Mahalanobis-Taguchi system: a systematic review from theory to application](https://www.tandfonline.com/doi/abs/10.1080/23307706.2021.1929525)
+- [Applying the Mahalanobis–Taguchi System to Improve Tablet PC Production Processes](https://www.mdpi.com/2071-1050/9/9/1557)
 - [Detection of influenza-like illness aberrations by directly monitoring Pearson residuals of fitted negative binomial regression models](https://pmc.ncbi.nlm.nih.gov/articles/PMC4352259/)
