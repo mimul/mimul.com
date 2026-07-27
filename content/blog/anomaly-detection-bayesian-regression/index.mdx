@@ -3,7 +3,7 @@ title: 회귀와 베이지안 모델링으로 조건부 정상 범위를 이상�
 description: 선형회귀부터 리지회귀, 감마회귀, 베이지안 선형회귀, MCMC 기반 로지스틱·포아송 회귀까지, 입력값에 따라 달라지는 정상 범위로 이상을 탐지하는 방법을 예제 코드와 함께 정리합니다.
 author: Mimul
 date: "2024-12-31T09:01:50.000Z"
-lastModificationTime: "2025-01-05T10:20:00.000Z"
+lastModificationTime: "2025-01-08T09:30:00.000Z"
 image: "./bayesian-poisson-boundary.png"
 tags:
   - anomaly-detection
@@ -25,7 +25,7 @@ tags:
 
 ## 선형회귀로 조건부 정상 범위 구하기
 
-설명변수 하나로 응답변수를 예측하는 선형회귀부터 시작한다. 연식(`year`)만으로 가격(`price`)을 예측하는 모델을 최소제곱법(OLS)으로 학습하면, 잔차가 정규분포 $N(0, \sigma^2)$를 따른다고 가정할 수 있다. 이 가정 위에서 이상 점수는 예측값과 실제값의 차이를 잔차 분산으로 정규화한 값이다.
+설명변수 하나로 응답변수를 예측하는 선형회귀부터 시작한다. 연식(year)만으로 가격(price)을 예측하는 모델을 최소제곱법(OLS)으로 학습하면, 잔차가 정규분포 $N(0, \sigma^2)$를 따른다고 가정할 수 있다. 이 가정 위에서 이상 점수는 예측값과 실제값의 차이를 잔차 분산으로 정규화한 값이다.
 
 $$a(x, y) = \frac{(y - w_1 x - w_0)^2}{\sigma^2}$$
 
@@ -46,6 +46,8 @@ anomaly_threshold = np.quantile(train_score, 1 - TARGET_FP_RATE)
 ![연식만으로 예측한 가격의 정상 범위와 추론 데이터](./linear-regression-boundary.png)
 
 정상 범위(회색 띠)가 연식에 따라 기울어져 있어, 오래된 차일수록 낮은 가격도 정상으로 받아들인다. 입력 조건을 무시한 채 가격만 보고 판정했다면 불가능했을 결과다. 다만 이 모델은 추론 데이터 550건 중 15건만 이상으로 판정한다. 실제 이상 매물은 50건이므로 35건을 놓치는 셈이다. 원인은 명확하다. 가격에 영향을 주는 변수가 연식 하나만은 아니기 때문이다.
+
+이렇게 정상 거동을 회귀로 예측하고 잔차를 모니터링하는 접근은 실제 설비 진단에도 쓰인다. 콜롬비아 해군은 훈련함의 디젤 발전기에 이 방식을 적용한 이상탐지 시스템을 개발했다. 운전 조건(부하, 회전수 등)으로 온도 같은 열적 변수의 정상값을 회귀로 예측한 뒤, 실측값과의 잔차를 EWMA(지수가중이동평균)로 완화하고 시간에 따라 변하는 관리한계선과 비교해 이상 징후를 지속시간 기준으로 판정한다.
 
 ## 설명변수를 늘려 다변량 선형회귀로 확장하기
 
@@ -276,7 +278,7 @@ $u_j$는 판매자마다 고정된 값이 아니라 분산 $\tau^2$인 정규분
 
 ## 3편에서 다룬 기법들이 논문의 분류체계에서 차지하는 위치
 
-이 글에서 다룬 선형회귀, 다변량 선형회귀, 리지회귀, 감마회귀, 베이지안 선형회귀, 베이지안 로지스틱 회귀, 베이지안 포아송 회귀는 모두 입력에서 출력을 예측하고, 그 예측과 실제값의 차이(예측 오차)를 이상 점수로 쓴다는 공통점을 가진다. 논문 "Dive into Time-Series Anomaly Detection: A Decade Review"의 분류체계에서는 이런 접근을 예측 기반(prediction-based), 그중에서도 예측 오차 기반(prediction error-based) 방법으로 분류한다.
+이 글에서 다룬 선형회귀, 다변량 선형회귀, 리지회귀, 감마회귀, 베이지안 선형회귀, 베이지안 로지스틱 회귀, 베이지안 포아송 회귀는 모두 입력에서 출력을 예측하고, 그 예측과 실제값의 차이(예측 오차)를 이상 점수로 쓴다는 공통점을 가진다. 논문 ["Dive into Time-Series Anomaly Detection: A Decade Review"](https://arxiv.org/pdf/2412.20512)의 분류체계에서는 이런 접근을 예측 기반(prediction-based), 그중에서도 예측 오차 기반(prediction error-based) 방법으로 분류한다.
 
 흥미로운 지점은 2편에서 쓴 이항분포·포아송분포와의 비교다. 2편의 이항분포·포아송분포 모델은 발생 확률을 상수 하나로 고정했으므로 밀도 기반, 분포 기반으로 분류됐다. 이 글의 이항 로지스틱 회귀·포아송 회귀는 같은 확률분포를 쓰지만 발생 확률이 입력변수에 대한 함수로 예측되므로 예측 기반으로 분류가 바뀐다. 확률분포 자체가 아니라 그 확률분포의 파라미터를 입력에서 예측하느냐가 두 분류를 가르는 기준이다. GLMM의 랜덤효과는 이 예측 기반 모델 위에 얹는 확장 기법이라, 논문의 분류체계에서 별도의 항목을 차지하지는 않는다.
 
@@ -287,6 +289,7 @@ $u_j$는 판매자마다 고정된 값이 아니라 분산 $\tau^2$인 정규분
 ## 참조 사이트
 
 - [Dive into Time-Series Anomaly Detection: A Decade Review](https://arxiv.org/pdf/2412.20512)
+- [Development of a Residual-Based Anomaly Detection System with Persistence Logic for Marine Diesel Generators](https://papers.phmsociety.org/index.php/ijphm/article/view/4762)
 - [Virtual metrology on semiconductor manufacturing based on Just-in-time learning](https://www.sciencedirect.com/science/article/pii/S2405896316308096)
 - [Ridge Regression: A Historical Context](https://www.researchgate.net/publication/346041807_Ridge_Regression_A_Historical_Context)
 - [Generalized Linear Models for Insurance Rating (CAS Monograph)](https://www.casact.org/sites/default/files/2021-01/05-Goldburd-Khare-Tevet.pdf)
