@@ -3,7 +3,7 @@ title: 이상탐지 기초, EDA부터 SVM·로지스틱 회귀 지도학습까�
 description: 이상탐지가 무엇인지 정의부터 살펴보고, 탐색적 데이터 분석과 SVM·로지스틱 회귀 같은 지도학습 기반 이상탐지의 원리와 한계를 예제 코드와 함께 설명합니다.
 author: Mimul
 date: "2024-08-02T09:00:00.000Z"
-lastModificationTime: "2024-08-25T11:10:00.000Z"
+lastModificationTime: "2024-08-28T09:30:00.000Z"
 image: "./svm-boundary.png"
 tags:
   - anomaly-detection
@@ -61,9 +61,11 @@ tags:
 
 다섯 개 변수를 두 개의 주성분으로 압축한 뒤에도 정상과 이상 데이터가 어느 정도 갈라져 있음을 확인할 수 있다. 이 결과는 이어서 다룰 SVM과 로지스틱 회귀 같은 지도학습 모델이 이 데이터에서 합리적인 성능을 낼 수 있으리라는 근거가 된다. (예제: [`series01/eda.py`](https://github.com/mimul/anomaly_detection/blob/main/series01/eda.py))
 
+이렇게 PCA로 다변량 데이터를 요약해 이상을 미리 감지하는 접근은 실제 설비 진단에도 쓰인다. Intel은 Seeq와 함께 PCA 기반 다변량 이상탐지기를 회전 설비 모니터링에 도입해, 실제 고장이 나기 3일 이상 전에 이상 징후를 잡아내 계획된 유지보수로 전환했다.
+
 ## SVM으로 이상을 탐지하기
 
-정상과 이상 라벨이 모두 있는 데이터라면, 두 클래스를 가르는 결정 경계를 학습하는 분류 모델을 바로 적용할 수 있다. SVM(서포트 벡터 머신)은 두 클래스 사이의 마진을 최대화하는 경계를 찾는 알고리즘으로, 커널 트릭을 쓰면 선형으로 분리되지 않는 데이터도 비선형 경계로 분류할 수 있다. SVM은 이상탐지 초기 연구에서 특히 많이 쓰인 기법이다. NASA는 여러 시스템에 흩어져 있는 비행 센서 데이터에서 이상을 잡아내기 위해 1-class SVM 기반 분산 이상탐지 기법을 연구했고, 반도체 제조 현장에서도 실제 파운드리에서 수집한 웨이퍼 맵 데이터로 결함 패턴을 SVM으로 분류하는 연구가 이뤄졌다.
+정상과 이상 라벨이 모두 있는 데이터라면, 두 클래스를 가르는 결정 경계를 학습하는 분류 모델을 바로 적용할 수 있다. SVM(서포트 벡터 머신)은 두 클래스 사이의 마진을 최대화하는 경계를 찾는 알고리즘으로, 커널 트릭을 쓰면 선형으로 분리되지 않는 데이터도 비선형 경계로 분류할 수 있다. SVM은 이상탐지 초기 연구에서 특히 많이 쓰인 기법이다. NASA는 여러 시스템에 흩어져 있는 비행 센서 데이터에서 이상을 잡아내기 위해 1-class SVM 기반 분산 이상탐지 기법을 연구했고, 반도체 제조 현장에서도 실제 파운드리에서 수집한 웨이퍼 맵 데이터로 결함 패턴을 SVM으로 분류하는 연구가 이뤄졌다. 화학공정에서는 Eastman Chemical의 실제 공정을 본뜬 Tennessee Eastman Process 벤치마크로 SVM 기반 고장 진단 연구가 광범위하게 이뤄졌다.
 
 다음 코드는 temp1과 temp2 두 변수만으로 SVM을 학습하고 결정 경계를 그린다. SVM은 특징 공간에서의 거리(유클리드 거리)에 기반한 알고리즘이므로, 변수의 스케일이 다르면 스케일이 큰 변수가 거리 계산을 지배해버린다. 그래서 학습 전에 표준화를 거쳐야 하고, 표준화와 SVM을 하나의 파이프라인으로 묶어 학습과 추론에서 같은 변환이 일관되게 적용되도록 한다.
 
@@ -123,10 +125,12 @@ SVM과 로지스틱 회귀는 정상과 이상 라벨이 모두 충분할 때 �
 ## 참조 사이트
 
 - [Anomaly detection: A survey](https://dl.acm.org/doi/10.1145/1541880.1541882)
+- [Accelerating Semiconductor Manufacturing Efficiency with Advanced Analytics (Intel + Seeq)](https://www.seeq.com/resources/blog/intel-seeq-ai-cut-downtime-in-semiconductor-manufacturing/)
 - [Credit Card Fraud Detection](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
 - [Introducing practical and robust anomaly detection in a time series](https://blog.x.com/engineering/en_us/a/2015/introducing-practical-and-robust-anomaly-detection-in-a-time-series)
 - [Monitoring Distributed Systems - Google SRE Book](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [DASHlink - Distributed Anomaly Detection using 1-class SVM for Vertically Partitioned Data](https://c3.ndc.nasa.gov/dashlink/resources/367/)
 - [WM-811K wafer map dataset](https://www.kaggle.com/datasets/qingyi/wm811k-wafer-map)
+- [Study on Support Vector Machine-Based Fault Detection in Tennessee Eastman Process](https://onlinelibrary.wiley.com/doi/10.1155/2014/836895)
 - [What Are Credit Score Reason Codes?](https://www.myfico.com/credit-education/blog/reason-codes)
 - [How we built it: Stripe Radar](https://stripe.dev/blog/how-we-built-it-stripe-radar)
