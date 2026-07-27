@@ -3,7 +3,7 @@ title: 시계열 이상탐지를 거리·밀도·예측 기반 프로세스 분�
 description: 시계열 이상탐지 방법론을 거리 기반, 밀도 기반, 예측 기반이라는 프로세스 중심 분류체계로 정리하고, Matrix Profile과 Isolation Forest, 지수평활 예측 오차 기법을 같은 데이터로 비교합니다.
 author: Mimul
 date: "2025-01-14T09:32:33.000Z"
-lastModificationTime: "2025-01-29T09:00:00.000Z"
+lastModificationTime: "2025-02-01T09:30:00.000Z"
 image: "./forecast-exponential-smoothing.png"
 tags:
   - anomaly-detection
@@ -82,6 +82,8 @@ def matrix_profile(series, window):
 반면 점 이상(100)은 상위 3개 안에 들지 않는다. 창 길이 50짜리 부분열 안에서 한 시점만 튀는 값은 z-정규화 이후에도 부분열 전체의 모양을 크게 바꾸지 않기 때문이다. 불일치 기반 방법은 부분열의 형태가 깨지는 변화, 즉 집단적 이상과 맥락적 이상을 잡는 데 강하고, 가장 단순한 형태의 점 이상은 오히려 놓치기 쉽다.
 
 불일치 탐지는 실제 우주 탐사 데이터에도 쓰였다. NASA 제트추진연구소(JPL)는 토성을 탐사한 Cassini 탐사선의 자기권 관측 데이터에 discord 탐지를 적용해, 태양풍과 자기권의 경계(bow shock)를 통과하는 구간을 찾아냈다. 라벨 없이 최근접 이웃 거리만으로 판정하는 방식이 실제 행성 탐사 데이터에서도 경계 통과 구간을 잘 짚어낸 사례다.
+
+상용 서비스에도 쓰인다. 오류 추적 서비스 Sentry는 Matrix Profile과 예측 기반 모델 Prophet을 결합해 서비스 메트릭의 이상탐지 기능을 프로덕션에 적용했다. Visa Research는 변수가 여럿인 다차원 시계열로 Matrix Profile을 확장해, 여러 센서나 지표를 동시에 다루는 이상탐지에도 이 방식이 통한다는 것을 보였다.
 
 클러스터링 기반 방법(NormA, SAND 등)은 접근이 다르다. 부분열 전체를 몇 개의 대표 패턴(군집)으로 나눠두고, 새 부분열이 어느 군집에도 잘 속하지 않으면 이상으로 판정한다. 불일치 기반이 이웃 하나까지의 거리만 보는 것과 달리, 클러스터링 기반은 정상 패턴들의 전체적인 분포를 먼저 요약해둔다는 점에서 다음에 볼 밀도 기반 방법과 발상이 가깝다.
 
@@ -170,7 +172,7 @@ score = ((series - forecast) / resid_std) ** 2
 
 27건 중 21건이 세 이상 구간(점 이상 1건, 맥락적 이상 1건, 집단적 이상 19건) 안에 들어가고, 나머지 6건은 정상 구간에서 발생한 오탐이다. 세 이상 유형을 모두 잡아낸다는 점이 앞의 두 기법과 다르다. 예측이 그 시점의 추세와 계절 위상을 반영해 나오므로, 값 자체는 전역 범위 안에 있어도 그 시점에 기대되는 값과 다르면 큰 오차로 드러난다. 맥락적 이상을 특히 잘 잡아내는 이유다. 값 하나가 튀는 점 이상도 예측과의 차이가 그대로 드러나므로 잡힌다.
 
-이런 예측 오차 기반 접근은 실제 모니터링 제품에도 쓰인다. SolarWinds의 Database Performance Monitor는 Holt-Winters 예측으로 쿼리 지표의 이상을 탐지하는 기능을 제공하며, 계절성을 반영해 오탐을 줄인다. HTM을 개발한 Numenta는 이를 상용화한 Grok을 AWS Marketplace에 출시해, EC2·RDS 같은 AWS 서비스 지표를 실시간으로 학습하고 이상을 탐지하게 했다.
+이런 예측 오차 기반 접근은 실제 모니터링 제품에도 쓰인다. SolarWinds의 Database Performance Monitor는 Holt-Winters 예측으로 쿼리 지표의 이상을 탐지하는 기능을 제공하며, 계절성을 반영해 오탐을 줄인다. VMware의 Avi Load Balancer도 Holt-Winters를 내장 기능으로 넣어, 트래픽과 부하의 계절성을 반영한 이상탐지를 별도 설정 없이 제공한다. HTM을 개발한 Numenta는 이를 상용화한 Grok을 AWS Marketplace에 출시해, EC2·RDS 같은 AWS 서비스 지표를 실시간으로 학습하고 이상을 탐지하게 했다.
 
 재구성 오차 기반(reconstruction-based)은 예측이 아니라 압축과 복원으로 접근한다. Autoencoder는 부분열을 원래 길이보다 작은 잠재 공간으로 압축했다가 다시 복원하도록 학습되고, 그 복원값과 원래 부분열의 차이(재구성 오차)를 이상 점수로 쓴다. GAN 기반 방법(MAD-GAN, USAD, TAnoGAN)은 정상 부분열만으로 생성자와 판별자를 학습해, 판별자 점수와 재구성 오차를 함께 이상 점수로 결합한다. 예측 오차 기반과 마찬가지로 학습 데이터에 이상이 거의 없다고 가정하므로, 이상이 소수 섞인 준지도 학습 환경에 가장 잘 맞는다.
 
@@ -206,6 +208,9 @@ score = ((series - forecast) / resid_std) ** 2
 
 - [Dive into Time-Series Anomaly Detection: A Decade Review](https://arxiv.org/pdf/2412.20512)
 - [Unsupervised detection of Saturn magnetic field boundary crossings from plasma spectrometer data](https://www.sciencedirect.com/science/article/pii/S0098300422000073)
+- [Time series monitoring: Anomaly detection using Matrix Profile and Prophet (Sentry)](https://blog.sentry.io/time-series-monitoring-anomaly-detection-matrix-profile-prophet)
+- [Matrix Profile for Anomaly Detection on Multidimensional Time Series (Visa Research)](https://arxiv.org/abs/2409.09298)
 - [Holt-Winters Forecasting and Exponential Smoothing Simplified (SolarWinds)](https://www.solarwinds.com/blog/holt-winters-forecasting-simplified)
+- [Holt-Winters Algorithm & Anomaly Detection (VMware Avi Load Balancer)](https://blogs.vmware.com/load-balancing/2024/03/20/holt-winters-algorithm-anomaly-detection-vmware-avi-load-balancer/)
 - [Unsupervised Real-Time Anomaly Detection for Streaming Data (Numenta)](https://numenta.github.io/numenta-web/papers/unsupervised-real-time-anomaly-detection-for-streaming-data/)
 - [Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications (Donut)](https://arxiv.org/abs/1802.03903)
