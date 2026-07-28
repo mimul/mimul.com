@@ -1,6 +1,6 @@
 ---
-title: 소프트웨어 복잡성의 원인과 줄이는 법, State부터 Deep Module까지
-description: State/Control이 만드는 복잡성의 원인부터 Immutable, Deep Module, 진화하는 아키텍처, 분산 시스템의 Essential Complexity까지 복잡성을 줄이는 이론과 실천을 정리합니다.
+title: 소프트웨어 복잡성의 원인과 줄이는 법, State부터 Stratified Design까지
+description: State/Control이 만드는 복잡성의 원인부터 Deep Module, Stratified Design의 기원과 계보, 분산 시스템의 Essential Complexity, 분류값을 다형성으로 바꾸는 법까지 이론과 실천을 정리합니다.
 author: Mimul
 date: "2021-08-04T02:07:09.000Z"
 lastModificationTime: "2026-07-28T12:00:00.000Z"
@@ -18,7 +18,7 @@ Fred Brooks는 1986년 "[No Silver Bullet](https://worrydream.com/refs/Brooks_19
 
 Backus는 1977년 튜링상 연설에서 기존 언어들의 복잡함과 취약함을 지적하며 "프로그램을 사고하도록 돕는 강력한 방법론이 절실히 필요하다"고 했다. Hoare는 1980년 튜링상 연설에서 한발 더 나아간다. "돈으로 살 수 없는 단 하나의 품질이 있다면 신뢰성이다. 신뢰성의 대가는 철저한 단순함을 추구하는 것"이라고 하면서, 소프트웨어를 설계하는 방법은 두 가지뿐이라고 정리한다. 결함이 없는 게 뻔히 보일 만큼 단순하게 만들거나, 결함이 있는지조차 보이지 않을 만큼 복잡하게 만들거나. 그리고 첫 번째 방법이 훨씬 어렵다고 덧붙인다.
 
-단순함이 어렵다는 이 결론은 "Out of the Tar Pit" 저자들도 그대로 받아들인다. 논문에는 "Simplicity is Hard"라는 소제목이 등장한다. 다만 저자들은 이 어려움 앞에서 체념하지 않는다. 복잡성이 어디서 생기는지 원인을 추적할 수 있다면 그중 상당수는 피할 수 있다는 것이 논문의 낙관이다. 이 글은 그 추적 경로를 따라간다. 먼저 복잡성이 실제로 어디서 생겨나는지 이론으로 정리하고, 그중 피할 수 없는 부분과 피할 수 있는 부분을 가르는 기준을 세운다. 그다음 이 기준을 진단 질문으로 바꾸고, 상태·모듈·아키텍처·분기를 겨냥한 처방을 요약한 뒤, 정기결제 지갑 서비스라는 하나의 예제를 등록부터 적립까지 단계적으로 넓히며 그 처방을 코드로 확인한다.
+단순함이 어렵다는 이 결론은 "Out of the Tar Pit" 저자들도 그대로 받아들인다. 논문에는 "Simplicity is Hard"라는 소제목이 등장한다. 다만 저자들은 이 어려움 앞에서 체념하지 않는다. 복잡성이 어디서 생기는지 원인을 추적할 수 있다면 그중 상당수는 피할 수 있다는 것이 논문의 낙관이다. 이 글은 그 추적 경로를 따라간다. 먼저 복잡성이 실제로 어디서 생겨나는지 이론으로 정리하고, 그중 피할 수 없는 부분과 피할 수 있는 부분을 가르는 기준을 세운다. 그다음 이 기준을 진단 질문으로 바꾸고, 상태·모듈·아키텍처·분기를 겨냥한 처방을 요약한 뒤, 정기결제 지갑 서비스라는 하나의 예제를 등록부터 적립까지 단계적으로 넓히며 그 처방을 코드로 확인한다. 그 처방 중 Stratified Design 하나는 별도로 시간을 내어, 이 용어가 어디서 왔고 왜 같은 "층"이라는 말이 서로 다른 두 갈래를 가리키게 됐는지까지 파고든다.
 
 ## 시스템의 복잡성은 어디서 오는가
 
@@ -226,7 +226,7 @@ Ousterhout는 모듈의 값어치를 인터페이스와 구현의 비율로 잰�
 
 깊은 모듈을 지향하는 것과 classitis를 피하는 것은 같은 원칙의 양면이 아니라 서로 반대 방향으로 당기는 trade-off다. 지식을 감추겠다고 계속 쪼개다 보면 조각 하나하나의 인터페이스는 작아지지만, 원래 하나였던 일을 끝내려는 호출자는 그 작은 인터페이스 여러 개를 모두 배우고 순서에 맞게 엮어야 한다. 조각 각각은 깊어 보여도, 그 조각들을 조합해야 하는 호출자의 관점에서는 알아야 할 것의 총량이 줄지 않고 여러 클래스에 걸쳐 흩어질 뿐이다. 개별 모듈의 깊이와 그 모듈들을 엮어 쓰는 호출자가 겪는 깊이는 다른 질문이라는 뜻이다. 그래서 쪼갤지 말지를 가르는 기준은 하나로 좁혀진다. 나누려는 두 부분이 서로 다른 지식을 감추면서도 각자 독립적으로 이해되고 호출될 수 있는가. 두 조각을 늘 같이 알아야만 하나의 일이 끝난다면, 그 분할은 감추기가 아니라 흩어놓기이므로 나누지 않는 편이 낫다. 뒤에 나올 지갑 예제에서 이 trade-off를 코드로 확인한다.
 
-### 층을 나누는 원칙: Stratified Design
+### 층을 나누는 원칙
 
 Stratified Design은 Hal Abelson과 Gerald Sussman이 1987년 MIT AI 메모에서 처음 제시한 개념이다. 원래는 Lisp을 예로 든 논문이었지만, Eric Normand는 저서 "Grokking Simplicity"에서 이 개념을 함수형 프로그래밍 전반에 맞게 다시 풀어썼다. 핵심 주장은 세 가지로 요약된다. 첫째, 각 층은 그 층에 특화된 언어다. 층마다 고유한 원시 개념과 조합 수단, 추상화 수단을 갖추고, 위층은 오로지 이 어휘만으로 구성되며 아래층의 구현 세부에는 손대지 않는다. 둘째, 폐쇄성(closure)이다. 부품을 조합한 결과는 다시 같은 층의 부품으로 취급할 수 있어서, 같은 층 안에서 조합을 얼마든지 반복할 수 있다. 셋째, 층별 교체 가능성이다. 아래층의 구현을 다른 것으로 바꿔도 위층은 영향을 받지 않는다. Stratified Design이 주는 변경 용이성은 바로 이 교체 가능성에서 나온다. 이 세 원칙을 정기결제 지갑 서비스로 확인하는 것은 뒤에서 이어간다.
 
@@ -411,57 +411,6 @@ void charge(UserId userId, long amount) {
 | 상태와 로직 분리 | 상태 없이 계산할 수 있는 부분은 어디까지인가? | `calculateEarnedPoints` / `charge` |
 | Essential·Accidental 판정 | 사용자가 이 상태를 이해하는가? | 재시도 횟수·캐시는 Imperative Shell로 |
 | Deep Module 적용 | 인터페이스 뒤에 지식을 감췄는가? 너무 잘게 쪼개지 않았는가? | `IdentityCheck`, `AccountCheck`, `Blacklist` |
-
-## Stratified Design
-
-앞서 지갑 예제에서 확인한 세 원칙, 즉 층은 특화된 언어라는 것, closure성, 층별 교체 가능성은 Abelson과 Sussman의 1987년 원전에서 온 것이다. 이 절은 그 원전이 실제로 어떤 문장으로 이 원칙을 세웠는지, 추상도로 층을 나누는 발상이 어디서부터 이어져 왔는지, 그리고 같은 "층"이라는 말이 서로 다른 두 계보를 동시에 가리키게 된 경위를 따라간다.
-
-### 원전 논문이 실제로 쓴 문장
-
-"Stratified Design"이라는 용어의 출처는 논문 "Lisp: A Language for Stratified Design"(Abelson & Sussman, MIT AI Memo AIM-986, 1987년 8월)이다. 이듬해 BYTE지 13권 2호(1988년 2월호)에 재수록되면서 더 널리 읽혔다. 분량은 10쪽 남짓으로 짧고, "Structure and Interpretation of Computer Programs"에서 다룬 그림 언어(picture language)와 수식 기호 미분기라는 두 예제로 논지를 편다.
-
-층은 특화된 언어라는 첫 번째 주장을 저자들은 이렇게 썼다. "계층화된 설계의 각 층은 그 층에 맞는 다양한 프리미티브와 조합 수단을 갖춘 특화된 언어로 볼 수 있다." 상위 층이 하위 층의 어휘만으로 구성된다는 말은, 상위 층을 읽는 사람이 하위 층의 구현 방식을 배울 필요가 없다는 뜻이기도 하다. 층별 교체 가능성에 대해서는 "어느 층의 부품이든 바꿀 수 있다"는 한 문장으로 정리한다. 층을 나누는 이유가 코드를 보기 좋게 정돈하는 데 있지 않고, 어느 층이든 갈아 끼울 수 있는 상태를 만드는 데 있다는 것이 이 문장이 가리키는 지점이다.
-
-Eric Normand는 이 1987년 원전을 함수형 프로그래밍에 맞게 다시 풀어 쓴 사람이다. 팟캐스트 "Lisp: A Language for Stratified Design"에서 원전의 내용을 직접 해설했고, 이 내용은 "Grokking Simplicity" 8장과 9장에 대응한다. 앞서 지갑 예제에 적용한 세 원칙은 Normand가 새로 만든 것이 아니라 이 원전을 그대로 옮긴 것이다.
-
-### 추상도로 층을 나누는 발상의 계보
-
-Abelson과 Sussman이 "Stratified Design"이라는 용어를 만들었을 뿐, 추상도로 층을 나누는 발상 자체는 그보다 앞선다.
-
-| 연도 | 문헌 | 내용 |
-|---|---|---|
-| 1968 | Dijkstra, "The Structure of the 'THE'-Multiprogramming System" | 운영체제를 6개의 추상 층으로 나누고, 상위 층이 하위 층이 제공하는 추상만으로 구성되게 설계했다. 프로세서 할당, 세그먼트화된 메모리, 메시지, 입출력, 사용자 프로그램이라는 개념을 층마다 배정하고 하위 층의 구현 세부에는 의존하지 않게 했다. "각 층이 특화된 언어"라는 발상이 운영체제 영역에서 먼저 나타난 사례다. |
-| 1972 | Parnas, "On the Criteria to Be Used in Decomposing Systems into Modules" | 모듈을 나누는 기준 자체는 앞서 Deep Module 절에서 다뤘다. 다만 정작 Parnas 자신은 추상도로 층을 나누는 발상에는 회의적이었고, 이 유보는 1979년 논문에서 다른 그림으로 이어진다. |
-| 1979 | Parnas, "Designing Software for Ease of Extension and Contraction" | 층 대신 uses 관계로 이루어진 방향성 비순환 그래프를 제시했다. A가 B를 uses한다는 관계는 A가 B를 씀으로써 구현이 실제로 단순해지고, B 없이 A를 포함하는 부분집합이 존재하지 않을 때만 성립한다. Stratified Design의 "하위 층만 호출한다"는 규율은 이 uses 관계를 함수 단위로 적용한 것에 가깝다. |
-| 1996 | Buschmann 외, POSA Vol.1 Layers 패턴 | 나누는 기준을 명시적으로 규정하지는 않지만 OSI 참조 모델을 대표 사례로 들어, 추상도 계보 위에 서 있다. |
-
-이 표에서 눈여겨볼 대목은 Parnas의 태도다. 정보 은닉이라는 원칙을 세운 당사자가 정작 추상도의 계층이라는 개념에는 동의하지 않았고, 1979년 논문에서는 층이라는 그림 대신 uses 관계라는 그래프로 대체했다. Stratified Design은 이 uses 관계를 함수 하나하나에 적용해서 다시 층의 형태로 되돌린 셈이다.
-
-### 책임의 종류는 왜 "층"이라 불리게 됐는가
-
-앞서 지갑 예제에서 서비스, 도메인, 인프라라는 책임 기반 계층과 Stratified Design의 추상도 기반 계층이 같은 "층"이라는 말을 쓰면서도 다른 기준으로 나뉜다는 점을 확인했다. 이 혼선이 어디서 시작됐는지는 tier와 layer라는 두 단어의 역사를 따라가면 드러난다.
-
-원래 tier는 물리적 배치를 가리키는 말이고 layer는 논리적 소프트웨어 구조를 가리키는 말이어서, 두 단어는 서로 다른 대상을 가리켰다. 1990년대 초 Open Environment Corporation의 John J. Donovan과 Wayne Eckerson 등이 프레젠테이션, 애플리케이션, 데이터라는 물리적 삼분할을 three-tier라는 이름으로 퍼뜨리면서 사정이 바뀌기 시작한 것으로 알려져 있다. UI는 브라우저, 업무 처리는 애플리케이션 서버, 데이터는 DB 서버라는 배치가 굳어지자, 같은 세 묶음을 논리적으로도 layer라 부르는 관행이 함께 퍼졌다. Sun의 J2EE나 Microsoft의 DNA 같은 제품 마케팅이 같은 도표의 설명에서 N-tier와 presentation/business/data layer라는 표현을 서로 바꿔 쓴 것도 이 혼용을 굳히는 데 한몫했다.
-
-이 혼용을 결정적으로 굳힌 것은 Martin Fowler의 "Patterns of Enterprise Application Architecture"(2002)다. 이 책은 presentation, domain, data source 세 층을 중심에 놓고 Buschmann의 Layers 패턴을 인용하면서도, layer를 책임으로 나눈 조직화 단위라는 뜻으로 썼다. Eric Evans의 "Domain-Driven Design"(2003)도 UI, Application, Domain, Infrastructure를 layer라 부르며 이 용법을 그대로 물려받았다. 실무에서 쓰는 레이어드 아키텍처는 추상도 층이라는 어휘를 3계층 클라이언트서버 모델을 거쳐 수입한 결과에 가깝다. 수입되는 과정에서 layer라는 단어만 남고, 추상도로 나눈다는 원래 의미는 옅어졌다.
-
-tier와 layer를 구분하지 않아도 실제 문제가 드러나지 않았던 이유도 이 역사에 있다. 3계층 클라이언트서버가 주류이던 시절에는 물리적 배치와 논리적 책임이 거의 1대1로 대응했으므로(UI는 브라우저, 업무는 애플리케이션 서버, 데이터는 DB 서버) 두 단어를 섞어 써도 가리키는 대상은 같았다. 이 대응이 깨진 계기는 컨테이너화다. 물리적 배치가 논리적 책임에서 독립하면서, 그동안 가려져 있던 두 단어의 차이가 다시 드러났다.
-
-이 역사를 알고 나면 Stratified Design과 레이어드 아키텍처를 대비하는 논의를 읽을 때 확인할 대목도 분명해진다. 그 논의에서 레이어드 아키텍처가 가리키는 것이 Dijkstra 계보의 추상도 층인지, PoEAA 계보의 책임 층인지에 따라 대비의 의미는 완전히 달라진다. 원래 다른 것이었던 두 개념이 같은 이름으로 불리고 있을 뿐이다.
-
-### 층 구조 자체를 거부한 Hexagonal Architecture
-
-앞서 지갑 예제에서 Hexagonal Architecture를 Stratified Design과 같은 계보로 묶어 소개했지만, 정확히 말하면 이 아키텍처는 층 구조 자체를 거부하는 데서 출발했다. [Alistair Cockburn은 인터뷰](https://jmgarridopaz.github.io/content/interviewalistair.html)에서 이 아키텍처를 고안한 동기를 이렇게 설명한다. "위나 아래, 좌나 우로 직사각형을 그리는 반사적인 습관을 끊고 싶었다." 중심의 육각형을 둘러싼 포트와 어댑터는 UI 쪽과 데이터베이스 쪽을 대칭으로 다루기 위한 장치이고, Cockburn은 "데이터베이스를 특별한 존재로 취급하는 습관을 없애고 싶었다"고도 말한다. 층으로 그리면 위쪽의 UI와 아래쪽의 DB가 자연히 비대칭으로 보이는데, 육각형은 이 비대칭을 지우려는 의도적 선택이다.
-
-그런데도 Hexagonal Architecture를 설명하는 자료 대부분은 바깥에서 안쪽으로 향하는 층이라는 표현을 쓴다. 층이라는 이름이 고안자의 의도와 무관하게 독자적으로 퍼진 또 하나의 사례다. Clean Architecture와 Onion Architecture가 이를 동심원으로 시각화한 것도 같은 흐름 위에 있다. 원 안쪽일수록 추상도가 높다고 설명하지만, 실제 구현에서는 앞서 본 것처럼 책임 기반 분할로 흘러가기 쉽다.
-
-### 함수 하나 안에서 추상도를 지키는 관행들
-
-Stratified Design은 모듈이나 층이라는 큰 단위를 겨냥하지만, 같은 발상을 함수 하나 안에서 지키려는 흐름도 따로 있었다. 1987년 원전과는 무관하게 Smalltalk와 리팩터링 진영에서 나온 관행들이다.
-
-Kent Beck은 "Implementation Patterns"(2007)에서 Composed Method를 이렇게 정의한다. 메서드의 본문은 같은 추상 수준에 있는 다른 메서드의 호출만으로 구성해야 한다는 것이다. Stratified Design을 함수 단위로 옮기면 이 정의와 정확히 겹친다. Joshua Kerievsky는 "Refactoring to Patterns"(2004)에서 긴 메서드를 의도가 드러나는 짧은 메서드들로 쪼개는 절차를 Compose Method라는 이름으로 체계화했고, Fowler의 Extract Function도 같은 방향의 리팩터링이다. Robert Martin은 "Clean Code"(2008)에서 이를 Stepdown Rule이라 부른다. "모든 함수 다음에는 한 단계 낮은 추상 수준의 함수가 이어지기를 원한다"는 문장으로 정리하면서, 하나의 함수 안에 여러 추상 수준을 섞지 말라는 규칙을 함께 제시한다. 이 규칙은 이후 Single Level of Abstraction Principle이라는 이름으로 더 널리 퍼졌다. 이 이름의 출처를 "Clean Code"로 보는 자료가 많지만, 원리 자체는 그보다 먼저 존재했을 가능성이 있다는 지적도 있다.
-
-시대도 계보도 다른 이 관행들이 겨냥하는 지점은 하나로 모인다. 함수 하나 안에서 추상 수준을 섞지 않는 것이다. 앞서 지갑 예제에서 나눈 층이 모듈과 인터페이스 단위의 규율이었다면, Composed Method와 Stepdown Rule은 그 규율을 함수 본문 안까지 끌고 들어간 버전이다. 어느 이름으로 부르든 실천은 같다.
 
 ## 분류값이 만드는 복잡성과 다형성
 
@@ -678,6 +627,81 @@ void transitionTo(ChargeStatus next) {
 이 전이 테이블이 지키는 자리는 [Immutable Data Model](https://www.mimul.com/blog/immutable-data-model/)에서 다룬 롱텀 이벤트의 현재상태 컬럼과 같다. 그 글은 데이터 모델 수준에서 상태 하나만 UPDATE로 남기고 나머지는 사실을 INSERT하는 방법을 다뤘는데, 여기서는 그 상태가 바뀔 수 있는 경로 자체를 코드 한 곳에 가두는 방법을 다뤘다. 지향점은 같다. 규칙이 흩어지지 않게 한곳에 모으는 것이다.
 
 `CardCharge`, `BankTransferCharge`, `PointCharge`를 나눈 이유도 classitis 기준과 같다. 각각 다른 수수료 정책과 한도, 곧 서로 무관한 지식을 감추기 때문이지 클래스 수를 늘리기 위해서가 아니다.
+
+## Stratified Design
+
+지금까지 지갑 예제로 등록, 충전, 충전 수단, 상태 전이까지 살펴봤다. 이 시점까지 미룬 이유가 있다. 앞선 절들은 Stratified Design을 포함한 여러 처방을 나란히 적용하는 데 집중했고, 이 절은 그중 Stratified Design 하나만 따로 떼어 등록 예제로 돌아가 복잡성과 어떤 관계를 맺는지부터 다시 짚고 그 기원과 계보를 깊게 파고든다.
+
+Stratified Design이 복잡성과 맺는 관계는 두 갈래로 나뉜다. 하나는 앞서 다룬 Ousterhout의 진단과 맞닿아 있다. 의존성과 모호성이라는 두 원인 중, 층을 인접한 것끼리만 호출하게 강제하는 규율은 의존성을 통제하고, 각 층이 하위 층의 구현을 감춘 특화된 언어로 작동하는 성질은 모호성을 줄인다. Unknown Unknowns가 자라나는 토양이 obscurity였다는 점을 떠올리면, 층 구조는 그 토양 자체를 좁히는 작업에 해당한다.
+
+다른 하나는 한계다. Stratified Design은 essential complexity 자체를 줄이지 못한다. 이미 발견된 복잡성을 코드 구조 안에 배치하는 인코딩 도구일 뿐이어서, 업무 규칙이 정말로 복잡하다면 그 복잡성은 상위 층 어딘가에 그대로 남는다. 층으로 감출 수 있는 것은 그 복잡성을 몰라도 되는 사람의 수이지 복잡성의 총량이 아니다.
+
+이 절이 층의 기원과 계보를 파고드는 이유가 여기 있다. 어디까지가 이 구조 덕분에 줄어드는 복잡성이고 어디부터가 여전히 사람이 감당해야 할 복잡성인지 가르는 경계는, 앞서 지갑 예제에서 확인한 세 원칙(층은 특화된 언어라는 것, closure성, 층별 교체 가능성)이 Abelson과 Sussman의 1987년 원전에서 정확히 무엇을 주장했는지를 봐야 드러난다. 이 절은 그 원전이 실제로 어떤 문장으로 이 원칙을 세웠는지, 추상도로 층을 나누는 발상이 어디서부터 이어져 왔는지, 그리고 같은 "층"이라는 말이 서로 다른 두 계보를 동시에 가리키게 된 경위를 따라간다.
+
+### 원전 논문이 실제로 쓴 문장
+
+"Stratified Design"이라는 용어의 출처는 논문 "Lisp: A Language for Stratified Design"(Abelson & Sussman, MIT AI Memo AIM-986, 1987년 8월)이다. 이듬해 BYTE지 13권 2호(1988년 2월호)에 재수록되면서 더 널리 읽혔다. 분량은 10쪽 남짓으로 짧고, "Structure and Interpretation of Computer Programs"에서 다룬 그림 언어(picture language)와 수식 기호 미분기라는 두 예제로 논지를 편다.
+
+층은 특화된 언어라는 첫 번째 주장을 저자들은 이렇게 썼다. "계층화된 설계의 각 층은 그 층에 맞는 다양한 프리미티브와 조합 수단을 갖춘 특화된 언어로 볼 수 있다." 상위 층이 하위 층의 어휘만으로 구성된다는 말은, 상위 층을 읽는 사람이 하위 층의 구현 방식을 배울 필요가 없다는 뜻이기도 하다. 층별 교체 가능성에 대해서는 "어느 층의 부품이든 바꿀 수 있다"는 한 문장으로 정리한다. 층을 나누는 이유가 코드를 보기 좋게 정돈하는 데 있지 않고, 어느 층이든 갈아 끼울 수 있는 상태를 만드는 데 있다는 것이 이 문장이 가리키는 지점이다.
+
+Eric Normand는 이 1987년 원전을 함수형 프로그래밍에 맞게 다시 풀어 쓴 사람이다. 팟캐스트 "Lisp: A Language for Stratified Design"에서 원전의 내용을 직접 해설했고, 이 내용은 "Grokking Simplicity" 8장과 9장에 대응한다. 앞서 지갑 예제에 적용한 세 원칙은 Normand가 새로 만든 것이 아니라 이 원전을 그대로 옮긴 것이다.
+
+### 추상도로 층을 나누는 발상의 계보
+
+Abelson과 Sussman이 "Stratified Design"이라는 용어를 만들었을 뿐, 추상도로 층을 나누는 발상 자체는 그보다 앞선다.
+
+| 연도 | 문헌 | 내용 |
+|---|---|---|
+| 1968 | Dijkstra, "The Structure of the 'THE'-Multiprogramming System" | 운영체제를 6개의 추상 층으로 나누고, 상위 층이 하위 층이 제공하는 추상만으로 구성되게 설계했다. 프로세서 할당, 세그먼트화된 메모리, 메시지, 입출력, 사용자 프로그램이라는 개념을 층마다 배정하고 하위 층의 구현 세부에는 의존하지 않게 했다. "각 층이 특화된 언어"라는 발상이 운영체제 영역에서 먼저 나타난 사례다. |
+| 1972 | Parnas, "On the Criteria to Be Used in Decomposing Systems into Modules" | 모듈을 나누는 기준 자체는 앞서 Deep Module 절에서 다뤘다. 다만 정작 Parnas 자신은 추상도로 층을 나누는 발상에는 회의적이었고, 이 유보는 1979년 논문에서 다른 그림으로 이어진다. |
+| 1979 | Parnas, "Designing Software for Ease of Extension and Contraction" | 층 대신 uses 관계로 이루어진 방향성 비순환 그래프를 제시했다. A가 B를 uses한다는 관계는 A가 B를 씀으로써 구현이 실제로 단순해지고, B 없이 A를 포함하는 부분집합이 존재하지 않을 때만 성립한다. Stratified Design의 "하위 층만 호출한다"는 규율은 이 uses 관계를 함수 단위로 적용한 것에 가깝다. |
+| 1996 | Buschmann 외, POSA Vol.1 Layers 패턴 | 나누는 기준을 명시적으로 규정하지는 않지만 OSI 참조 모델을 대표 사례로 들어, 추상도 계보 위에 서 있다. |
+
+이 표에서 눈여겨볼 대목은 Parnas의 태도다. 정보 은닉이라는 원칙을 세운 당사자가 정작 추상도의 계층이라는 개념에는 동의하지 않았고, 1979년 논문에서는 층이라는 그림 대신 uses 관계라는 그래프로 대체했다. Stratified Design은 이 uses 관계를 함수 하나하나에 적용해서 다시 층의 형태로 되돌린 셈이다.
+
+### 책임의 종류는 왜 "층"이라 불리게 됐는가
+
+앞서 지갑 예제에서 서비스, 도메인, 인프라라는 책임 기반 계층과 Stratified Design의 추상도 기반 계층이 같은 "층"이라는 말을 쓰면서도 다른 기준으로 나뉜다는 점을 확인했다. 이 혼선이 어디서 시작됐는지는 tier와 layer라는 두 단어의 역사를 따라가면 드러난다.
+
+원래 tier는 물리적 배치를 가리키는 말이고 layer는 논리적 소프트웨어 구조를 가리키는 말이어서, 두 단어는 서로 다른 대상을 가리켰다. 1990년대 초 Open Environment Corporation의 John J. Donovan과 Wayne Eckerson 등이 프레젠테이션, 애플리케이션, 데이터라는 물리적 삼분할을 three-tier라는 이름으로 퍼뜨리면서 사정이 바뀌기 시작한 것으로 알려져 있다. UI는 브라우저, 업무 처리는 애플리케이션 서버, 데이터는 DB 서버라는 배치가 굳어지자, 같은 세 묶음을 논리적으로도 layer라 부르는 관행이 함께 퍼졌다. Sun의 J2EE나 Microsoft의 DNA 같은 제품 마케팅이 같은 도표의 설명에서 N-tier와 presentation/business/data layer라는 표현을 서로 바꿔 쓴 것도 이 혼용을 굳히는 데 한몫했다.
+
+이 혼용을 결정적으로 굳힌 것은 Martin Fowler의 "Patterns of Enterprise Application Architecture"(PoEAA, 2002)다. 이 책은 presentation, domain, data source 세 층을 중심에 놓고 Buschmann의 Layers 패턴을 인용하면서도, layer를 책임으로 나눈 조직화 단위라는 뜻으로 썼다. Eric Evans의 "Domain-Driven Design"(2003)도 UI, Application, Domain, Infrastructure를 layer라 부르며 이 용법을 그대로 물려받았다. 실무에서 쓰는 레이어드 아키텍처는 추상도 층이라는 어휘를 3계층 클라이언트서버 모델을 거쳐 수입한 결과에 가깝다. 수입되는 과정에서 layer라는 단어만 남고, 추상도로 나눈다는 원래 의미는 옅어졌다.
+
+tier와 layer를 구분하지 않아도 실제 문제가 드러나지 않았던 이유도 이 역사에 있다. 3계층 클라이언트서버가 주류이던 시절에는 물리적 배치와 논리적 책임이 거의 1대1로 대응했으므로(UI는 브라우저, 업무는 애플리케이션 서버, 데이터는 DB 서버) 두 단어를 섞어 써도 가리키는 대상은 같았다. 이 대응이 깨진 계기는 컨테이너화다. 물리적 배치가 논리적 책임에서 독립하면서, 그동안 가려져 있던 두 단어의 차이가 다시 드러났다.
+
+이 역사를 알고 나면 Stratified Design과 레이어드 아키텍처를 대비하는 논의를 읽을 때 확인할 대목도 분명해진다. 그 논의에서 레이어드 아키텍처가 가리키는 것이 Dijkstra 계보의 추상도 층인지, PoEAA 계보의 책임 층인지에 따라 대비의 의미는 완전히 달라진다. 원래 다른 것이었던 두 개념이 같은 이름으로 불리고 있을 뿐이다.
+
+### 층 구조 자체를 거부한 Hexagonal Architecture
+
+앞서 지갑 예제에서 Hexagonal Architecture를 Stratified Design과 같은 계보로 묶어 소개했지만, 정확히 말하면 이 아키텍처는 층 구조 자체를 거부하는 데서 출발했다. [Alistair Cockburn은 인터뷰](https://jmgarridopaz.github.io/content/interviewalistair.html)에서 이 아키텍처를 고안한 동기를 이렇게 설명한다. "위나 아래, 좌나 우로 직사각형을 그리는 반사적인 습관을 끊고 싶었다." 중심의 육각형을 둘러싼 포트와 어댑터는 UI 쪽과 데이터베이스 쪽을 대칭으로 다루기 위한 장치이고, Cockburn은 "데이터베이스를 특별한 존재로 취급하는 습관을 없애고 싶었다"고도 말한다. 층으로 그리면 위쪽의 UI와 아래쪽의 DB가 자연히 비대칭으로 보이는데, 육각형은 이 비대칭을 지우려는 의도적 선택이다.
+
+그런데도 Hexagonal Architecture를 설명하는 자료 대부분은 바깥에서 안쪽으로 향하는 층이라는 표현을 쓴다. 층이라는 이름이 고안자의 의도와 무관하게 독자적으로 퍼진 또 하나의 사례다. Clean Architecture와 Onion Architecture가 이를 동심원으로 시각화한 것도 같은 흐름 위에 있다. 원 안쪽일수록 추상도가 높다고 설명하지만, 실제 구현에서는 앞서 본 것처럼 책임 기반 분할로 흘러가기 쉽다.
+
+### 함수 하나 안에서 추상도를 지키는 관행들
+
+Stratified Design은 모듈이나 층이라는 큰 단위를 겨냥하지만, 같은 발상을 함수 하나 안에서 지키려는 흐름도 따로 있었다. 1987년 원전과는 무관하게 Smalltalk와 리팩터링 진영에서 나온 관행들이다.
+
+Kent Beck은 "Implementation Patterns"(2007)에서 Composed Method를 이렇게 정의한다. 메서드의 본문은 같은 추상 수준에 있는 다른 메서드의 호출만으로 구성해야 한다는 것이다. 앞서 본 `registerAccount`로 확인해보자.
+
+```java
+// 추상 수준이 섞인 예: 로그 문자열 조립(저수준)과 등록 절차(고수준)가 한 메서드에 있다
+void registerAccount(UserId userId, BankAccount account, Email email) {
+    log.info("register attempt uid=" + userId.value() + " ts=" + Instant.now());
+    RegistrationDecision decision = decideRegistration(userId, account, email, identity, accountCheck, blacklist);
+    if (!decision.allowed()) throw new RejectedException(decision.reason());
+    userRepository.linkAccount(userId, account);
+}
+
+// Stepdown Rule: 한 메서드 안에서는 같은 추상 수준의 호출만 이어진다
+void registerAccount(UserId userId, BankAccount account, Email email) {
+    RegistrationDecision decision = decideRegistration(userId, account, email, identity, accountCheck, blacklist);
+    applyRegistration(decision, userId, account);
+}
+```
+
+로그 문자열을 조립하는 저수준 코드가 `decideRegistration` 호출이라는 고수준 흐름과 나란히 있으면, 읽는 사람은 두 수준을 오가며 문맥을 전환해야 한다. `applyRegistration`으로 한 단계 아래 처리를 위임하면 `registerAccount` 본문은 다시 한 가지 추상 수준으로 정렬된다. Stratified Design을 함수 단위로 옮기면 이 정의와 정확히 겹친다. Joshua Kerievsky는 "Refactoring to Patterns"(2004)에서 긴 메서드를 의도가 드러나는 짧은 메서드들로 쪼개는 절차를 Compose Method라는 이름으로 체계화했고, Fowler의 Extract Function도 같은 방향의 리팩터링이다. Robert Martin은 "Clean Code"(2008)에서 이를 Stepdown Rule이라 부른다. "모든 함수 다음에는 한 단계 낮은 추상 수준의 함수가 이어지기를 원한다"는 문장으로 정리하면서, 하나의 함수 안에 여러 추상 수준을 섞지 말라는 규칙을 함께 제시한다. 이 규칙은 이후 Single Level of Abstraction Principle이라는 이름으로 더 널리 퍼졌다. [Principles Wiki](http://principles-wiki.net/principles:single_level_of_abstraction)는 이 이름의 출처를 "Clean Code"로 표기하면서도, 원리 자체는 그보다 먼저부터 있었을 가능성이 있다고 주석을 단다.
+
+시대도 계보도 다른 이 관행들이 겨냥하는 지점은 하나로 모인다. 함수 하나 안에서 추상 수준을 섞지 않는 것이다. 앞서 지갑 예제에서 나눈 층이 모듈과 인터페이스 단위의 규율이었다면, Composed Method와 Stepdown Rule은 그 규율을 함수 본문 안까지 끌고 들어간 버전이다. 어느 이름으로 부르든 실천은 같다.
 
 ## Essential Complexity에는 이 도구들이 닿지 않는다
 
