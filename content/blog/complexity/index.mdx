@@ -292,6 +292,30 @@ class WalletApplicationService {
 }
 ```
 
+```mermaid
+flowchart TD
+    subgraph Service["서비스 계층 · 처리 순서로 조직됨"]
+        Register["registerAccount"]
+    end
+    subgraph Domain["도메인 계층"]
+        Empty["남은 업무 로직 없음"]
+    end
+    subgraph Infra["인프라 계층"]
+        BL["블랙리스트 조회"]
+        ID["본인확인 API"]
+        AC["계좌 실재 확인 API"]
+        Repo["저장소 · 연결·적립"]
+    end
+    Register -->|"1"| BL
+    Register -->|"2"| ID
+    Register -->|"3"| AC
+    Register -->|"4, 5"| Repo
+    Register -.->|"위임할 로직이 없어 건너뜀"| Domain
+    linkStyle 4 stroke:#d33,stroke-width:2px
+```
+
+실선은 서비스 계층이 검증하고 저장하고 적립한다는 처리 순서대로 인프라의 개별 연산을 직접 호출하는 경로를 나타내고, 점선은 원래 도메인 계층으로 이어져야 했을 호출이 실제로는 비어 있음을 나타낸다. 하위 층의 구현을 감추는 경계 자체가 이 그림에는 없다.
+
 이 코드에서 도메인 로직이라 부를 만한 부분은 사실상 없다. 블랙리스트 검사, 본인확인, 계좌 확인, 최초 가입 판단이 전부 외부 호출과 뒤섞여 있어서, 어디까지가 업무 규칙이고 어디부터가 기술적 절차인지 코드만 봐서는 구분할 수 없다.
 
 이 실패는 우연이 아니다. 서비스, 도메인, 인프라라는 계층 이름은 검증하고 저장하고 적립한다는 처리 순서를 그대로 옮겨놓은 것에 가깝다. Ousterhout는 이런 구성을 시간적 분해(temporal decomposition)라고 부르고, 코드를 무엇을 아는가가 아니라 언제 일어나는가로 나누면 지식이 여러 모듈에 걸쳐 새어나간다고 지적한다. 계좌가 실재하는지 판단하는 지식과 이메일이 블랙리스트에 있는지 판단하는 지식은 서로 무관한데도, 둘 다 "먼저 검증한다"는 순서 하나로 묶여 같은 서비스 계층에 나란히 놓인다.
@@ -345,7 +369,7 @@ flowchart TD
     linkStyle 4 stroke:#d33,stroke-width:2px
 ```
 
-실선은 인접한 층끼리만 넘나드는 comfortable layers를, 점선은 `welcomeBonus`가 `IdentityCheck`를 건너뛰어 직접 부르는 금지된 경로를 나타낸다. 이 경로가 열리는 순간 `decideRegistration`이 감추고 있던 어휘와 교체 가능성이 동시에 깨진다.
+실선은 인접한 층끼리만 넘나드는 comfortable layers를, 점선은 `welcomeBonus`가 `IdentityCheck`를 건너뛰어 직접 부르는 금지된 경로를 나타낸다. 이 경로가 열리는 순간 `decideRegistration`이 감추고 있던 어휘와 교체 가능성이 동시에 깨진다. 앞서 본 책임 기반 그림과 나란히 놓으면 차이가 분명해진다. 그 그림에서는 서비스 계층 하나가 인프라의 개별 연산 네 가지를 처리 순서대로 직접 호출했지만, 이 그림에서 상위 층이 아는 것은 하위 층의 이름뿐이고 그 뒤의 구현은 전혀 모른다.
 
 중간 층인 `decideRegistration`은 `IdentityCheck`, `AccountCheck`, `Blacklist`라는 하위 층의 어휘만으로 구성되어 있고, 그 구현이 외부 API인지 로컬 파일인지는 알지 못한다. 상위 층인 `welcomeBonus`는 한 걸음 더 나아가 불리언 값 하나만 받는다. 이 값이 저장소 조회로 나온 것인지 캐시로 나온 것인지조차 이 함수는 관심이 없다. 본인확인 API가 다른 제공사로 바뀌어도 `IdentityCheck` 구현체 하나만 갈아 끼우면 되고, `decideRegistration`과 `welcomeBonus`는 한 줄도 바뀌지 않는다. 앞서 책임 기반으로 나눈 코드에서는 API 제공사가 바뀌면 응용 서비스 코드 안의 호출 부분을 직접 찾아 고쳐야 했던 것과 대조적이다.
 
@@ -387,6 +411,57 @@ void charge(UserId userId, long amount) {
 | 상태와 로직 분리 | 상태 없이 계산할 수 있는 부분은 어디까지인가? | `calculateEarnedPoints` / `charge` |
 | Essential·Accidental 판정 | 사용자가 이 상태를 이해하는가? | 재시도 횟수·캐시는 Imperative Shell로 |
 | Deep Module 적용 | 인터페이스 뒤에 지식을 감췄는가? 너무 잘게 쪼개지 않았는가? | `IdentityCheck`, `AccountCheck`, `Blacklist` |
+
+## Stratified Design
+
+앞서 지갑 예제에서 확인한 세 원칙, 즉 층은 특화된 언어라는 것, closure성, 층별 교체 가능성은 Abelson과 Sussman의 1987년 원전에서 온 것이다. 이 절은 그 원전이 실제로 어떤 문장으로 이 원칙을 세웠는지, 추상도로 층을 나누는 발상이 어디서부터 이어져 왔는지, 그리고 같은 "층"이라는 말이 서로 다른 두 계보를 동시에 가리키게 된 경위를 따라간다.
+
+### 원전 논문이 실제로 쓴 문장
+
+"Stratified Design"이라는 용어의 출처는 논문 "Lisp: A Language for Stratified Design"(Abelson & Sussman, MIT AI Memo AIM-986, 1987년 8월)이다. 이듬해 BYTE지 13권 2호(1988년 2월호)에 재수록되면서 더 널리 읽혔다. 분량은 10쪽 남짓으로 짧고, "Structure and Interpretation of Computer Programs"에서 다룬 그림 언어(picture language)와 수식 기호 미분기라는 두 예제로 논지를 편다.
+
+층은 특화된 언어라는 첫 번째 주장을 저자들은 이렇게 썼다. "계층화된 설계의 각 층은 그 층에 맞는 다양한 프리미티브와 조합 수단을 갖춘 특화된 언어로 볼 수 있다." 상위 층이 하위 층의 어휘만으로 구성된다는 말은, 상위 층을 읽는 사람이 하위 층의 구현 방식을 배울 필요가 없다는 뜻이기도 하다. 층별 교체 가능성에 대해서는 "어느 층의 부품이든 바꿀 수 있다"는 한 문장으로 정리한다. 층을 나누는 이유가 코드를 보기 좋게 정돈하는 데 있지 않고, 어느 층이든 갈아 끼울 수 있는 상태를 만드는 데 있다는 것이 이 문장이 가리키는 지점이다.
+
+Eric Normand는 이 1987년 원전을 함수형 프로그래밍에 맞게 다시 풀어 쓴 사람이다. 팟캐스트 "Lisp: A Language for Stratified Design"에서 원전의 내용을 직접 해설했고, 이 내용은 "Grokking Simplicity" 8장과 9장에 대응한다. 앞서 지갑 예제에 적용한 세 원칙은 Normand가 새로 만든 것이 아니라 이 원전을 그대로 옮긴 것이다.
+
+### 추상도로 층을 나누는 발상의 계보
+
+Abelson과 Sussman이 "Stratified Design"이라는 용어를 만들었을 뿐, 추상도로 층을 나누는 발상 자체는 그보다 앞선다.
+
+| 연도 | 문헌 | 내용 |
+|---|---|---|
+| 1968 | Dijkstra, "The Structure of the 'THE'-Multiprogramming System" | 운영체제를 6개의 추상 층으로 나누고, 상위 층이 하위 층이 제공하는 추상만으로 구성되게 설계했다. 프로세서 할당, 세그먼트화된 메모리, 메시지, 입출력, 사용자 프로그램이라는 개념을 층마다 배정하고 하위 층의 구현 세부에는 의존하지 않게 했다. "각 층이 특화된 언어"라는 발상이 운영체제 영역에서 먼저 나타난 사례다. |
+| 1972 | Parnas, "On the Criteria to Be Used in Decomposing Systems into Modules" | 모듈을 나누는 기준 자체는 앞서 Deep Module 절에서 다뤘다. 다만 정작 Parnas 자신은 추상도로 층을 나누는 발상에는 회의적이었고, 이 유보는 1979년 논문에서 다른 그림으로 이어진다. |
+| 1979 | Parnas, "Designing Software for Ease of Extension and Contraction" | 층 대신 uses 관계로 이루어진 방향성 비순환 그래프를 제시했다. A가 B를 uses한다는 관계는 A가 B를 씀으로써 구현이 실제로 단순해지고, B 없이 A를 포함하는 부분집합이 존재하지 않을 때만 성립한다. Stratified Design의 "하위 층만 호출한다"는 규율은 이 uses 관계를 함수 단위로 적용한 것에 가깝다. |
+| 1996 | Buschmann 외, POSA Vol.1 Layers 패턴 | 나누는 기준을 명시적으로 규정하지는 않지만 OSI 참조 모델을 대표 사례로 들어, 추상도 계보 위에 서 있다. |
+
+이 표에서 눈여겨볼 대목은 Parnas의 태도다. 정보 은닉이라는 원칙을 세운 당사자가 정작 추상도의 계층이라는 개념에는 동의하지 않았고, 1979년 논문에서는 층이라는 그림 대신 uses 관계라는 그래프로 대체했다. Stratified Design은 이 uses 관계를 함수 하나하나에 적용해서 다시 층의 형태로 되돌린 셈이다.
+
+### 책임의 종류는 왜 "층"이라 불리게 됐는가
+
+앞서 지갑 예제에서 서비스, 도메인, 인프라라는 책임 기반 계층과 Stratified Design의 추상도 기반 계층이 같은 "층"이라는 말을 쓰면서도 다른 기준으로 나뉜다는 점을 확인했다. 이 혼선이 어디서 시작됐는지는 tier와 layer라는 두 단어의 역사를 따라가면 드러난다.
+
+원래 tier는 물리적 배치를 가리키는 말이고 layer는 논리적 소프트웨어 구조를 가리키는 말이어서, 두 단어는 서로 다른 대상을 가리켰다. 1990년대 초 Open Environment Corporation의 John J. Donovan과 Wayne Eckerson 등이 프레젠테이션, 애플리케이션, 데이터라는 물리적 삼분할을 three-tier라는 이름으로 퍼뜨리면서 사정이 바뀌기 시작한 것으로 알려져 있다. UI는 브라우저, 업무 처리는 애플리케이션 서버, 데이터는 DB 서버라는 배치가 굳어지자, 같은 세 묶음을 논리적으로도 layer라 부르는 관행이 함께 퍼졌다. Sun의 J2EE나 Microsoft의 DNA 같은 제품 마케팅이 같은 도표의 설명에서 N-tier와 presentation/business/data layer라는 표현을 서로 바꿔 쓴 것도 이 혼용을 굳히는 데 한몫했다.
+
+이 혼용을 결정적으로 굳힌 것은 Martin Fowler의 "Patterns of Enterprise Application Architecture"(2002)다. 이 책은 presentation, domain, data source 세 층을 중심에 놓고 Buschmann의 Layers 패턴을 인용하면서도, layer를 책임으로 나눈 조직화 단위라는 뜻으로 썼다. Eric Evans의 "Domain-Driven Design"(2003)도 UI, Application, Domain, Infrastructure를 layer라 부르며 이 용법을 그대로 물려받았다. 실무에서 쓰는 레이어드 아키텍처는 추상도 층이라는 어휘를 3계층 클라이언트서버 모델을 거쳐 수입한 결과에 가깝다. 수입되는 과정에서 layer라는 단어만 남고, 추상도로 나눈다는 원래 의미는 옅어졌다.
+
+tier와 layer를 구분하지 않아도 실제 문제가 드러나지 않았던 이유도 이 역사에 있다. 3계층 클라이언트서버가 주류이던 시절에는 물리적 배치와 논리적 책임이 거의 1대1로 대응했으므로(UI는 브라우저, 업무는 애플리케이션 서버, 데이터는 DB 서버) 두 단어를 섞어 써도 가리키는 대상은 같았다. 이 대응이 깨진 계기는 컨테이너화다. 물리적 배치가 논리적 책임에서 독립하면서, 그동안 가려져 있던 두 단어의 차이가 다시 드러났다.
+
+이 역사를 알고 나면 Stratified Design과 레이어드 아키텍처를 대비하는 논의를 읽을 때 확인할 대목도 분명해진다. 그 논의에서 레이어드 아키텍처가 가리키는 것이 Dijkstra 계보의 추상도 층인지, PoEAA 계보의 책임 층인지에 따라 대비의 의미는 완전히 달라진다. 원래 다른 것이었던 두 개념이 같은 이름으로 불리고 있을 뿐이다.
+
+### 층 구조 자체를 거부한 Hexagonal Architecture
+
+앞서 지갑 예제에서 Hexagonal Architecture를 Stratified Design과 같은 계보로 묶어 소개했지만, 정확히 말하면 이 아키텍처는 층 구조 자체를 거부하는 데서 출발했다. [Alistair Cockburn은 인터뷰](https://jmgarridopaz.github.io/content/interviewalistair.html)에서 이 아키텍처를 고안한 동기를 이렇게 설명한다. "위나 아래, 좌나 우로 직사각형을 그리는 반사적인 습관을 끊고 싶었다." 중심의 육각형을 둘러싼 포트와 어댑터는 UI 쪽과 데이터베이스 쪽을 대칭으로 다루기 위한 장치이고, Cockburn은 "데이터베이스를 특별한 존재로 취급하는 습관을 없애고 싶었다"고도 말한다. 층으로 그리면 위쪽의 UI와 아래쪽의 DB가 자연히 비대칭으로 보이는데, 육각형은 이 비대칭을 지우려는 의도적 선택이다.
+
+그런데도 Hexagonal Architecture를 설명하는 자료 대부분은 바깥에서 안쪽으로 향하는 층이라는 표현을 쓴다. 층이라는 이름이 고안자의 의도와 무관하게 독자적으로 퍼진 또 하나의 사례다. Clean Architecture와 Onion Architecture가 이를 동심원으로 시각화한 것도 같은 흐름 위에 있다. 원 안쪽일수록 추상도가 높다고 설명하지만, 실제 구현에서는 앞서 본 것처럼 책임 기반 분할로 흘러가기 쉽다.
+
+### 함수 하나 안에서 추상도를 지키는 관행들
+
+Stratified Design은 모듈이나 층이라는 큰 단위를 겨냥하지만, 같은 발상을 함수 하나 안에서 지키려는 흐름도 따로 있었다. 1987년 원전과는 무관하게 Smalltalk와 리팩터링 진영에서 나온 관행들이다.
+
+Kent Beck은 "Implementation Patterns"(2007)에서 Composed Method를 이렇게 정의한다. 메서드의 본문은 같은 추상 수준에 있는 다른 메서드의 호출만으로 구성해야 한다는 것이다. Stratified Design을 함수 단위로 옮기면 이 정의와 정확히 겹친다. Joshua Kerievsky는 "Refactoring to Patterns"(2004)에서 긴 메서드를 의도가 드러나는 짧은 메서드들로 쪼개는 절차를 Compose Method라는 이름으로 체계화했고, Fowler의 Extract Function도 같은 방향의 리팩터링이다. Robert Martin은 "Clean Code"(2008)에서 이를 Stepdown Rule이라 부른다. "모든 함수 다음에는 한 단계 낮은 추상 수준의 함수가 이어지기를 원한다"는 문장으로 정리하면서, 하나의 함수 안에 여러 추상 수준을 섞지 말라는 규칙을 함께 제시한다. 이 규칙은 이후 Single Level of Abstraction Principle이라는 이름으로 더 널리 퍼졌다. 이 이름의 출처를 "Clean Code"로 보는 자료가 많지만, 원리 자체는 그보다 먼저 존재했을 가능성이 있다는 지적도 있다.
+
+시대도 계보도 다른 이 관행들이 겨냥하는 지점은 하나로 모인다. 함수 하나 안에서 추상 수준을 섞지 않는 것이다. 앞서 지갑 예제에서 나눈 층이 모듈과 인터페이스 단위의 규율이었다면, Composed Method와 Stepdown Rule은 그 규율을 함수 본문 안까지 끌고 들어간 버전이다. 어느 이름으로 부르든 실천은 같다.
 
 ## 분류값이 만드는 복잡성과 다형성
 
@@ -632,6 +707,8 @@ Hoare의 말대로 소프트웨어를 설계하는 쉬운 길은 결함이 안 �
 - [Simple Made Easy](https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/SimpleMadeEasy.md)
 - [Out of the Tar Pit](https://curtclifton.net/papers/MoseleyMarks06a.pdf)
 - [A Philosophy of Software Design](https://www.amazon.com/dp/173210221X)
+- [Lisp: A Language for Stratified Design](https://dspace.mit.edu/handle/1721.1/6064)
+- [Stratified Design](https://scrapbox.io/kawasima/Stratified_Design)
 - [Building Evolutionary Architectures](https://nealford.com/books/buildingevolutionaryarchitectures.html)
 - [Essential Complexity in Systems Architecture](https://www.infoq.com/presentations/complexity-distributed-behavior/)
 - [Photon: Fault-tolerant and Scalable Joining of Continuous Data Streams](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/41529.pdf)
