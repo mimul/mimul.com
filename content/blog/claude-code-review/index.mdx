@@ -1,5 +1,5 @@
 ---
-title: Claude Code로 코드 리뷰 자동화하기 — 설정부터 실패 학습 루프까지
+title: Claude Code로 코드 리뷰 자동화하기, 설정부터 실패 학습 루프까지
 description: Claude Code의 CLAUDE.md·Settings·Skills·MCP 등 핵심 설정을 정리하고, AI 기반 코드 리뷰 자동화 프로세스와 실패를 세션 간 축적하는 학습 루프 구현 방법을 설명합니다.
 author: Mimul
 date: "2026-02-24T18:25:00.000Z"
@@ -403,7 +403,7 @@ Command（명령）→ Agent（실행자）→ Skills（기술 + 도메인 지�
 
 ## 코드 리뷰 설정 예시
 
-설정 구조를 파악했으니, 이를 실제 코드 리뷰 자동화에 어떻게 적용하는지 살펴본다. 아래 예시는 Skills와 Commands를 조합해 리뷰 → 대응 → 회신 전 과정을 Claude가 보조하도록 구성한 것이다. 먼저 코드 리뷰 프로세스 전체 흐름을 파악한 뒤 커맨드별 설정을 확인한다.
+설정 구조를 파악했으니, 이를 실제 코드 리뷰 자동화에 어떻게 적용하는지 살펴본다. 아래 예시는 Skills와 Commands를 조합해 리뷰 → 대응 → 회신 전 과정을 Claude가 보조하도록 구성했다. 먼저 코드 리뷰 프로세스 전체 흐름을 파악한 뒤 커맨드별 설정을 확인한다.
 
 ### 코드 리뷰 프로세스
 
@@ -776,7 +776,7 @@ description: >
 
 | 지적 | 이유 |
 |------|------|
-| A-RV-06 `build_router` pub(crate) | `tests/*.rs` 통합 테스트는 별도 크레이트로 컴파일되어 `pub(crate)` 접근 불가 — 컴파일 에러 발생 확인. `pub`이 유일하게 올바른 가시성. |
+| A-RV-06 `build_router` pub(crate) | `tests/*.rs` 통합 테스트는 별도 크레이트로 컴파일되어 `pub(crate)` 접근 불가(컴파일 에러 발생 확인). `pub`이 유일하게 올바른 가시성. |
 
 
 **3. /reply-review-rust**
@@ -832,7 +832,7 @@ description: >
 
 PR이 Github에 올라오면 즉시 아래 셀프 병합 가이드 라인을 기준으로 해 One-Way Door인 경우 인간 리뷰 요청을 리뷰 담당자 슬랙으로 보내고, Two-Way Door인 경우는 코드 리뷰 프롬프트를 정의하면 그대로 자동으로 리뷰/소스 수정까지 하고 난 다음 PR 병합(머지)까지 한다. 자동화는 [Claude Code Action](https://github.com/anthropics/claude-code-action)을 가이드라인을 읽고 판정하는 로직과 코드리뷰 로직을 넣고,  Two-Way Door로 판정이 나면 자동으로 코드 리뷰와 병합을 진행한다.
 
-코드 리뷰 자동화 부분에 One-Way Door/Two-Way Door 용어는 [Jeff Bezos 의 2015 주주에게 편지 에 표시된 의사 결정 프레임](https://s2.q4cdn.com/299287126/files/doc_financials/annual/2015-Letter-to-Shareholders.PDF)에서 따왔다. 아래 "셀프(자동) 병합 가이드라인"의 내용을 보면 알겠지만, One-Way Door는 돌아갈 수 없는 결정을 말하고 이번 적용한 PR이 문제가 되어 롤백이 불가능한 경우를 뜻한다. 그리고 Two-Way Door는 돌아갈 수 있는 결정을 뜻하는데, PR이 문제가 되어도 롤백이 가능해 원복을 할 수 있다는 의미이다. 참고로 아래는 One-Way Door/Two-Way Door 판정의 기준을 나타낸다.
+코드 리뷰 자동화 부분에 One-Way Door/Two-Way Door 용어는 [Jeff Bezos 의 2015 주주에게 편지 에 표시된 의사 결정 프레임](https://s2.q4cdn.com/299287126/files/doc_financials/annual/2015-Letter-to-Shareholders.PDF)에서 따왔다. 아래 "셀프(자동) 병합 가이드라인"의 내용을 보면 알겠지만, One-Way Door는 돌아갈 수 없는 결정을 말하고 이번 적용한 PR이 문제가 되어 롤백이 불가능한 경우를 뜻한다. 그리고 Two-Way Door는 돌아갈 수 있는 결정으로, PR이 문제가 되어도 롤백해 원복할 수 있다. 참고로 아래는 One-Way Door/Two-Way Door 판정의 기준을 나타낸다.
 
 ```
 ## 셀프(자동) 병합 가이드라인
@@ -956,12 +956,12 @@ Claude Code는 세션이 끝나면 기억을 재설정한다. 그래서 프롬�
 ## 참조 사이트
 
 - [Best Practices for Claude Code](https://code.claude.com/docs/en/best-practices)
-- [Claude Code Memory — Official Docs](https://code.claude.com/docs/en/memory)
-- [Claude Code Skills — Official Docs](https://code.claude.com/docs/en/skills)
-- [Sub-agents — Claude Code Official Docs](https://code.claude.com/docs/ko/sub-agents)
-- [Writing a Good CLAUDE.md — HumanLayer](https://www.humanlayer.dev/blog/writing-a-good-claude-md)
-- [agents.md Outperforms Skills — Vercel](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)
+- [Claude Code Memory (공식 문서)](https://code.claude.com/docs/en/memory)
+- [Claude Code Skills (공식 문서)](https://code.claude.com/docs/en/skills)
+- [Sub-agents (Claude Code 공식 문서)](https://code.claude.com/docs/ko/sub-agents)
+- [Writing a Good CLAUDE.md (HumanLayer)](https://www.humanlayer.dev/blog/writing-a-good-claude-md)
+- [agents.md Outperforms Skills (Vercel)](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals)
 - [IFScale: Instruction Following at Scale (arXiv)](https://arxiv.org/abs/2507.11538)
-- [CLAUDE.md Management Plugin — Anthropic](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management)
+- [CLAUDE.md Management Plugin (Anthropic)](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-md-management)
 - [Context7 Dashboard](https://context7.com/dashboard)
 - [Serena MCP Server](https://github.com/oraios/serena)
