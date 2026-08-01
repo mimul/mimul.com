@@ -1,5 +1,5 @@
 ---
-title: Rust와 Axum으로 구현하는 Clean 아키텍처 API — DI, 트랜잭션, JWT 인증
+title: Rust와 Axum으로 구현하는 Clean 아키텍처 API와 DI·트랜잭션·JWT 인증
 description: Rust와 Axum 프레임워크로 Clean 아키텍처 기반 Todo API를 구현하는 방법을 정리합니다. 라우팅, sqlx 트랜잭션, 생성자 DI, JWT 인증 AOP, utoipa API 문서화까지 단계별로 코드와 함께 설명합니다.
 author: Mimul
 date: "2023-05-10T23:11:13.000Z"
@@ -9,7 +9,7 @@ tags:
   - rust
   - axum
 ---
-Rust를 공부하면서 실제 서비스에 필요한 기능들을 하나씩 조합해 [axum-rusty](https://github.com/mimul/axum-rusty) 프로젝트를 만들었습니다. Clean Architecture 기반으로 로그인, Todo API를 구현한 프로젝트로, Rust와 Axum 생태계를 실전에서 어떻게 활용하는지 궁금한 분들을 위해 핵심 구현 포인트를 정리합니다.
+Rust를 공부하면서 실제 서비스에 필요한 기능들을 하나씩 조합해 [axum-rusty](https://github.com/mimul/axum-rusty) 프로젝트를 만들었다. Clean Architecture 기반으로 로그인, Todo API를 구현한 프로젝트로, Rust와 Axum 생태계를 실전에서 어떻게 활용하는지 궁금한 사람들을 위해 핵심 구현 포인트를 정리한다.
 
 ### 핵심 라이브러리 구현 포인트
 
@@ -382,4 +382,4 @@ pub async fn get_todo(
 
 ---
 
-Axum의 타입 세이프한 라우팅, sqlx의 트랜잭션 제어, 생성자 DI 패턴, JWT 인증 미들웨어, utoipa 문서화까지 Clean 아키텍처를 Rust로 구현하는 핵심 패턴을 정리했습니다. 전체 코드는 [axum-rusty](https://github.com/mimul/axum-rusty)에서 확인할 수 있습니다.
+Axum의 타입 세이프한 라우팅, sqlx의 트랜잭션 제어, 생성자 DI 패턴, JWT 인증 미들웨어, utoipa 문서화까지 Clean 아키텍처를 Rust로 구현하는 핵심 패턴을 정리했다. 전체 코드는 [axum-rusty](https://github.com/mimul/axum-rusty)에서 확인할 수 있다.
