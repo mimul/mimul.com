@@ -47,7 +47,7 @@ Framework1의 Scheduler는 Master에게 Slave에서 실행하려는 두 개의 T
 마지막으로, Master는 Slave1에 Task를 보내고, Framework의 Executor에 적절한 자원을 할당하고, 두 개의 작업을 차례차례로 런칭한다.(그림의 점선 라인으로 묘사되어 있다) 그 상태에서 나머지 1CPU & 1GB 메모리가 할당되지 않았기 때문에 자원 할당 모듈은 Framework2에 할당된다.
 자원 배분 프로세스는 작업이 실행 완료되고 자원이 해제되면 다시 배분 작업을 수행한다.
 
-Mesos가 제공하는 thin 인터페이스는 각 Framework가 개별적으로 확장될 수 있게 되어 있다. 하지만, 여기에 하나의 의문점이 남는다. "각 Framework에는 제약이 존재하지만, Mesos는 개별 Framework의 제약 조건을 몰라도 이러한 Framework의 제약성을 어떻게 만족시킬 수 있을까?" 예를 들어, Framework가 요구하는 데이터가 어디에 저장되어 있는지 Mesos는 모르는데, 어떻게 Framework는 데이터 지역성(locality)을 달성할 수 있을까? 이러한 의문에 대해서 Mesos는 Framework쪽에서 리소스 요청을 거부할 수 있도록 하는것으로 대응하고 있다. Framework는 Mesos에서 배분 받은 자원을 자신의 제약 조건을 충족하지 못하는 경우 거부한다. 특별히, 지연 스케줄링이라는 심플한 정책을 가지고 있다. 이것은 Framework측이 입력 데이터가 저장되는 노드를 획득할까지의 제한된 시간동안 대기를 허용하는 것을 통해, 이를 이용하여 Framework측의 데이터 지역성(locality)을 극복할 수 있다.
+Mesos가 제공하는 thin 인터페이스는 각 Framework가 개별적으로 확장될 수 있게 되어 있다. 하지만, 여기에 하나의 의문점이 남는다. "각 Framework에는 제약이 존재하지만, Mesos는 개별 Framework의 제약 조건을 몰라도 이러한 Framework의 제약성을 어떻게 만족시킬 수 있을까?" 예를 들어, Framework가 요구하는 데이터가 어디에 저장되어 있는지 Mesos는 모르는데, 어떻게 Framework는 데이터 지역성(locality)을 달성할 수 있을까? 이러한 의문에 대해서 Mesos는 Framework쪽에서 리소스 요청을 거부할 수 있도록 하는 것으로 대응하고 있다. Framework는 Mesos에서 배분 받은 자원을 자신의 제약 조건을 충족하지 못하는 경우 거부한다. 특별히, 지연 스케줄링이라는 심플한 정책을 가지고 있다. 이것은 Framework측이 입력 데이터가 저장되는 노드를 획득할까지의 제한된 시간동안 대기를 허용하는 것을 통해, 이를 이용하여 Framework측의 데이터 지역성(locality)을 극복할 수 있다.
 
 ## 활용 사례
 
