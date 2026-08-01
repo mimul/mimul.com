@@ -1,5 +1,5 @@
 ---
-title: Bloom Filter 핵심 정리 — 작동 원리, 수학 이론, Java 구현까지
+title: Bloom Filter 핵심 정리, 작동 원리부터 수학 이론과 Java 구현까지
 description: 공간 효율적인 확률형 자료구조인 Bloom Filter의 작동 원리, false positive 개념, 수학적 오류율 계산법, Google Guava 구현 예, Cassandra·HBase 등 NoSQL 활용 사례를 단계별로 설명합니다.
 author: Mimul
 date: "2012-04-02T23:45:44.000Z"
@@ -22,15 +22,15 @@ False positive들이 가능하며, false negative들은 불가능하다. 요소�
 
 **1. 구성 요소**
 
-- 해시(hash) 함수 : 해시 알고리즘 구현체.
-- Bloom Filter Key : 해시 알고리즘에 의해 반환된 KEY.
-- Bloom Filter Index : Bloom Filter Key를 임의의 크기의 비트들의 블록으로 나눈 하나 하나.
-- 블룸 필터는 두 가지를 제공 : 하나는 추가하는 add(), 하나는 존재하는지에 대한 isExist().
-- false positive : 없는데 있다고 하는 것. false negative : 있는데 없다고 하는 것.
+- **해시(hash) 함수**: 해시 알고리즘 구현체
+- **Bloom Filter Key**: 해시 알고리즘이 반환한 키
+- **Bloom Filter Index**: Bloom Filter Key를 임의 크기의 비트 블록으로 나눈 하나하나의 조각
+- 블룸 필터는 추가하는 add()와 존재 여부를 확인하는 isExist(), 이렇게 두 가지 연산을 제공한다.
+- **false positive**: 없는데 있다고 판단하는 경우, **false negative**: 있는데 없다고 판단하는 경우
 
 **2. 작동 방식**
 
-예를 들어, m(bloom filter의 bit 사이즈) = 10, k(hashing functions의 수) = 2로하자. 2개의 해시 함수를 h1, h2 하고 Bloom Filter 배열은 아래와 같다.
+예를 들어, m(bloom filter의 bit 사이즈) = 10, k(hashing functions의 수) = 2로 하자. 2개의 해시 함수를 h1, h2 하고 Bloom Filter 배열은 아래와 같다.
 
 ```text
 +-+-+-+-+-+-+-+-+-+-+
@@ -71,7 +71,7 @@ False positive들이 가능하며, false negative들은 불가능하다. 요소�
 이런 형태로 동작하는 방식이다.
 
 Bloom Filter는 기존 hash table의 key-value의 쌍으로 저장하지 않고 hash table상에 키가 존재하는지 안하는지 true, false 정보의 조각(Bit의 Set)이 저장된다고 보면 된다.
-즉, 각 Value를 저장하는 대신에 Bloom Filter는 Key가 존재하는 지점(해시 함수에 의해)을 가르키는 Bits의 배열이라고 봐도 된다. 찾는 비트의 조합이 모두 1일 경우 제대로 찾을 확률이 높아진다는 것이다.
+즉, 각 Value를 저장하는 대신에 Bloom Filter는 Key가 존재하는 지점(해시 함수에 의해)을 가리키는 Bits의 배열이라고 봐도 된다. 찾는 비트의 조합이 모두 1일 경우 제대로 찾을 확률이 높아진다.
 Space와 Time을 적절하게 배합하고 고른 분포도를 가지며 Collision을 대처한다면 좋은 이득을 얻을 수 있다.
 많은 비트를 할당할수록 성능은 좋을 수 있으나 많은 메모리가 필요하고 해싱 함수를 늘리게 되면 연산이 많아지게 되어 성능은 느리나 메모리를 덜 차지하게 되는 trade-off 관계가 존재한다. Optimizing하는게 관건이다.
 
@@ -132,17 +132,17 @@ public class GuavaBloomFilterDemo {
 false-positive 값: [609, 131, 197, 405, 951, 41, 169, 649, 877, 175, 255]
 ```
 
-####  활용되는 곳
+#### 활용되는 곳
 
-- 스펠링체크, 사전, 웹 검색, IP Filtering, Router 등에 활용되고 Squid Web, Venti Storage System, SPIN model checker, Google Chrome Browser 등에도 활용되고 있다.
-- Cassandra : SSTable 생성시(Index용으로 활용) - Read 성능 향상(Disk IO를 줄임).
+- 스펠링체크, 사전, 웹 검색, IP Filtering, Router 등에 쓰이고 Squid Web, Venti Storage System, SPIN model checker, Google Chrome Browser 등에도 쓰이고 있다.
+- **Cassandra**: SSTable 생성 시 인덱스 용도로 사용해 Read 성능을 향상시킨다(디스크 I/O 감소)
   * [SMHasher & MurmurHash hash 함수 사용](https://github.com/aappleby/smhasher)
-- HBase : HFile안에 로우와 컬럼이 존재하는 지 검사하기 위해 사용.
-- Bigtable : 불필요한 디스크 접근을 피하기 위해.
-- Oracle
-  * Parallel Join시 Slave간의 communication 데이터량을 줄이기 위해.(10gR2)
-  * Join-Filter Pruning 사용시.(11gR1)
-  * Result Cache 지원 (11gR1).
+- **HBase**: HFile 안에 로우와 컬럼이 존재하는지 검사하기 위해 사용한다
+- **Bigtable**: 불필요한 디스크 접근을 피하기 위해 사용한다
+- **Oracle**
+  * Parallel Join 시 Slave 간의 communication 데이터량을 줄이기 위해(10gR2)
+  * Join-Filter Pruning 사용 시(11gR1)
+  * Result Cache 지원(11gR1)
 - [Guava Bloom Filter](http://code.google.com/p/guava-libraries/issues/detail?id=12)
 - pyreBloom = Python + Redis + Bloom Filter
 - bloomfilter-rb = Ruby + Redis + Bloom Filter
