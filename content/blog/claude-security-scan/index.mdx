@@ -60,7 +60,7 @@ Claude를 보안 도구로 활용해 [Semgrep](https://semgrep.dev/), [Trivy](ht
 |SBOM 생성         | 없음                    | Excellent  | Trivy 강점   |
 |커스터마이징        | Excellent (자체 규칙 작성) | 좋음        | Semgrep 강점 |
 
-내 경험상 Semgrep은 커스텀 규칙이 필요한 도메인 특화 취약점에서 강하고, Trivy는 초기 설정 없이도 즉시 쓸 수 있는 의존성 스캔에서 가치가 크다. 아키텍처나 비즈니스 로직 수준 취약점은 두 도구 모두 상대적으로 약하다. `security-full-scan`이 보완해야 하는 부분이어서 [소프트웨어 보안의 철학, 전략, 원칙](https://www.mimul.com/blog/ai-security-rule/)을 기반으로 해당 프로젝트에서 사용하는 언어에 특성을 가미한 security-style.md 파일을 rules에 적용해서 코드 리뷰, 리팩토링에서 활용해서 보완하고 있다. Rust기반의 프로젝트에서 사용중인 [rust-security-style.md](https://github.com/mimul/axum-rusty/blob/main/.claude/rules/rust-security-style.md)가 한 예다.
+내 경험상 Semgrep은 커스텀 규칙이 필요한 도메인 특화 취약점에서 강하고, Trivy는 초기 설정 없이도 즉시 쓸 수 있는 의존성 스캔에서 가치가 크다. 아키텍처나 비즈니스 로직 수준 취약점은 두 도구 모두 상대적으로 약하다. `security-full-scan`이 보완해야 하는 부분이어서 [소프트웨어 보안의 철학, 전략, 원칙](https://www.mimul.com/blog/ai-security-rule/)을 기반으로 해당 프로젝트에서 사용하는 언어에 특성을 가미한 security-style.md 파일을 rules에 적용해서 코드 리뷰, 리팩토링에서 활용해서 보완하고 있다. Rust기반의 프로젝트에서 사용중인 [security-style.md](https://github.com/mimul/axum-rusty/blob/main/.claude/rules/security-style.md)가 한 예다.
 
 DAST(Dynamic Application Security Testing, 동적 분석) 영역도 전혀 커버하지 못하기 때문에 이건 `/security-scan` 영역에서 수행하면 된다.
 
