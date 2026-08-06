@@ -39,6 +39,12 @@
     color: $white;
     opacity: 0.8;
   }
+
+  // gatsby-remark-images가 이미지 원본 픽셀 너비를 인라인 max-width로 박아넣기 때문에
+  // !important로 덮어써야 750px로 통일된다.
+  .gatsby-resp-image-wrapper {
+    max-width: 750px !important;
+  }
 }
 
 .ar-typo {
