@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#DC2626"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="500" fill="#FFFFFF"/>
+  <text x="450" y="32" text-anchor="middle" font-size="19" font-weight="700" fill="#1F2937">복잡성의 원인과 증상</text>
+
+  <!-- column headers -->
+  <text x="170" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#64748B" letter-spacing="0.5">원인</text>
+  <text x="730" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#64748B" letter-spacing="0.5">증상</text>
+
+  <!-- ===== edges (drawn first, under boxes) ===== -->
+  <path d="M290,121 C450,121 450,107.5 610,107.5" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <path d="M290,121 C450,121 450,261 610,261" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <path d="M290,381 C450,381 450,261 610,261" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <path d="M290,381 C450,381 450,422.5 610,422.5" fill="none" stroke="#DC2626" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+  <!-- ===== cause boxes (left) ===== -->
+  <rect x="50" y="85" width="240" height="72" rx="12" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="170" y="118" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">의존성</text>
+  <text x="170" y="138" text-anchor="middle" font-size="12" fill="#3653C7">(Dependencies)</text>
+
+  <rect x="50" y="345" width="240" height="72" rx="12" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="170" y="378" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">모호성</text>
+  <text x="170" y="398" text-anchor="middle" font-size="12" fill="#3653C7">(Obscurity)</text>
+
+  <!-- ===== symptom boxes (right) ===== -->
+  <rect x="610" y="75" width="240" height="65" rx="12" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="730" y="113" text-anchor="middle" font-size="16" font-weight="600" fill="#1F2937">변경 전파</text>
+
+  <rect x="610" y="225" width="240" height="72" rx="12" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="730" y="266" text-anchor="middle" font-size="16" font-weight="600" fill="#1F2937">인지 부하</text>
+
+  <rect x="610" y="380" width="240" height="85" rx="12" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+  <text x="730" y="418" text-anchor="middle" font-size="16" font-weight="700" fill="#B91C1C">Unknown Unknowns</text>
+  <text x="730" y="440" text-anchor="middle" font-size="12" fill="#DC2626">가장 위험한 증상</text>
+</svg>
