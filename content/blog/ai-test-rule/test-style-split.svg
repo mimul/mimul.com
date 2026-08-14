@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 340" font-family="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5B7CFA"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1080" height="340" fill="#FFFFFF"/>
+
+  <!-- Top box: common philosophy -->
+  <rect x="340" y="26" width="400" height="62" rx="10" fill="#DCEBFF" stroke="#3653C7" stroke-width="2"/>
+  <text x="540" y="52" text-anchor="middle" font-size="15" font-weight="700" fill="#1F2937">공통 테스트 철학 · 원칙 · 방법</text>
+  <text x="540" y="73" text-anchor="middle" font-size="12" fill="#334155">이 문서 (프로젝트 공통)</text>
+
+  <!-- trunk + crossbar -->
+  <line x1="540" y1="88" x2="540" y2="112" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="225" y1="112" x2="855" y2="112" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="225" y1="112" x2="225" y2="134" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="540" y1="112" x2="540" y2="134" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="855" y1="112" x2="855" y2="134" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- language boxes -->
+  <rect x="140" y="136" width="170" height="56" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <rect x="455" y="136" width="170" height="56" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <rect x="770" y="136" width="170" height="56" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="225" y="169" text-anchor="middle" font-size="14.5" fill="#1F2937">Java</text>
+  <text x="540" y="169" text-anchor="middle" font-size="14.5" fill="#1F2937">Rust</text>
+  <text x="855" y="169" text-anchor="middle" font-size="14.5" fill="#1F2937">TypeScript</text>
+
+  <!-- arrows down to test-style.md -->
+  <line x1="225" y1="192" x2="225" y2="230" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="540" y1="192" x2="540" y2="230" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="855" y1="192" x2="855" y2="230" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- test-style.md boxes -->
+  <rect x="140" y="232" width="170" height="56" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <rect x="455" y="232" width="170" height="56" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <rect x="770" y="232" width="170" height="56" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="225" y="265" text-anchor="middle" font-size="13" fill="#1F2937">test-style.md</text>
+  <text x="540" y="265" text-anchor="middle" font-size="13" fill="#1F2937">test-style.md</text>
+  <text x="855" y="265" text-anchor="middle" font-size="13" fill="#1F2937">test-style.md</text>
+
+  <text x="540" y="320" text-anchor="middle" font-size="12" fill="#64748B">언어·프레임워크별 세부 규칙은 각 프로젝트 문서로 분리한다</text>
+</svg>
