@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1570 460" font-family="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <rect x="0" y="0" width="1570" height="460" fill="#FFFFFF"/>
+  <text x="785" y="25" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">이상탐지 분류체계 속 3편의 위치: 예측 기반 · 예측 오차 기반</text>
+
+  <!-- connectors -->
+  <path d="M865,120 L865,145 M275,145 L1375,145 M275,145 L275,180 M865,145 L865,180 M1375,145 L1375,180" fill="none" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M275,234 L275,260 M115,260 L435,260 M115,260 L115,310 M275,260 L275,310 M435,260 L435,310" fill="none" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M865,234 L865,260 M625,260 L1105,260 M625,260 L625,310 M785,260 L785,310 M945,260 L945,310 M1105,260 L1105,310" fill="none" stroke="#94A3B8" stroke-width="1.5"/>
+  <path d="M1375,234 L1375,260 M1295,260 L1455,260 M1295,260 L1295,310 M1455,260 L1455,310" fill="none" stroke="#94A3B8" stroke-width="1.5"/>
+
+  <!-- root -->
+  <rect x="715" y="60" width="300" height="60" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+  <text x="865" y="85" text-anchor="middle" font-size="15" font-weight="700" fill="#1F2937">이상탐지 기법</text>
+  <text x="865" y="104" text-anchor="middle" font-size="12" fill="#64748B">(프로세스 중심 분류체계)</text>
+
+  <!-- branch: 거리 기반 -->
+  <rect x="185" y="180" width="180" height="54" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="275" y="203" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">거리 기반</text>
+  <text x="275" y="220" text-anchor="middle" font-size="10" fill="#64748B">(Distance-based)</text>
+
+  <!-- branch: 밀도 기반 -->
+  <rect x="775" y="180" width="180" height="54" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="865" y="203" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">밀도 기반</text>
+  <text x="865" y="220" text-anchor="middle" font-size="10" fill="#64748B">(Density-based)</text>
+
+  <!-- branch: 예측 기반 -->
+  <rect x="1285" y="180" width="180" height="54" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="1375" y="203" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">예측 기반</text>
+  <text x="1375" y="220" text-anchor="middle" font-size="10" fill="#64748B">(Prediction-based)</text>
+
+  <!-- leaves: 거리 기반 -->
+  <rect x="40" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="115" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">근접 기반</text>
+  <text x="115" y="356" text-anchor="middle" font-size="11" fill="#64748B">(kNN)</text>
+
+  <rect x="200" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="275" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">불일치 기반</text>
+  <text x="275" y="356" text-anchor="middle" font-size="11" fill="#64748B">(Matrix Profile)</text>
+
+  <rect x="360" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="435" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">클러스터링 기반</text>
+  <text x="435" y="356" text-anchor="middle" font-size="11" fill="#64748B">(NormA, SAND)</text>
+
+  <!-- leaves: 밀도 기반 -->
+  <rect x="550" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="625" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">분포 기반</text>
+  <text x="625" y="356" text-anchor="middle" font-size="11" fill="#64748B">(SVM, 홀텔링 등)</text>
+
+  <rect x="710" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="785" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">인코딩 기반</text>
+  <text x="785" y="356" text-anchor="middle" font-size="11" fill="#64748B">(GMM, HMM, PCA)</text>
+
+  <rect x="870" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="945" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">그래프 기반</text>
+  <text x="945" y="356" text-anchor="middle" font-size="11" fill="#64748B">(Series2Graph)</text>
+
+  <rect x="1030" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="1105" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">트리 기반</text>
+  <text x="1105" y="356" text-anchor="middle" font-size="11" fill="#64748B">(Isolation Forest)</text>
+
+  <!-- leaves: 예측 기반 -->
+  <rect x="1220" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="1295" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">예측 오차 기반</text>
+  <text x="1295" y="356" text-anchor="middle" font-size="11" fill="#64748B">(회귀, 지수평활)</text>
+
+  <rect x="1380" y="310" width="150" height="64" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+  <text x="1455" y="336" text-anchor="middle" font-size="13" font-weight="600" fill="#1F2937">재구성 오차 기반</text>
+  <text x="1455" y="356" text-anchor="middle" font-size="11" fill="#64748B">(Autoencoder, GAN)</text>
+
+  <!-- highlight: 3편 = 예측 기반 > 예측 오차 기반 (회귀, 베이지안 회귀) -->
+  <rect x="1212" y="302" width="166" height="80" rx="14" fill="none" stroke="#4C6EF5" stroke-width="2.5"/>
+
+  <!-- legend -->
+  <rect x="40" y="425" width="22" height="14" rx="3" fill="none" stroke="#4C6EF5" stroke-width="2.5"/>
+  <text x="70" y="436" font-size="12" fill="#475569">굵은 파란 테두리 = 3편(회귀·베이지안 회귀)이 다루는 영역</text>
+</svg>

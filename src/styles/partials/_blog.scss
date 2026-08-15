@@ -27,14 +27,18 @@
   box-shadow: 0 15px 26px rgba(0, 0, 0, 0.4);
 }
 
+.subtitle.ar-hero-subtitle {
+  font-size: 1.05rem !important;
+}
+
 @media screen and (max-width: 768px) {
   // .title.is-3 등 Bulma 사이즈 클래스(명시도 2)를 이겨야 하므로 .title과 결합
   .title.ar-hero-title {
-    font-size: 1.5rem;
+    font-size: 1.5rem !important;
   }
 
   .subtitle.ar-hero-subtitle {
-    font-size: 1rem;
+    font-size: 1rem !important;
   }
 }
 
@@ -46,17 +50,17 @@
 
   // Bulma 기본 .content.is-medium(1.25rem)이 과도하게 커서 블로그 본문 크기로 축소
   &.is-medium {
-    font-size: 1.05rem;
+    font-size: 1.05rem !important;
 
     @media screen and (max-width: 768px) {
-      font-size: 0.95rem;
+      font-size: 0.95rem !important;
     }
   }
 
   // prismjs 테마(node_modules)의 font-size: 1em(=1rem 상속)이 과도하게 커서 축소
   code[class*="language-"],
   pre[class*="language-"] {
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
   }
 
   .intro {

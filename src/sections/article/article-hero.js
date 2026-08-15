@@ -36,7 +36,7 @@ const ArticleHero = ({ article, authors }) => {
               ) : null}
             </p>
             <div className="divider" />
-            <h1 className="title is-3 is-light is-semibold is-spaced main-title ar-hero-title p-name">
+            <h1 className="title is-4 is-light is-semibold is-spaced main-title ar-hero-title p-name">
               {article.title}
             </h1>
             <h2 className="subtitle ar-hero-subtitle p-summary">{article.excerpt}</h2>
