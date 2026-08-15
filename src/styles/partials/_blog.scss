@@ -53,6 +53,12 @@
     }
   }
 
+  // prismjs 테마(node_modules)의 font-size: 1em(=1rem 상속)이 과도하게 커서 축소
+  code[class*="language-"],
+  pre[class*="language-"] {
+    font-size: 0.9rem;
+  }
+
   .intro {
     font-style: italic;
     font-family: "Cabin", sans-serif;

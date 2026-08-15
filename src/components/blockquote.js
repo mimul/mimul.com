@@ -14,12 +14,12 @@ const Blockquote = styled.blockquote`
     padding-bottom: 0;
     width: 100%;
     margin: 0 auto;
-    font-size: 20px;
+    font-size: 16px;
     line-height: 1.32;
     font-weight: normal;
 
     ${mediaqueries.tablet`
-      font-size: 26px;
+      font-size: 16px;
     `};
   }
 `;
