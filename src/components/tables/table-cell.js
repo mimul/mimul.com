@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import mediaqueries from "@styles/media";
 
 const TableCell = styled.td`
-  font-size: 16px;
+  font-size: 15px;
 
   ${mediaqueries.tablet`
     font-size: 14px;

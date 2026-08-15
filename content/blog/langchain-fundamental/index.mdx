@@ -100,7 +100,7 @@ model = ChatGoogleGenerativeAI(
 ```
 
 - ChatGoogleGenerativeAI는 LangChain이 Google에서 제공하는 생성 AI 모델(Gemini)과 상호 작용하기 위한 인터페이스가 되는 클래스다. 이 클래스의 인스턴스를 만들어 특정 Google AI 모델을 설정하고 LangChain의 다른 기능(프롬프트 등)과 함께 작업할 수 있다.
-- ```model="gemini-2.0-flash"```은 실제로 사용할 Google AI 모델의 이름을 지정한다.
+- ```model="gemini-2.0-flash"```은 사용할 Google AI 모델의 이름을 지정한다.
 - ```temperature=0```은 모델 출력의 '랜덤성'과 '창의성'을 조정하기 위한 파라미터다. 값은 보통 0~2 정도의 범위에서 설정한다. 0에 가까울수록 모델은 매번 거의 같고, 가장 확률이 높다고 생각되는 단어를 선택하기 쉬워져, 결정적이고 일관성 있는 출력이 된다. 사실에 근거한 회답이나, 재현성이 요구되는 경우에 적합하다. 값이 클수록 모델은 보다 다양한 단어를 선택하게 되어 창조적이고 매번 다른 가능성이 있는 출력이 된다.
 
 이 코드 블록을 실행하면 지정된 설정(gemini-2.0-flash 모델을 사용하고 출력의 무작위성을 최대한 억제)을 가진 ChatGoogleGenerativeAI 인스턴스가 만들어지고 변수 model에 저장된다. 아래 코드는 OpenAI, Microsoft Azure, Anthropic, OpenRouter, xAI, Olama와 같은 다른 LLM 플랫폼 모델을 LangChain으로 초기화하는 방법을 나타낸다.
@@ -170,7 +170,7 @@ LangChain을 이용함으로써 이러한 다양한 LLM을 비교적 통일된 �
 
 ### 프롬프트와 모델을 실행하는 방법
 
-여기에서는 프롬프트 템플릿과 정의한 모델을 결합하여 실제로 LLM을 호출하고 응답을 얻는 절차에 대해 기술한다. run, apply, generate, predict 등 다양한 방법의 메소드들이 존재하나, 최근에 권장 사항은 invoke 메소드에 의한 실행을 추천한다.
+여기에서는 프롬프트 템플릿과 정의한 모델을 결합하여 LLM을 호출하고 응답을 얻는 절차에 대해 기술한다. run, apply, generate, predict 등 다양한 방법의 메소드들이 존재하나, 최근에 권장 사항은 invoke 메소드에 의한 실행을 추천한다.
 
 | 실행 메소드      | 설명                                 |
 | :------------ | :---------------------------------- |
@@ -230,7 +230,7 @@ for chunk in model.stream(llm_prompt2):
 
 이전 단계에서 생성한 프롬프트(```llm_prompt1```, ```llm_prompt2```)를 미리 정의된 LLM 모델(model)에 입력하여 응답을 얻는다. 
 
-- ```model.invoke(llm_prompt1)```에서 model은 ChatGoogleGenerativeAI를 사용하여 정의한 모델 객체이며 .invoke()메서드는 파라미터로 입력된 프롬프트(```llm_prompt1```)를 실제로 LLM에 보내고 받은 응답을 response1 변수에 저장한다.
+- ```model.invoke(llm_prompt1)```에서 model은 ChatGoogleGenerativeAI를 사용하여 정의한 모델 객체이며 .invoke()메서드는 파라미터로 입력된 프롬프트(```llm_prompt1```)를 LLM에 보내고 받은 응답을 response1 변수에 저장한다.
 - ```model.invoke(llm_prompt2)```도 마찬가지로 다른 프롬프트(```llm_prompt2```)를 모델에 입력하고 응답을 response2에 저장한다.
 
 위의 실행에 대한 출력 결과는 아래와 같다.

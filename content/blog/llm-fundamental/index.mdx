@@ -342,7 +342,7 @@ display(Image(graph.get_graph().draw_mermaid_png()))
 Tool Calling 에이전트의 동작 흐름을 정의하는 LangGraph 그래프를 구축한다.
 
 - `should_continue` 함수는 에이전트의 의사 결정 열쇠이다. `last_message = state["messages"][-1]`에서 직전 메시지(call_llm 노드가 생성한 AIMessage)를 취득하고, `if last_message.tool_calls:`에서 해당 메시지에 tool_calls 속성이 존재하는지(LLM이 툴 호출을 요구했는지)를 체크하여 존재하면 "tools"를 반환한다.
-- `tool_node = ToolNode(tools)`에서 ToolNode는 LangGraph에서 제공하는 내장 노드이다. 이 노드는 그래프 상태(state)에서 `tool_calls`를 가진 AIMessage를 받으면 해당 툴을 실제로 실행하고 그 결과를 ToolMessage 객체로 생성한다. 이 노드를 사용하려면 state에 messages 키가 반드시 있어야 하고, 가장 마지막 메시지가 `tool_calls` 속성을 가진 AIMessage여야 한다.
+- `tool_node = ToolNode(tools)`에서 ToolNode는 LangGraph에서 제공하는 내장 노드이다. 이 노드는 그래프 상태(state)에서 `tool_calls`를 가진 AIMessage를 받으면 해당 툴을 실행하고 그 결과를 ToolMessage 객체로 생성한다. 이 노드를 사용하려면 state에 messages 키가 반드시 있어야 하고, 가장 마지막 메시지가 `tool_calls` 속성을 가진 AIMessage여야 한다.
 - `workflow.add_conditional_edges(...)`는 조건 분기 설정이다. "agent" 노드 실행 후 `should_continue` 함수를 호출하여 "tools"를 반환하면 "tools" 노드로, END를 반환하면 그래프가 종료된다.
 - `workflow.add_edge("tools", "agent")`에서 tools 노드 실행 후에는 반드시 agent 노드가 호출된다. 이로써 tools 노드의 결과를 LLM이 다시 처리하여 추가 툴 호출이 필요한지 판단할 수 있다. 충분히 정보가 수집되었다고 판단되면 agent 노드에서 사용자의 질문에 답변하고 그래프 실행을 종료한다.
 
