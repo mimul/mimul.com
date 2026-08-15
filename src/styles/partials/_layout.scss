@@ -214,11 +214,17 @@
 //Subtitles
 .subtitle {
   opacity: 0.8;
+  font-size: 1.1rem;
 
   &.is-compact {
     max-width: 600px;
     margin: 0 auto;
   }
+}
+
+//Bulma 기본 700 굵기가 과도하게 두꺼워 축소
+.has-text-weight-bold {
+  font-weight: 600 !important;
 }
 
 //Divider

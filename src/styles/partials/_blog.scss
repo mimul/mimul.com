@@ -27,6 +27,17 @@
   box-shadow: 0 15px 26px rgba(0, 0, 0, 0.4);
 }
 
+@media screen and (max-width: 768px) {
+  // .title.is-3 등 Bulma 사이즈 클래스(명시도 2)를 이겨야 하므로 .title과 결합
+  .title.ar-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle.ar-hero-subtitle {
+    font-size: 1rem;
+  }
+}
+
 .post-body {
   overflow-wrap: break-word;
   word-wrap: break-word;
