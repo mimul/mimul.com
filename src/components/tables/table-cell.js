@@ -6,7 +6,7 @@ const TableCell = styled.td`
   font-size: 15px;
 
   ${mediaqueries.tablet`
-    font-size: 14px;
+    font-size: 13px;
   `}
 `;
 
