@@ -37,7 +37,7 @@ function MDX({ content, children }) {
     <MDXProvider components={shortcodes}>
       <MDXBody>
         <article
-          className="content is-medium post-body"
+          className="content is-normal post-body"
           data-clarity-region="article"
         >
           {content}
