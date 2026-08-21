@@ -23,12 +23,12 @@ MCP를 사용하지 않으면 AI가 데이터베이스, 웹 서비스, 로컬 �
 
 초기 LLM 앱은 텍스트만 응답할 수 있었고, 응답에 대해 무엇을 할지는 인간이 판단해야 했습니다.
 
-![LLM](./llm1.png)
+![LLM](./llm_one.png)
 _초기 LLM: 텍스트 응답만 가능, 행동 결정은 인간의 몫_
 
 이 문제를 처음 해결한 것이 [OpenAI의 Function Calling](https://platform.openai.com/docs/guides/function-calling)입니다. Function Calling을 사용하면 LLM이 어떤 작업을 수행할지 결정하고, 지정된 JSON 응답을 통해 LLM 앱이 직접 작업을 수행할 수 있습니다.
 
-![LLM Function Call](./llm2.png)
+![LLM Function Call](./llm_two.png)
 _Function Calling: LLM이 직접 작업을 결정하고 구조화된 응답으로 실행_
 
 그러나 LLM 앱이 많은 외부 서비스에 대해 일일이 연동을 구현하는 데는 한계가 있으며, 새로운 서비스가 나올 때마다 추가 대응이 필요합니다. 그래서 LLM 앱과 외부 서비스를 연계하기 위한 통일된 인터페이스인 MCP가 필요했습니다.
