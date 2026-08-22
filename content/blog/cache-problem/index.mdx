@@ -4,7 +4,7 @@ description: 분산 시스템에서 자주 발생하는 Cache Penetration, Cache
 author: Mimul
 date: "2020-04-17T23:10:01.000Z"
 lastModificationTime: "2026-04-05T00:00:00.000Z"
-image: "./cache_no.png"
+image: "./cache_no.jpg"
 tags:
   - cache
   - redis
@@ -19,7 +19,7 @@ DB에 존재하지 않는 값을 검색할 때 DB에서 반환된 빈 결과를 
 
 쿼리가 반환하는 데이터가 비어 있더라도 결과를 캐시하여 이 문제를 해결하게 된다.
 
-![empty 캐싱](./cache_penetration_ans1.png)
+![empty 캐싱](./cache_penetration_ans1.jpg)
 
 그러나 악의적인 사용자가 존재하지 않는 값을 대량으로 검색하면 캐시가 데이터베이스에 존재하지 않는 값으로 채워질 수 있다. 이 경우 캐시 공간이 낭비되고 정상적인 요청에서 캐시 적중률이 저하된다. 따라서 이 빈 캐시의 유효기간은 짧게 설정하는 것이 좋다.
 
@@ -47,7 +47,7 @@ def get_data(key):
 
 데이터를 검색하기 전에 Bloom 필터를 사용하여 DB에 데이터가 없는지 여부를 결정한다. 존재하지 않는 데이터에 대해서는 조기 리턴을 실시해, 캐시나 데이터베이스에의 액세스가 발생하지 않게 한다.
 
-![bloomfilter](./cache_penetration_ans2.png)
+![bloomfilter](./cache_penetration_ans2.jpg)
 
 이 경우는 존재할 수 있는 데이터의 경우 먼저 캐시를 검색하고 데이터가 없으면 DB에 액세스하여 결과를 fetch 한다. 검색 키의 반복률이 낮고 검색 키의 종류가 매우 많은 경우에는 블룸 필터를 사용하는 것이 효과적이다. 블룸 필터를 알려면 [Bloom Filter 소개](https://www.mimul.com/blog/bloom-filter/) 글을 참고하면 된다.
 
@@ -72,7 +72,7 @@ def get_data(key):
 
 다른 스레드는 데이터베이스를 쿼리하는 스레드가 실행을 마치고 데이터를 다시 캐시에 추가하고 락을 해제하기를 기다린다. 해당 키의 락이 해제가 되면 다른 스레드는 캐시에서 데이터를 검색할 수 있게 된다.
 
-![검색키잠금](./cache_breakdown_ans1.png)
+![검색키잠금](./cache_breakdown_ans1.jpg)
 
 이 방법은 구현이 단순하지만, 락 경쟁으로 인한 대기 시간이 발생할 수 있어 고트래픽 환경에서는 병목이 될 수 있다.
 

@@ -70,7 +70,7 @@ LOSS = 'mean_squared_error'  # 손실 함수: 평균 제곱 오차
 
 기본 방법은 **경사 하강법(Gradient Descent)** 이다. 손실 곡선에서 현재 위치의 기울기(gradient)를 구하고, 기울기가 낮아지는 방향으로 파라미터를 이동한다.
 
-![그라디언트 방법(경사, 기울기)](./gradient.png)
+![그라디언트 방법(경사, 기울기)](./gradient.jpg)
 
 공이 경사면을 굴러 내려가듯 학습이 진행된다. 공이 굴러가는 방향은 편미분으로 계산하며, 이 계산을 TensorFlow가 내부적으로 처리한다.
 
@@ -99,15 +99,15 @@ OPTIMIZER = tf.keras.optimizers.SGD  # 최적화: 확률적 경사 하강법
 
 학습률(Learning Rate)은 한 번의 학습에서 파라미터를 얼마나 크게 이동할지를 결정하는 하이퍼파라미터다.
 
-![학습률](./learning_rate.png)
+![학습률](./learning_rate.jpg)
 
 **너무 크면**: 최적해를 지나쳐 발산하거나 수렴하지 못한다.
 
-![너무 큰 학습률 문제: 수렴하지 않음](./large_learning_rate.png)
+![너무 큰 학습률 문제: 수렴하지 않음](./large_learning_rate.jpg)
 
 **너무 작으면**: 학습이 매우 느리고, 전역 최적해가 아닌 국부 최적해(local optimum)에 갇힐 수 있다.
 
-![너무 작은 학습률 문제 : 학습이 느리고 국부적인 해결책](./small_learning_rate.png)
+![너무 작은 학습률 문제 : 학습이 느리고 국부적인 해결책](./small_learning_rate.jpg)
 
 아래는 학습률 0.003 / 0.03 / 0.3 / 3을 비교한 결과다.
 

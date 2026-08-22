@@ -72,7 +72,7 @@ WHERE a.company_id = 12
 
 위 쿼리의 실행 계획을 읽어보면 R 테이블에 제일 먼저 패치되어 derived3 테이블이 되고 그 다음 v 테이블과 조인되고 그 결과가 derived2 테이블이 되고 ss, g, u 순으로 조인되어 결과가 출력된다. 아래 그림은 MySQL Workbench의 VISUAL EXPLAIN 기능을 활용한 결과이다.
 
-![VISUAL EXPLAIN 1](./explain1.png)
+![VISUAL EXPLAIN 1](./explain1.jpg)
 
 UNION의 경우는 select_type에는 PRIMARY(UNION에서 처음 패치되는 테이블), UNION(2번째 이후에 패치되는 테이블), UNION RESULT(UNION 실행 결과), DEPENDENT UNION(DEPENDENT SUBQUERY가 UNION이 되어 있는 경우), UNCACHEABLE UNION(UNCACHEABLE SUBQUERY가 UNION인 경우) 중에 하나가 표현된다.
 
@@ -104,7 +104,7 @@ FROM (
 
 위 쿼리의 실행계획을 읽어보면 id 3의 r과 s 테이블이 조인한 결과와 a, s 테이블의 조인한 결과가 union2,3 테이블에 통합되고 그 결과가 derived2 테이블에 저장된다.
 
-![VISUAL EXPLAIN 2](./explain2.png)
+![VISUAL EXPLAIN 2](./explain2.jpg)
 
 ## 주요 EXPLAIN 필드 설명
 
