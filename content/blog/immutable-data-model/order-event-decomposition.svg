@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1140 600" font-family="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="arrowA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4C6EF5"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1140" height="600" fill="#FFFFFF"/>
+  <text x="570" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1F2937">주문 이벤트 분해 전후 비교</text>
+
+  <!-- 분해 전 라벨 -->
+  <text x="220" y="76" text-anchor="middle" font-size="14" font-weight="700" fill="#64748B">분해 전</text>
+
+  <!-- Left box: 주문 (E) 통합 -->
+  <rect x="50" y="90" width="340" height="430" rx="12" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="220" y="122" text-anchor="middle" font-size="17" font-weight="700" fill="#1F2937">주문 (E)</text>
+  <line x1="66" y1="142" x2="374" y2="142" stroke="#CBD5E1" stroke-width="1"/>
+
+  <!-- attribute rows: bullet + text, orange for 일시 속성 -->
+  <circle cx="66" cy="168" r="3.5" fill="#94A3B8"/>
+  <text x="80" y="172" font-size="13.5" fill="#334155">주문ID</text>
+
+  <circle cx="66" cy="196" r="3.5" fill="#94A3B8"/>
+  <text x="80" y="200" font-size="13.5" fill="#334155">회원ID</text>
+
+  <circle cx="66" cy="224" r="3.5" fill="#F59E0B"/>
+  <text x="80" y="228" font-size="13.5" fill="#B45309" font-weight="600">주문일시</text>
+
+  <circle cx="66" cy="252" r="3.5" fill="#94A3B8"/>
+  <text x="80" y="256" font-size="13.5" fill="#334155">확인자ID</text>
+
+  <circle cx="66" cy="280" r="3.5" fill="#F59E0B"/>
+  <text x="80" y="284" font-size="13.5" fill="#B45309" font-weight="600">주문확인일시</text>
+
+  <circle cx="66" cy="308" r="3.5" fill="#94A3B8"/>
+  <text x="80" y="312" font-size="13.5" fill="#334155">송장번호</text>
+
+  <circle cx="66" cy="336" r="3.5" fill="#F59E0B"/>
+  <text x="80" y="340" font-size="13.5" fill="#B45309" font-weight="600">발송일시</text>
+
+  <circle cx="66" cy="364" r="3.5" fill="#94A3B8"/>
+  <text x="80" y="368" font-size="13.5" fill="#334155">취소사유</text>
+
+  <circle cx="66" cy="392" r="3.5" fill="#F59E0B"/>
+  <text x="80" y="396" font-size="13.5" fill="#B45309" font-weight="600">취소일시</text>
+
+  <!-- legend -->
+  <circle cx="66" cy="490" r="3.5" fill="#F59E0B"/>
+  <text x="80" y="494" font-size="12" fill="#B45309">일시 속성 (4개) — 업무마다 UPDATE 대상</text>
+
+  <!-- 분해 후 라벨 -->
+  <text x="915" y="76" text-anchor="middle" font-size="14" font-weight="700" fill="#64748B">분해 후</text>
+
+  <!-- Right stacked boxes -->
+  <rect x="740" y="90" width="350" height="76" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="915" y="120" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1F2937">주문 (E)</text>
+  <text x="915" y="144" text-anchor="middle" font-size="12.5" fill="#475569">주문ID · 회원ID · 주문일시</text>
+
+  <rect x="740" y="186" width="350" height="76" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="915" y="216" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1F2937">주문 확인 (E)</text>
+  <text x="915" y="240" text-anchor="middle" font-size="12.5" fill="#475569">주문ID · 확인자ID · 확인일시</text>
+
+  <rect x="740" y="282" width="350" height="76" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="915" y="312" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1F2937">발송 (E)</text>
+  <text x="915" y="336" text-anchor="middle" font-size="12.5" fill="#475569">주문ID · 송장번호 · 발송일시</text>
+
+  <rect x="740" y="378" width="350" height="76" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="915" y="408" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1F2937">취소 (E)</text>
+  <text x="915" y="432" text-anchor="middle" font-size="12.5" fill="#475569">주문ID · 취소사유 · 취소일시</text>
+
+  <!-- connecting lines: junction fan-out -->
+  <line x1="390" y1="305" x2="560" y2="305" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="560" y="288" text-anchor="middle" font-size="12.5" fill="#64748B">분해</text>
+
+  <path d="M560,305 C650,305 650,128 740,128" fill="none" stroke="#4C6EF5" stroke-width="1.3" marker-end="url(#arrowA)"/>
+  <path d="M560,305 C650,305 650,224 740,224" fill="none" stroke="#4C6EF5" stroke-width="1.3" marker-end="url(#arrowA)"/>
+  <path d="M560,305 C650,305 650,320 740,320" fill="none" stroke="#4C6EF5" stroke-width="1.3" marker-end="url(#arrowA)"/>
+  <path d="M560,305 C650,305 650,416 740,416" fill="none" stroke="#4C6EF5" stroke-width="1.3" marker-end="url(#arrowA)"/>
+
+  <text x="570" y="560" text-anchor="middle" font-size="12.5" fill="#64748B">일시 속성 하나당 엔티티 하나 — 각 엔티티는 그 시점의 INSERT 한 번으로 끝난다</text>
+</svg>
