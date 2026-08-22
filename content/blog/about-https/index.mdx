@@ -39,7 +39,7 @@ tags:
 
 **1. Identity(인증)**
 
-https://mimul.com을 접속하면 브라우저는 mimul.com에서 인증서를 수신하기 때문에 접속한 mimul.com이 진짜 mimul.com임을 증명해 준다.
+[https://mimul.com](https://mimul.com)을 접속하면 브라우저는 mimul.com에서 인증서를 수신하기 때문에 접속한 mimul.com이 진짜 mimul.com임을 증명해 준다.
 
 **2. Integrity(무결성)**
 
@@ -61,13 +61,13 @@ Google은 HTTPS 페이지를 [우선적으로 색인을 생성](https://webmaste
 
 HTTP의 경우는 TCP 핸드셰이크 후에 HTTP 요청/응답으로 서로 애플리케이션 데이터를 주고 받는다. 이때 통신은 평문으로 이루어지고, 중간자 HTTP 데이터를 보거나 변조가 가능하다. 반면, HTTPS는 HTTP over TLS를 말하며, TCP 핸드세이크 후에 TLS 핸드셰이크를 진행하고 그후부터는 암호화 통신이 시작되며 HTTP 요청/응답을 통해 애플리케이션 데이터를 주고 받는다.
 
-![HTTP vs HTTPS](./ssl_http_https.png)
+![HTTP vs HTTPS](./ssl_http_https_1.png)
 
 ## TLS 핸드셰이크 프로토콜
 
 HTTPS는 HTTP over TLS를 말한다. 그래서 TLS의 핸드셰이크 프로토콜을 이해하는게 필요하다.
 
-![TLS 핸드 셰이크 프로토콜](./ssl_tls.png)
+![TLS 핸드 셰이크 프로토콜](./ssl_tls_1.png)
 
 **1. 매개변수 교환/동의**
 
@@ -95,7 +95,7 @@ TLS 통신을 실현하는 데 필요한 매개 변수를 클라이언트와 서
 
 TLS는 끊어진 session을 재연결하는 TLS Session resumption이라는 기능이 있다. 이 기능은 일단 연결이 완료된 TLS Session 정보의 ID에 대해 캐시 연결시 캐시된 정보를 이용하여 세션을 다시 연결이 아닌 마지막 연결을 복구하는 기능이다. TLS Session resumption를 이용했을 때의 프로토콜의 동작은 TLS1.2 RFC인 [RFC5246의 Section 7.3](https://tools.ietf.org/html/rfc5246)에 기술되어 있다.
 
-![TLS 핸드 셰이크 resumption](./ssl_tls_resumption.png)
+![TLS 핸드 셰이크 resumption](./ssl_tls_resumption_1.png)
 
 ## SSL 프로토콜 종류
 
