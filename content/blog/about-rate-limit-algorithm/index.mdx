@@ -29,7 +29,7 @@ tags:
 
 네트워크로의 데이터 주입 속도의 상한을 정해 제어하고 네트워크에서 트래픽 체증을 일정하게 유지한다. 일정한 유출 속도(유출 속도는 고정된 값)를 제한하여 버스트 유입 속도를 부드럽게 한다.
 
-![Leaky Bucket](./rate_leakybucket.png)
+![Leaky Bucket](./rate_leakybucket_1.png)
 
 - 고정 용량의 버킷에 다양한 유량의 물이 들어오면 버킷에 담기고 그 담긴물은 일정량 비율로 떨어진다.
 - 들어오는 물의 양이 많아 버킷의 용량을 초과하게 되면 그 물은 버린다.
@@ -96,7 +96,7 @@ public class LeakyBucket extends RateLimiter {
 
 일시적으로 많은 트래픽이 와도 토큰이 있다면 처리가 가능하면서 토큰 손실 처리를 통해 평균 처리 속도를 제한할 수 있다. 즉, 평균 유입 속도를 제한하고 처리 패킷 손실없이 특정 수준의 버스트 요청 허용할 수 있다.
 
-![Token Bucket](./rate_tokenbucket.png)
+![Token Bucket](./rate_tokenbucket_1.png)
 
 - 토큰은 정해진 비율로 토큰 버킷에 넣는다.
 - 버킷은 최대 n개의 토큰을 저장하며, 버킷이 가득차면 새로 추가된 토큰은 삭제되거나 거부된다.
@@ -160,7 +160,7 @@ public class TokenBucket extends RateLimiter {
 
 정해진 시간 단위로 window가 만들어지고 요청 건수가 기록되어 해당 window의 요청 건수가 정해진 건수보다 크면 해당 요청은 처리가 거부된다. 이 알고리즘을 사용하면 경계의 시간대(12:59, 13:01초에 몰리면)에 요청이 오면 두배의 부하를 받게 된다. 즉, 구현은 쉽지만, 기간 경계의 트래픽 편향 문제가 발생된다.
 
-![Fixed Window Counter](./rate_fixed_window_counter.png)
+![Fixed Window Counter](./rate_fixed_window_counter_1.png)
 
 - 버킷에는 정해진 시간 단위의 window(window 1번은 12:00 - 13:00, window 2번은 13:00 - 14:00)가 존재하고
 - 시간 단위의 각 window는 요청이 오면 요청 건수가 기록된다.
@@ -204,7 +204,7 @@ public class FixedWindowCounter extends RateLimiter {
 
 Fixed window counter의 단점인 기간 경계의 편향에 대응하기 위한 알고리즘이다. 하지만, window의 요청건에 대한 로그를 관리해야하기 때문에 구현과 메모리 비용이 높은 문제점이 있다.
 
-![Sliding Window Log](./rate_sliding-window-log.png)
+![Sliding Window Log](./rate_sliding-window-log_1.png)
 
 - 분당 2건의 요청을 처리한다면 12초와 24초에 온 요청은 허용이 되고 36초에 온 요청 분당 2건처리 원칙에 의해 거부되고
 - 1분 25초의 요청이 들어오면 12초와 24초에 온 요청 로그를 pop해서 꺼내 없애고 남은 건 바로 전 요청인 36초에 온거 하나만 있어서 1분 25초에 들어온 요청은 처리가 된다.
@@ -241,7 +241,7 @@ public class SlidingWindowLog extends RateLimiter {
 
 Fixed window counter의 경계 문제와 Sliding window log의 로그 보관 비용 등의 문제점을 보완할 수 있는 알고리즘이다.
 
-![Sliding Window Counter](./rate_sliding-window.png)
+![Sliding Window Counter](./rate_sliding-window_1.png)
 
 - 분당 10건 처리한다면 1분 안에 9건의 요청이 오고 1분과 2분 사이에는 5건이 요청온다고 가정.
 - 1분 15초에 요청이 왔는데 1분 15초 지점은 1분과 2분 사이에서 25% 지점, 이전 기간은 1 - 0.25 = 75% 비율로 계산해서 9 * 0.75 + 5 = 14.75 > 10으로 한도를 초과했기 때문에 요청은 거부된다. 즉, 이전 window와 현재 window의 비율값으로 계산된 합이 처리 건수를 초과하면 거부된다.
