@@ -126,7 +126,7 @@ workflow.add_edge("model", END)
 
 그래프의 처리 흐름을 정의한다. `add_edge` 메소드는 그래프의 노드와 노드 사이를 연결하는 edge의 역할을 정의한다. 여기서는 그래프가 시작(START)되면 model 노드를 실행하고 그것이 끝나면 그래프를 종료(END)하는 단순한 흐름이다.
 
-![langgraph state](./langgraph_state_three.png)
+![langgraph state](./langgraph_state_3.png)
 
 ```python
 def call_llm(state: GraphState):
@@ -337,7 +337,7 @@ display(Image(graph.get_graph().draw_mermaid_png()))
 
 그래프를 정의하고 실행 결과를 시각화하면 아래와 같다.
 
-![langgraph tool calling state](./langgraph_tool_calling_state_three.png)
+![langgraph tool calling state](./langgraph_tool_calling_state_3.png)
 
 Tool Calling 에이전트의 동작 흐름을 정의하는 LangGraph 그래프를 구축한다.
 
