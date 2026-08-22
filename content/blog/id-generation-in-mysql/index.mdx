@@ -16,7 +16,7 @@ MySQL의 ID를 auto_increment로 사용할 때 대두되는 문제점으로는 I
 
 MySQL InnoDB의 테이블은 인덱스는 트리 구조(B+Tree)를 가지며, 기본 키(Primary Key)는 리프 페이지에 테이블의 값을 가지는 클러스터 인덱스 구조를 가진다.
 
-![MySQL Clusted Index](./mysql_cluster_index.png)
+![MySQL Clusted Index](./mysql_cluster_index_1.png)
 
 - 기본 키의 트리 구조에서 데이터는 리프 페이지에 유지된다.
 - 페이지 사이즈의 디폴트는 16KB(※innodb_page_size로 변경 가능)

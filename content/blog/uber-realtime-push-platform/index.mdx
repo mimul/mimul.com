@@ -65,8 +65,7 @@ Uber가 개발도상국에서 빠르게 성장하면서 데이터 사용 비용�
 
 새로운 시스템을 **RAMEN(Real-time Asynchronous MEssage Network, 실시간 비동기식 메시지 네트워크)** 이라고 명명했습니다.
 
-![Uber-Architecture](./uber-overall-architecture.png)
-_Figure 1: High-level architecture of the overall system._
+![High-level architecture of the overall system](./uber-overall-architecture_1.png)
 
 ## 메시지 생성과 페이로드 구성
 
@@ -130,8 +129,7 @@ API 게이트웨이를 중간에 두는 이점은 다음과 같습니다.
 
 SSE는 단방향 프로토콜이기 때문에, at-least-once 보증을 위해 확인(ACK)과 재시도를 애플리케이션 프로토콜 위에 구현해야 했습니다.
 
-![message-diagram](./uber-message-diagram.png)
-_Figure 2: Server-client interaction for the SSE protocol._
+![ Server-client interaction for the SSE protocol](./uber-message-diagram_1.png)
 
 클라이언트는 `/ramen/receive?seq=0`으로 첫 번째 요청을 보내고, 서버는 HTTP 200과 `Content-Type: text/event-stream`으로 응답해 SSE 연결을 유지합니다.
 
@@ -175,8 +173,7 @@ _Apache Helix_: ZooKeeper 위에서 작동하는 클러스터 관리 프레임�
 
 _Redis & Apache Cassandra_: 멀티 리전 아키텍처에서 메시지의 올바른 복제와 저장을 담당합니다. Cassandra는 내구성이 뛰어나고 여러 리전에 걸쳐 복제되는 스토리지이며, Redis는 Cassandra 위에서 캐시로 사용됩니다.
 
-![RAMEN-Architecture](./uber-arch.png)
-_Figure 3: Architecture for the new RAMEN backend server._
+![Architecture for the new RAMEN backend server](./uber-arch_1.png)
 
 주요 구성 요소는 세 가지입니다.
 
