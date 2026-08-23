@@ -26,18 +26,18 @@ Performance는 O(log n).
 Hash 함수는 Object와 캐시 시스템이 일정 구간을 정하게 한다. Java 언어의 예를 보면 Object의 hashCode() 함수는 리턴을 int로 하고 리턴값 int의 구간은 -2^31에서 2^31-1을 가진다.
 다음 그림은 네 개의 Object(1,2,3,4)와 3개의 캐시 시스템(A, B, C)가 링에 배치되어 있다.
 
-![Consistent Hashing 1](./consistent-hashing-1.png)
+![Consistent Hashing 1](./consistent-hashing-1.jpg)
 
 위의 그림에서 1,4는 캐시 시스템 A에 들어가고 2는 B, 3은 C에 들어간다. 이때 C가 제거되었다고 가정하면 Object 3은 A에 들어간다. 기타 할당은 변하지 않는다. 다음 그림처럼 캐시 D가 추가되면, 3, 4는 D로 옮긴다. 그리고 1만 A에 남아있다.
 
-![Consistent Hashing 2](./consistent-hashing-2.png)
+![Consistent Hashing 2](./consistent-hashing-2.jpg)
 
 이렇게 함으로써 각 캐시 시스템에 할당된 구간의 사이즈에 예외가 발생해도 잘 동작하게 된다. 한 가지 고민해야 할 점은 무작위로 분포되기 때문에 캐시 시스템 사이의 Object의 분포는 균일하지 않을 수 있다. 이를 위한 해결책으로 '가상 노드'를 사용하는 방법이 있다. 가상 노드는 캐시 시스템을 링 안에서 복제하는데, 이는 캐시 시스템 하나를 추가할 때마다 링에 여러 개 배치되게 되는 방식이다.
 
 가상 노드의 효과는 다음 그래프와 같은데 10,000개의 Object를 10개의 캐시 시스템으로 시뮬레이션한 결과이다. X축은 캐시 시스템의 복제 수가 되고 Y축은 표준 편차이다.
 복제 수가 작은 Object들의 분산도가 불균형한데 이는 캐시 시스템의 Object 수 평균의 표준 편차가 크기 때문이다. 이 실험에서 복제를 100이나 200으로 했을 경우 합리적인 균형을 실현할 수 있다고 한다. (표준 편차가 평균 5~10% 정도가 적당함)
 
-![Consistent Hashing 3](./consistent-hashing-3.png)
+![시뮬레이션한 결과](./consistent-hashing-3.jpg)
 
 시스템마다 다수의 Virtual Nodes(가상 노드)를 만들어서 로드밸런싱을 좋게 한 예는 [libketama](https://www.metabrew.com/article/libketama-consistent-hashing-algo-memcached-clients)이다.
 

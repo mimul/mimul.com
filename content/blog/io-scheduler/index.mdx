@@ -19,7 +19,7 @@ I/O Scheduler는 Request Queue를 적절히 조작하여 seek time을 최소화�
 즉 request가 들어왔을 때 큐에 이미 그 request가 있거나 이웃한 block에 대한 request가 있을 때 두 개의 request를 합치는 것이다. 또한 디스크의 seek를 줄이기 위해서 새로 들어온 request를 FIFO 방식으로 뒤에 붙이는 것이 아니라 이미 기다리고 있는 request들 사이에 block 번호에 따라 sorting된 상태가 되게끔 삽입해 넣는 것이다.
 이렇게 함으로써 디스크의 seek를 최소화하고 disk의 arm은 디스크를 왕복 횡단하면서 서비스를 할 수 있게 된다. 그렇다고 해서, "굶고 있는(starving)" I/O request가 많아도 안된다. 적당히 공정성(fairness)을 유지해서, latency도 줄여주어야 한다. 이러한 모습은 마치 Elevator와 비슷하기 때문에 I/O Scheduler는 Elevator라고도 불린다.
 
-![I/O Elevator](./elevator.png)
+![I/O Elevator](./elevator.jpg)
 
 블록 I/O Request는 일단 Elevator에 넣어져, 예약된 후 Dispatch된다. Dispatch되는 Request는 RequestQueue에 넣어져 장치 드라이버가 I/O를 수행해 간다.
 
@@ -30,7 +30,7 @@ I/O Scheduler는 Request Queue를 적절히 조작하여 seek time을 최소화�
 - No Operation. 아무것도 하지 않는 스케줄러.
 - 주로 지능형 RAID 컨트롤러가 있거나, SSD를 사용하거나, 반도체 디스크 등 성능 좋은 디스크를 사용할 경우 선택되는 스케줄러로 커널은 아무것도 하지 않는 것이 부하를 줄일 수 있다는 생각이 기저에 있다.
 
-![noop](./noop.png)
+![noop](./noop.jpg)
 
 **2. anticipatory(as) 스케줄러**
 
@@ -47,7 +47,7 @@ I/O Scheduler는 Request Queue를 적절히 조작하여 seek time을 최소화�
 - 몇몇 프로세스가 많은 수의 I/O를 발생시키는 환경에 적합하다.
 - 데이터베이스의 파일 시스템에 많이 사용된다.
 
-![deadline](./deadline.png)
+![deadline](./deadline.jpg)
 
 **4. cfq(Completely Fair Queuing) 스케줄러**
 
@@ -55,7 +55,7 @@ I/O Scheduler는 Request Queue를 적절히 조작하여 seek time을 최소화�
 - 많은 프로세스들이 세세한 I/O를 많이 발생시킬 때 사용하면 좋다.
 - Fedora Core 커널 패키지의 기본이다.
 
-![cfq](./cfg.png)
+![cfq](./cfg.jpg)
 
 ### 설정 방법
 
@@ -128,7 +128,7 @@ export LD_PRELOAD="/usr/local/lib/libtcmalloc.so"
 
 현재 설치한 서버의 디폴트 I/O Scheduler인 cfq와 DB 서버에서 많이 설정해 사용하고 있는 deadline을 비교하여 Insert를 BMT한 결과 deadline이 조금 앞선 결과를 보여주었다.
 
-![deadline cfq bmt](./deadline_cfq_bmt.png)
+![deadline cfq bmt](./deadline_cfq_bmt.jpg)
 
 위 BMT는 스토리지가 어떻게 구성되었는지 등의 환경에 따라 성능치가 다르게 나올 수 있다는 점은 알아두길 바란다.
 

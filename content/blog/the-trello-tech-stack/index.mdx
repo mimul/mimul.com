@@ -53,7 +53,7 @@ Mustache는 로직이 적은 템플릿 언어로서, 모델을 HTML로 변환해
 
 매력적이진 않지만, 잘 작동이 되었다.
 
-![Trello Architecture](./trello_archi_1.png)
+![Trello Architecture](./trello_archi_1.jpg)
 
 WebSocket을 지원하지 않는 브라우저(예를 들어 Internet Explorer 같은)라면 사용자가 활성화되면 몇 초마다 콘텐츠 갱신을 위해 AJAX 요청을 하고 사용자가 유휴 상태가 되면, 10 초마다 폴링을 하고 있다. 서버의 설정 덕분에 적은 오버헤드로 HTTPS 요청을 서비스 할 수 있었으며, TCP 연결을 오픈하고 있으므로 필요할 때 폴링하여 어느 정도의 사용자 경험을 보장할 수 있었다. 우리는 Socket.io의 다운로드용으로 Comet을 시도해봤지만, 앱에 리스크가 존재해서 이용하는 것을 포기했다.
 

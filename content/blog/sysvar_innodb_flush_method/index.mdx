@@ -4,7 +4,7 @@ description: MySQL InnoDB의 innodb_flush_method 매개변수인 fdatasync, O_DI
 author: Mimul
 date: "2010-05-15T21:20:46.000Z"
 lastModificationTime: "2026-04-08T00:00:00.000Z"
-image: "./mysql_explain.png"
+image: "./mysql.jpg"
 tags:
   - mysql
   - mariadb
@@ -23,7 +23,7 @@ MySQL InnoDB innodb_flush_method 매개 변수는 Unix/Linux에서 데이터 파
 
 O_DIRECT 플래그를 사용하여 파일을 열면 OS가 가지고 있는 Direct I/O 기능을 이용할 수 있다. 즉, 이것은 OS의 캐시 메커니즘을 무시하는 기능이며, RDBMS는 자체적으로 데이터를 캐시하므로 OS의 캐시 메커니즘이 필요 없다는 의미이다.
 
-![Direct I/O](./mysql_o_direct.png)
+![Direct I/O](./mysql_o_direct.jpg)
 
 일반적으로 디스크의 파일에 액세스하는 경우 파일 캐시를 통과하게 되어 있는데 이 파일 캐싱 덕분에, 캐시 히트했을 경우에는 데이터 읽기 속도가 빨라진다. 또한, 파일 캐시를 이용한 지연된 쓰기 기능은 프로세스에 대한 쓰기 작업 성능이 향상된다.
 Direct I/O를 사용하면 디스크상의 파일(데이터)에 액세스하기 위해 파일 캐시를 통과하지 않고 데이터는 응용 프로그램과 같은 프로세스와 디스크에 직접 전달된다.
@@ -73,7 +73,7 @@ CREATE TABLE user(
 
 **2. 테스트 결과**
 
-![테스트 결과](./fdata_o_direct_test.png)
+![테스트 결과](./fdata_o_direct_test.jpg)
 
 buffer_pool이 128M 이전은 fdatasync 방식이 성능이 더 높고 128M 이후부터는 O_DIRECT 방식이 더 높은 성능 결과를 보여주고 있다.
 앞쪽으로 fdatasync 방식이 더 성능이 높은 것은 InnoDB 버퍼 풀에 없는 데이터가 OS 파일 캐시에 있을 수 있어 디스크 I/O를 줄일 수 있기 때문에 성능 효과를 본 것 같다. 즉, OS 파일 캐시가 InnoDB 버퍼 풀에 대한 보조 캐시 역할을 한 것이라고 볼 수 있다.
