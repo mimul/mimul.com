@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1140 540" font-family="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+  <defs>
+    <marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4C6EF5"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1140" height="540" fill="#FFFFFF"/>
+  <text x="570" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1F2937">반품 롱텀 이벤트 구조</text>
+
+  <!-- Top: 롱텀 이벤트 (UPDATE 발생 지점) -->
+  <rect x="390" y="60" width="280" height="76" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.8"/>
+  <text x="530" y="90" text-anchor="middle" font-size="15" font-weight="700" fill="#1F2937">반품 (롱텀 이벤트)</text>
+  <text x="530" y="112" text-anchor="middle" font-size="12.5" fill="#92400E">반품ID · 현재상태</text>
+
+  <rect x="700" y="70" width="230" height="30" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="1"/>
+  <text x="815" y="90" text-anchor="middle" font-size="11.5" fill="#B91C1C">UPDATE는 여기에만 발생</text>
+  <line x1="700" y1="85" x2="670" y2="98" stroke="#DC2626" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Arrow down to super type -->
+  <line x1="530" y1="136" x2="530" y2="180" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrowB)"/>
+
+  <!-- Super type: 반품 액티비티 -->
+  <rect x="380" y="182" width="300" height="72" rx="10" fill="#EAF2FF" stroke="#4C6EF5" stroke-width="1.5"/>
+  <text x="530" y="211" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1F2937">반품 액티비티 (슈퍼타입)</text>
+  <text x="530" y="234" text-anchor="middle" font-size="12.5" fill="#475569">반품ID · 일시</text>
+
+  <!-- Fan-out lines to 3 subtype events -->
+  <path d="M530,254 C530,290 130,290 130,330" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrowB)"/>
+  <path d="M530,254 L530,330" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrowB)"/>
+  <path d="M530,254 C530,290 930,290 930,330" fill="none" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#arrowB)"/>
+
+  <!-- Subtype event boxes -->
+  <rect x="0" y="332" width="260" height="80" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="130" y="362" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">반품 신청 (E)</text>
+  <text x="130" y="386" text-anchor="middle" font-size="12.5" fill="#475569">주문ID · 반품 사유</text>
+
+  <rect x="400" y="332" width="260" height="80" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="530" y="362" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">검수 (E)</text>
+  <text x="530" y="386" text-anchor="middle" font-size="12.5" fill="#475569">검수자 · 검수 결과</text>
+
+  <rect x="800" y="332" width="260" height="80" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="930" y="362" text-anchor="middle" font-size="14" font-weight="700" fill="#1F2937">환불 (E)</text>
+  <text x="930" y="386" text-anchor="middle" font-size="12.5" fill="#475569">환불 수단 · 환불 금액</text>
+
+  <text x="570" y="470" text-anchor="middle" font-size="12.5" fill="#64748B">상세 이벤트는 INSERT ONLY로 쌓이고, 진행 상태를 나타내는 UPDATE는 롱텀 이벤트 하나로 격리된다</text>
+</svg>
