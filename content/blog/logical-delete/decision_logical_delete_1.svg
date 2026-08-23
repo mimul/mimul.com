@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 1000" font-family="'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444444"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="640" height="1000" fill="#ffffff"/>
+
+  <!-- 시작 -->
+  <rect x="240" y="20" width="140" height="50" rx="25" fill="#ded6f5" stroke="#6b5b95" stroke-width="1.5"/>
+  <text x="310" y="50" text-anchor="middle" font-size="15" fill="#333333">시작</text>
+  <path d="M310,70 L310,93" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Diamond 1 -->
+  <polygon points="310,95 480,160 310,225 140,160" fill="#fffdf5" stroke="#333333" stroke-width="1.5"/>
+  <text x="310" y="155" text-anchor="middle" font-size="13" fill="#222222">
+    <tspan x="310" dy="0">액티브·삭제 상태의</tspan>
+    <tspan x="310" dy="16">취급이 실제로 다른가?</tspan>
+  </text>
+
+  <!-- 아니오 -> 사용자구분 속성만 추가 -->
+  <path d="M140,160 L178,160" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="158" y="150" text-anchor="middle" font-size="12" fill="#555555">아니오</text>
+  <rect x="5" y="125" width="170" height="70" rx="8" fill="#f9c6c9" stroke="#c0505f" stroke-width="1.5"/>
+  <text x="90" y="153" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="90" dy="0">사용자구분 속성만 추가</tspan>
+    <tspan x="90" dy="16">(서브타입 불필요)</tspan>
+  </text>
+
+  <!-- 예 -> Diamond 2 -->
+  <path d="M310,225 L310,233" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="323" y="233" text-anchor="middle" font-size="12" fill="#555555">예</text>
+
+  <!-- Diamond 2 -->
+  <polygon points="310,235 480,300 310,365 140,300" fill="#fffdf5" stroke="#333333" stroke-width="1.5"/>
+  <text x="310" y="295" text-anchor="middle" font-size="13" fill="#222222">
+    <tspan x="310" dy="0">삭제를 업무 기록으로</tspan>
+    <tspan x="310" dy="16">남겨야 하는가?</tspan>
+  </text>
+
+  <!-- 예 -> 등록말소·BAN -->
+  <path d="M480,300 L442,300" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="462" y="290" text-anchor="middle" font-size="12" fill="#555555">예</text>
+  <rect x="445" y="265" width="170" height="70" rx="8" fill="#b8dff0" stroke="#3f8fb0" stroke-width="1.5"/>
+  <text x="530" y="293" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="530" dy="0">등록말소·BAN 이벤트로</tspan>
+    <tspan x="530" dy="16">분리 설계</tspan>
+  </text>
+
+  <!-- 아니오 -> Diamond 3 -->
+  <path d="M310,365 L310,373" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="330" y="373" text-anchor="middle" font-size="12" fill="#555555">아니오</text>
+
+  <!-- Diamond 3 -->
+  <polygon points="310,375 500,450 310,525 120,450" fill="#fffdf5" stroke="#333333" stroke-width="1.5"/>
+  <text x="310" y="445" text-anchor="middle" font-size="13" fill="#222222">
+    <tspan x="310" dy="0">서브타입을 어떤 방식으로</tspan>
+    <tspan x="310" dy="16">구현할까?</tspan>
+  </text>
+
+  <!-- -> 싱글 테이블 상속 -->
+  <path d="M120,450 L178,450" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="5" y="410" width="170" height="80" rx="8" fill="#bfe3b4" stroke="#4c8c3c" stroke-width="1.5"/>
+  <text x="90" y="440" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="90" dy="0">싱글 테이블 상속</tspan>
+    <tspan x="90" dy="16">삭제 포함 검색이</tspan>
+    <tspan x="90" dy="16">잦을 때</tspan>
+  </text>
+
+  <!-- -> 구체 테이블 상속 -->
+  <path d="M500,450 L442,450" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="445" y="410" width="170" height="80" rx="8" fill="#f7cba4" stroke="#c07830" stroke-width="1.5"/>
+  <text x="530" y="440" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="530" dy="0">구체 테이블 상속</tspan>
+    <tspan x="530" dy="16">개인정보 격리·성능이</tspan>
+    <tspan x="530" dy="16">중요할 때</tspan>
+  </text>
+
+  <!-- -> 클래스 테이블 상속 (기본) -->
+  <path d="M310,525 L310,543" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="195" y="545" width="230" height="75" rx="8" fill="#fdf6e3" stroke="#b08d3e" stroke-width="1.5"/>
+  <text x="310" y="573" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="310" dy="0">클래스 테이블 상속</tspan>
+    <tspan x="310" dy="16">횡단 검색 + FK 모두</tspan>
+    <tspan x="310" dy="16">필요할 때 (기본)</tspan>
+  </text>
+
+  <!-- 세 갈래 합류 -> Diamond 4 -->
+  <path d="M90,490 L90,650 L305,650" stroke="#444444" stroke-width="1.5" fill="none"/>
+  <path d="M530,490 L530,650 L315,650" stroke="#444444" stroke-width="1.5" fill="none"/>
+  <path d="M310,620 L310,650" stroke="#444444" stroke-width="1.5" fill="none"/>
+  <path d="M310,650 L310,668" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Diamond 4 -->
+  <polygon points="310,670 510,740 310,810 110,740" fill="#fffdf5" stroke="#333333" stroke-width="1.5"/>
+  <text x="310" y="735" text-anchor="middle" font-size="12.5" fill="#222222">
+    <tspan x="310" dy="0">이벤트가 참조하는 사용자 정보는</tspan>
+    <tspan x="310" dy="16">항상 최신이면 되는가?</tspan>
+  </text>
+
+  <!-- 예 -> 사용자ID(FK)만 보유 -->
+  <path d="M510,740 L442,740" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="475" y="730" text-anchor="middle" font-size="12" fill="#555555">예</text>
+  <rect x="445" y="705" width="170" height="70" rx="8" fill="#b8dff0" stroke="#3f8fb0" stroke-width="1.5"/>
+  <text x="530" y="733" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="530" dy="0">이벤트가 사용자ID</tspan>
+    <tspan x="530" dy="16">(FK)만 보유</tspan>
+  </text>
+
+  <!-- 아니오 -> Diamond 5 -->
+  <path d="M310,810 L310,833" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="330" y="826" text-anchor="middle" font-size="12" fill="#555555">아니오</text>
+
+  <!-- Diamond 5 -->
+  <polygon points="310,835 480,900 310,965 140,900" fill="#fffdf5" stroke="#333333" stroke-width="1.5"/>
+  <text x="310" y="895" text-anchor="middle" font-size="13" fill="#222222">
+    <tspan x="310" dy="0">과거 시점 상태를</tspan>
+    <tspan x="310" dy="16">어떻게 보존할까?</tspan>
+  </text>
+
+  <!-- -> 스냅샷 방식 -->
+  <path d="M140,900 L178,900" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="5" y="860" width="170" height="80" rx="8" fill="#f9c6c9" stroke="#c0505f" stroke-width="1.5"/>
+  <text x="90" y="890" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="90" dy="0">스냅샷 방식</tspan>
+    <tspan x="90" dy="16">구현 단순함이</tspan>
+    <tspan x="90" dy="16">우선일 때</tspan>
+  </text>
+
+  <!-- -> 버전 관리(시점 기준) 방식 -->
+  <path d="M480,900 L440,900" stroke="#444444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="440" y="855" width="195" height="90" rx="8" fill="#f7cba4" stroke="#c07830" stroke-width="1.5"/>
+  <text x="537" y="882" text-anchor="middle" font-size="12.5" fill="#333333">
+    <tspan x="537" dy="0">버전 관리(시점 기준) 방식</tspan>
+    <tspan x="537" dy="16">이력 추적·중복</tspan>
+    <tspan x="537" dy="16">최소화가 중요할 때</tspan>
+  </text>
+</svg>
