@@ -1,9 +1,9 @@
 ---
 title: 소프트웨어 복잡성의 원인과 줄이는 법, State부터 Stratified Design까지
-description: State/Control이 만드는 복잡성의 원인부터 Deep Module, Stratified Design의 기원과 계보, 분산 시스템의 본질적 복잡성, 분류값을 다형성으로 바꾸는 법까지 이론과 실천을 정리합니다.
+description: State/Control이 만드는 복잡성의 원인부터 결합도와 응집도를 낮추는 구체적 기법, Deep Module과 Stratified Design의 기원, 분산 시스템의 본질적 복잡성까지 이론과 실천을 정리합니다.
 author: Mimul
 date: "2021-08-04T02:07:09.000Z"
-lastModificationTime: "2021-08-23T14:11:00.000Z"
+lastModificationTime: "2021-08-16T21:55:28.000Z"
 image: "./software_complexity.png"
 tags:
   - complexity
@@ -143,7 +143,7 @@ Brooks는 "No Silver Bullet"에서 소프트웨어의 어려움을 본질(Essent
 
 이 기준을 가상의 실험으로 확인해보자. 이상적인 세계에서는 성능을 걱정할 필요가 없고, 언어와 인프라가 필요한 모든 것을 지원한다고 하자. 이 세계에서 개발팀이 할 일은 사용자의 비공식 요구사항을 형식 요구사항으로 바꾸고, 그 형식 요구사항을 범용 인프라 위에서 그대로 실행하는 것뿐이다. 이 경로에 필요 없는 상태, 필요 없는 순서 제어가 있다면 그것은 정의상 우연적이다. 정기결제 지갑에서 사용자에게 지금까지 적립된 총 포인트를 보여주는 기능이 있다고 하자. 충전 내역을 순회해서 매번 합산하지 않고 별도의 `totalEarnedPoints` 필드에 저장해두고 충전할 때마다 갱신하는 방식을 택했다면, 이 필드는 파생 데이터를 상태로 만든 것이므로 우연적 복잡성에 해당한다. 충전 내역만 있으면 총 적립 포인트는 언제든 다시 계산할 수 있어서, 원칙적으로는 상태로 들고 있을 필요가 없기 때문이다.
 
-이 파생 상태가 치르는 대가는 저장 공간이 아니라 동기화 책임이다. 충전 내역에 행을 추가하는 것과 `totalEarnedPoints`를 갱신하는 것은 서로 다른 두 번의 쓰기이므로, 한쪽만 반영하고 다른 쪽을 빠뜨리는 코드가 섞여 들어오면 충전 내역과 합계가 어긋난다. 두 요청이 동시에 들어오면 문제는 더 커진다. 두 스레드가 같은 `totalEarnedPoints` 값을 읽고 각자 자기 몫을 더해 저장하면, 나중에 쓴 값이 앞선 갱신을 덮어써서 한쪽 적립분이 사라진다. kawasima는 ["複雑さの分類"](https://scrapbox.io/kawasima/複雑さの分類)에서 이렇게 파생 가능한 값을 상태로 별도로 들고 있는 순간 갱신 누락, 동시 갱신 충돌, 원본과 파생값의 불일치를 계속 확인해야 하는 책임이 함께 생긴다고 정리한다. 캐시나 집계 값을 두는 선택 자체가 잘못은 아니지만, 그 선택은 성능과 동기화 책임을 맞바꾸는 거래라는 사실은 남는다.
+이 파생 상태가 치르는 대가는 저장 공간이 아니라 동기화 책임이다. 충전 내역에 행을 추가하는 것과 `totalEarnedPoints`를 갱신하는 것은 서로 다른 두 번의 쓰기이므로, 한쪽만 반영하고 다른 쪽을 빠뜨리는 코드가 섞여 들어오면 충전 내역과 합계가 어긋난다. 두 요청이 동시에 들어오면 문제는 더 커진다. 두 스레드가 같은 `totalEarnedPoints` 값을 읽고 각자 자기 몫을 더해 저장하면, 나중에 쓴 값이 앞선 갱신을 덮어써서 한쪽 적립분이 사라진다. 이렇게 파생 가능한 값을 상태로 별도로 들고 있는 순간 갱신 누락, 동시 갱신 충돌, 원본과 파생값의 불일치를 계속 확인해야 하는 책임이 함께 생긴다고 정리한다. 캐시나 집계 값을 두는 선택 자체가 잘못은 아니지만, 그 선택은 성능과 동기화 책임을 맞바꾸는 거래라는 사실은 남는다.
 
 이 구분이 실무에서 갖는 힘은 "복잡한 게 원래 그런 것"이라는 체념을 반박할 근거를 준다는 데 있다. 복잡성 전부가 문제 자체에서 나온 것이라면 손댈 방법이 없지만, 상당수가 도구와 구현 방식의 산물이라면 그 부분은 없앨 수 있는 대상이 된다. 본질적 복잡성에 대해서는 사용자와 함께 다루는 수밖에 없지만, 우연적 복잡성은 개발팀의 선택으로 줄일 수 있는 영역이다.
 
@@ -171,11 +171,11 @@ Armour는 진짜 문제가 2단계와 3단계에 있다고 본다. 2단계는 �
 
 ### 결합도(Coupling)와 로컬/글로벌 복잡성
 
-결합도는 컴포넌트 간의 상호작용(Interaction)과 의존성이 늘어날수록 시스템 유지보수 비용은 기하급수적으로 폭증한다. `extCostofSoftware(External Cost of Software, 소프트웨어를 변경할 때 조직·비즈니스 외부까지 발생하는 비용) ≃ extCostofChange(External Cost of Change, 하나의 일반적인 변경을 수행할 때 발생하는 외부 비용) ≃ extCostofBigChange(External Cost of Big Change, 대규모 변경에서 발생하는 외부 비용) ≃ extCoupling(External Coupling, 자신의 외부에 있는 다른 컴포넌트/시스템과 얼마나 강하게 연결되어 있는가)`의 예에서 처럼 소프트웨어의 복잡성은 코드량만으로 결정되지 않고, 변경이 얼마나 넓게 전파되는가에 의해 결정될 수도 있다.
+결합도가 높을수록, 즉 컴포넌트 간의 상호작용(Interaction)과 의존성이 늘어날수록 시스템 유지보수 비용은 기하급수적으로 폭증한다. 소프트웨어를 변경할 때 조직·비즈니스 외부까지 발생하는 비용은 하나의 일반적인 변경에서 시작해 대규모 변경으로 갈수록 커지고, 그 크기는 결국 컴포넌트가 자신의 외부와 얼마나 강하게 연결되어 있는가로 되돌아간다. 소프트웨어의 복잡성은 코드량만으로 결정되지 않고, 변경이 얼마나 넓게 전파되는가에 의해서도 결정된다.
 
 로컬 복잡성(Local Complexity)은 개별 모듈 내부에서 구성 요소 간의 상호 작용으로 인해 유발되는 복잡성이다. 로컬 복잡성이 높은 코드는 외부 설계도가 아무리 잘 작성되어 있어도, 개별 코드 조각을 하나하나 파고들어 뜯어보거나 추가로 보완 설명해 주는 상세 문서가 없으면 내부 동작을 절대 파악하기 어렵다.
 
-글로벌 복잡성(Global Complexity): 수많은 모듈 간의 연결 관계 및 외부 상호작용이 빚어내는 전체 시스템 차원의 복잡성입
+글로벌 복잡성(Global Complexity)은 수많은 모듈 간의 연결 관계 및 외부 상호작용이 빚어내는 전체 시스템 차원의 복잡성이다. 개별 모듈은 각자 단순해 보여도, 모듈 사이의 연결이 늘어나면 변경 하나가 얼마나 멀리까지 전파될지 예측하기 어려워진다. 이 로컬과 글로벌의 구분은 3부에서 결합이 미치는 범위를 다섯 단계로 세분하는 거리(distance) 축으로 다시 언급한다.
 
 
 ## 제2부 복잡성 진단하기
@@ -319,6 +319,260 @@ Ousterhout는 모듈의 값어치를 인터페이스와 구현의 비율로 잰�
 |---|---|---|
 | 기능 단위 | 기존 인터페이스에 매개변수·분기를 추가 | 인터페이스가 점점 얕아짐 |
 | 추상 단위 | 새 요구를 담을 인터페이스를 다시 설계 | 깊은 모듈이 유지됨 |
+
+### 결합도를 낮추는 구체적 기법
+
+앞서 모듈을 깊게 만들기에서 인용한 Constantine과 Yourdon의 결합도·응집도 척도는 원칙을 세우는 데서 그치지 않는다. 이 척도를 실제 코드에 대입하면 결합을 낮추고 응집을 높이는 구체적인 실패 패턴과 그 처방이 드러난다. 
+
+#### 결합 종류
+
+스탬프 결합은 결합의 세기, 즉 강도(strength)를 재는 오래된 분류 중 한 자리를 차지한다.
+
+| 결합 종류 | 공유하는 것 |
+|---|---|
+| [내용 결합(Content Coupling)](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29) | 다른 모듈의 내부 구현 |
+| 공통 결합(Common Coupling) | 전역 변수 |
+| [외부 결합(External Coupling)](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29) | 표준화된 인터페이스를 가진 전역 상태 |
+| 제어 결합(Control Coupling) | 상대 모듈의 동작을 바꾸는 제어 플래그 |
+| 스탬프 결합(Stamp Coupling) | 데이터 덩어리(객체, 레코드) |
+| [데이터 결합(Data Coupling)](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29) | 프리미티브 데이터 |
+
+내용 결합에서 데이터 결합으로 내려갈수록 공유하는 것이 작아지고 결합은 느슨해진다. 뒤에서 스탬프 결합, 제어 결합, 공통 결합을 하나씩 해소하며 이 표를 다시 확인한다.
+
+#### 스탬프 결합(Stamp Coupling)
+
+정기결제 지갑에 고령자 우대 할인이 있다고 하자. 할인율을 계산하는 함수는 나이 하나만 있으면 되는데, 다음처럼 짜면 User 전체를 받는 경우가 흔하다.
+
+**Before**
+
+```java
+record User(UserId id, String name, int age, String address, String email) {}
+
+long calculateSeniorDiscount(User user, long amount) {
+    if (user.age() >= 65) {
+        return (long) (amount * 0.1);
+    }
+    return 0;
+}
+```
+
+`calculateSeniorDiscount`가 실제로 쓰는 필드는 `age` 하나뿐이지만, 시그니처에는 `name`, `address`, `email`까지 함께 딸려 들어온다. Constantine과 Yourdon은 이렇게 함수가 필요로 하는 데이터보다 큰 복합 객체 자체를 통째로 넘기는 결합을 스탬프 결합이라 불렀다. 이 결합의 대가는 User에 필드가 추가되거나 이름이 바뀔 때마다 드러난다. `calculateSeniorDiscount`는 그 필드를 쓰지도 않는데, User의 구조가 바뀌었다는 이유만으로 다시 컴파일하고 테스트를 다시 만들어야 한다. 나이 하나를 확인하려고 User 전체를 조립해야 하는 테스트의 부담도 함께 따라온다.
+
+해결은 함수가 정말 필요로 하는 원시 값만 받도록 시그니처를 좁히는 것이다.
+
+**After**
+
+```java
+long calculateSeniorDiscount(int age, long amount) {
+    if (age >= 65) {
+        return (long) (amount * 0.1);
+    }
+    return 0;
+}
+```
+
+이 처방은 앞서 모듈을 깊게 만들기에서 본 매개변수 수를 늘리지 않는다는 원칙과 반대 방향처럼 보이지만 다른 문제를 겨냥한다. 그 원칙은 제공사별 옵션 플래그처럼 특수 목적 요청이 늘 때마다 매개변수가 함께 늘어나는 것을 막는 원칙이었다. 스탬프 결합을 끊는 것은 반대로 이미 넘기고 있던 객체에서 실제로 쓰이지 않는 필드를 걷어내는 일이므로, 두 원칙은 함수가 받는 데이터의 크기를 최소로 유지한다는 같은 목표로 수렴한다. 다만 나이 말고도 거주지, 요금제처럼 여러 값이 함께 필요해지고 그 값들이 항상 같이 바뀐다면, 그때는 원시 값을 나열하는 대신 그 값들만 묶은 새 Value Object를 만드는 편이 낫다. 판단 기준은 그 값들이 항상 함께 바뀌는가에 있다.
+
+#### 제어 결합(Control Coupling)
+
+정기결제 지갑에 관리자가 검증을 건너뛰고 강제로 충전하는 기능이 필요해졌다고 하자.
+
+**Before**
+
+```java
+void charge(UserId userId, long amount, boolean skipValidation) {
+    if (!skipValidation) {
+        validateAmount(amount);
+    }
+    walletRepository.credit(userId, amount);
+}
+```
+
+`charge`를 호출하는 쪽은 `skipValidation` 값에 따라 내부에서 어떤 분기를 타는지 알아야 결과를 예측할 수 있다. 상대 모듈의 동작을 바꾸는 제어 플래그를 넘기는 이 결합이 제어 결합이다. 이 플래그는 사실 일반 충전과 관리자 강제 충전이라는 서로 다른 두 요청을 한 시그니처에 욱여넣은 결과이고, 플래그가 하나 더 늘면(예: `skipDuplicateCheck`) 조합은 네 가지로 늘지만 실제로 쓰이는 조합은 둘뿐일 수 있다.
+
+Fowler는 리팩터링 카탈로그에서 이 문제를 [Remove Flag Argument](https://refactoring.com/catalog/removeFlagArgument.html)라는 이름으로 정리하고, 플래그 값마다 이름이 분명한 별도 메서드로 나누라고 권한다.
+
+**After**
+
+```java
+void charge(UserId userId, long amount) {
+    validateAmount(amount);
+    walletRepository.credit(userId, amount);
+}
+
+void forceChargeByAdmin(UserId userId, long amount) {
+    walletRepository.credit(userId, amount);
+}
+```
+
+호출자는 이제 플래그의 의미를 추론할 필요 없이 이름만으로 어떤 요청인지 안다. `skipValidation=true`이면서 실제로는 검증을 수행하는 경우처럼, 코드에는 있어도 의미가 없는 조합도 애초에 만들어지지 않는다. 이 처방은 뒤에 나올 응집도를 높이는 구체적 기법의 순차적 응집(Sequential Cohesion)과 방향은 같지만 계기는 다르다. 그 절은 이름에 남은 "And"를 신호로 삼고, 여기서는 매개변수에 남은 불리언 플래그를 신호로 삼는다. 뒤에 나올 분기를 다형성으로 바꾸기와도 구별해야 한다. 그 절은 회원 등급이나 결제 수단처럼 계속 늘어나는 분류값이 여러 메서드에 흩어져 반복되는 변경 전파를 다루지만, 여기서는 `charge` 하나 안에 숨어 있던 불리언 하나가 서로 다른 두 요청을 가르는 신호였을 뿐이고 분기도 그 함수 하나에만 있었다.
+
+#### 공통 결합(Common Coupling)
+
+정기결제 지갑에 일일 충전 한도를 검사하는 기능을 붙인다고 하자. 오늘 하루 누적 충전액을 어딘가에 들고 있어야 하는데, 클래스 바깥의 정적 변수로 두면 다음과 같은 코드가 된다.
+
+**Before**
+
+```java
+class DailyChargeLimiter {
+    static long todayTotal = 0;
+
+    static void charge(long amount) {
+        if (todayTotal + amount > 1_000_000) {
+            throw new RejectedException("일일 한도 초과");
+        }
+        todayTotal += amount;
+    }
+}
+```
+
+`todayTotal`은 어떤 클래스의 필드도 아니고 프로그램 전체에 노출된 전역 변수다. 이 변수를 읽고 쓰는 코드가 하나뿐이면 문제가 드러나지 않지만, 환불 처리나 야간 배치의 일일 집계 초기화처럼 다른 기능이 같은 변수를 함께 건드리는 순간 그 코드 전부가 공통 결합으로 묶인다. [Eric Normand는 이런 상태를 전역성, 가변성, 상태성 세 성질이 겹친 결과로 설명하고](https://ericnormand.me/article/global-mutable-state), 코드를 읽어도 어디서 값이 바뀌었는지 추적할 수 없게 된다고 짚는다.
+
+해법은 전역 변수를 지역 변수로 되돌리는 것이다. `todayTotal`을 함수 바깥에 두는 대신 호출자가 들고 있다가 인자로 넘기고, 갱신된 값은 반환값으로 돌려받는다.
+
+**After**
+
+```java
+record DailyChargeLimit(long total) {
+    DailyChargeLimit charge(long amount) {
+        if (total + amount > 1_000_000) {
+            throw new RejectedException("일일 한도 초과");
+        }
+        return new DailyChargeLimit(total + amount);
+    }
+}
+```
+
+`todayTotal`을 아는 코드는 이제 이 값을 실제로 들고 있는 호출자 하나로 좁혀진다. 값을 바꾸는 대신 새 값을 반환하는 방식은 앞서 상태와 제어 제거하기에서 본 불변성 처방과 같은 방향이다. 전역 변수 자체를 없앤 것이 아니라, 그 변수를 아는 사람의 수를 하나로 줄인 것이다.
+
+#### 결합이 정말 아픈지 판단하는 세 축
+
+지금까지 스탬프 결합, 제어 결합, 공통 결합을 해소하며 앞서 본 강도(strength) 축의 표를 하나씩 확인했다. 그런데 강도는 결합을 재는 축 하나일 뿐이다. 거리(distance)와 변동성(volatility)이라는 두 축을 더한다. 거리는 결합이 미치는 범위를 잰다. 메서드 사이의 결합, 클래스 사이의 결합, 컴포넌트 사이의 결합, 서비스 사이의 결합, 시스템 사이의 결합 순으로 멀어지고, 거리가 멀수록 변경을 조율하는 비용도 커진다. 이 축은 1부에서 본 로컬 복잡성과 글로벌 복잡성 구분을 다섯 단계로 세분한 것이다. 변동성은 두 요소가 왜 함께 바뀌는지로 결합을 나눈다. 상대 없이는 아예 실행되지 않는 운영상 결합(Operational), 변경할 때 서로 조율이 필요한 개발상 결합(Development), 개념 자체를 공유해서 함께 바뀔 수밖에 없는 의미적 결합(Semantic), 책임이 겹쳐서 함께 바뀌는 기능적 결합(Functional), 이유 없이 우연히 얽혀 함께 바뀌는 우발적 결합(Incidental)이 그 갈래다. [Michael Nygard의 강연 "Uncoupling"](https://www.slideshare.net/mtnygard/uncoupling-101026908)이 이 분류의 출처다.
+
+[Vladimir Khononov는 강연 "Balancing Coupling in Software Design"](https://speakerdeck.com/vladikk/balancing-coupling-in-software-design-kandddinsky-2022)에서 결합(coupling)을 단순히 "강하다/약하다"로 판단하지 말고, 결합이 주는 고통을 강도 곱하기 변동성 곱하기 거리로 보아야 한다고 했다. 셋 중 두 값이 커도 나머지 한 값을 충분히 낮추면 고통은 줄어든다.
+
+애그리거트(Aggregate)는 강도와 변동성이 모두 높지만, 관련 있는 연산을 문자 그대로 하나의 모듈에 묶어 거리를 메서드 수준으로 낮춘다. 바운디드 컨텍스트(Bounded Context)도 강도와 변동성은 높지만, 관련 있는 컴포넌트를 하나의 경계 안에 모아 거리를 줄이는 같은 전략을 쓴다. 지원 서브도메인(Support Subdomain)은 강도는 높아도 이미 안정된 영역이라 변동성이 낮아서, 거리가 시스템 사이로 멀어져도 고통은 크지 않다. 부패 방지 계층(Anti-Corruption Layer)은 거리와 변동성이 높은 외부 시스템 앞에 세워, 그 결합의 강도 자체를 낮춘다. 애그리거트와 바운디드 컨텍스트라는 이름은 뒤에서(도메인 모델을 다루는 절, 4부) 다시 나온다. 거리를 낮추는 이 전략은 뒤에 나올 층으로 격리하기에서 인접한 층끼리만 호출하게 강제하는 규율과 같은 일이다.
+
+변동성 중에서도 의미적 결합은 스탬프 결합과 연결되어 있다. 여러 시스템이 SKU라는 개념을 공유한다고 하자. SKU에 가격, 원가, 진열 위치 같은 속성이 있다가 프라이스 포인트라는 속성이 새로 추가되면, SKU를 참조하던 모든 시스템이 이 속성까지 함께 알아야 하는 처지에 놓인다. [Nygard는 하류 시스템을 전체 개념에 묶지 말라고 말한다](https://www.michaelnygard.com/blog/2015/04/the-perils-of-semantic-coupling/). 앞서 본 지갑의 User도 마찬가지다. 함수 하나의 시그니처만 좁히는 것으로는 부족하고, User라는 개념 자체를 서비스 전체가 공유해도 되는지 물어야 한다. 결합이 정말 아픈지는 그래서 강도, 거리, 변동성을 곱하기 전에 이미 갈린다. 정말 같은 개념인가, 그 모듈에는 필요 없는 것까지 딸려 있지 않은가(스탬프 결합인가), 그렇다면 다른 이름을 줘야 하지 않는가라는 세 질문이다.
+
+### 응집도를 높이는 구체적 기법
+
+결합도가 낮을수록 좋다는 것은 직관적이지만, 응집도는 "응집"이라는 일상에서 잘 쓰지 않는 단어 탓에 그 자체로 이해하기 어렵다. Cohesion과 어원이 닿아 있는 Adhesion(부착)은 서로 다른 두 대상이 외부의 힘으로 들러붙는 일방적 관계다. 반면 Cohesion(응집)은 같은 종류이거나 서로 닮았다는 이유로 저절로 뭉쳐 있는 상호관계다. 떼어놓는 것이 오히려 부자연스럽게 느껴진다면 응집도가 높다는 뜻이다. 이 구분은 앞서 본 Rich Hickey의 Simple과 Easy 구분처럼 어원에서 출발해 두 단어를 정확히 가른다. Simple이 얽힘 여부를 묻는 질문이었다면, Cohesion은 두 요소가 정말 같은 이유로 붙어 있는지를 묻는 질문이다.
+
+응집도의 여섯 단계는 Stevens, Myers, Constantine이 1974년 논문 "Structured Design"에서 정의했고, 이후 Yourdon과 Constantine의 책으로 널리 퍼졌다.
+
+| 응집 종류 | 판단 기준 |
+|---|---|
+| 기능적 응집(Functional Cohesion) | 모든 요소가 단 하나의 임무를 위해서만 존재한다 |
+| 순차적 응집(Sequential Cohesion) | 한 요소의 출력이 다음 요소의 입력이 되어 정해진 순서로 실행돼야 한다 |
+| 정보적 응집(Communicational Cohesion) | 서로 다른 일을 하지만 같은 데이터에 함께 작용한다 |
+| 시간적 응집(Temporal Cohesion) | 서로 무관하지만 같은 시점에 실행돼야 한다 |
+| 논리적 응집(Logical Cohesion) | 비슷한 범주로 묶였을 뿐 실제로는 서로 다른 일을 한다 |
+| 우연적 응집(Coincidental Cohesion) | 아무 관계 없이 우연히 한곳에 모였다 |
+
+이 여섯 단계를 코드에서 가려내는 실용적인 방법이 하나 있다. 모듈이 하는 일을 한 문장으로 설명해본다. 그 문장이 여러 절로 이루어지거나 동사가 두 개 이상이면 순차적 응집이나 정보적 응집을 의심할 신호다. "먼저", "그다음", "~한 뒤" 같은 시간을 나타내는 말이 들어가면 순차적 응집이나 시간적 응집의 신호이고, 서술어가 특정 대상 하나를 가리키지 않으면 논리적 응집의 신호다. 이 문장 테스트는 2부에서 본 복잡성을 진단하는 질문과 같은 자리에 놓인다. 그 표가 상태와 의존성을 물었다면, 이 테스트는 응집을 묻는다.
+
+#### 기능적 응집(Functional Cohesion)
+
+기능적 응집은 나머지 다섯 단계가 얼마나 멀어져 있는지를 재는 목표점이다. 모듈이 하는 일을 동사 하나로 설명할 수 있으면 기능적 응집이다. 앞서 모듈을 깊게 만들기에서 본 `IdentityCheck`, `AccountCheck`, `Blacklist`가 이미 이 상태다. 각각 본인확인, 계좌 실재 확인, 이메일 차단이라는 임무 하나만 맡고 있는 사례처럼 생각하면 된다.
+
+#### 순차적 응집(Sequential Cohesion)
+
+이름은 함수가 실제로 하는 일을 숨김없이 드러내야 한다. 다음처럼 충전과 알림 발송을 한 함수에 담으면 이름에서부터 문제가 드러난다.
+
+**Before**
+
+```java
+void chargeAndNotify(UserId userId, long amount) {
+    walletRepository.credit(userId, amount);
+    notificationService.send(userId, "충전이 완료되었습니다");
+}
+```
+
+이 이름을 정직하게 지으려면 "And"를 쓸 수밖에 없다. 이름에 "And"나 "Or"가 들어간다는 것은 그 함수가 두 개 이상의 책임을 동시에 지고 있다는 신호다. 이 신호가 가리키는 것이 순차적 응집이다. 충전이라는 출력이 곧바로 알림 발송의 입력이 되어, 두 절차가 반드시 이 순서로 함께 실행돼야 하는 형태로 묶여 있다. 알림 발송 방식만 바뀌어도 이 함수를 다시 손봐야 하고, 충전 로직만 테스트하고 싶어도 알림 서비스까지 함께 준비해야 한다. Deep Module 절에서 본 classitis 기준, 즉 감추는 지식이 다르면 쪼갠다는 기준이 여기서도 그대로 적용된다. 충전이 감추는 지식(저장소에 잔액을 반영하는 방법)과 알림이 감추는 지식(알림을 어떤 채널로 보내는지)은 서로 무관하므로 나눌 값어치가 있다.
+
+**After**
+
+```java
+void charge(UserId userId, long amount) {
+    walletRepository.credit(userId, amount);
+}
+
+void notifyChargeCompleted(UserId userId) {
+    notificationService.send(userId, "충전이 완료되었습니다");
+}
+```
+
+쪼갠 두 함수는 이름만으로 하는 일을 완전하게 설명한다. `charge`는 충전만 하고 알림을 보내지 않으며, `notifyChargeCompleted`는 알림만 보내고 잔액을 건드리지 않는다. 이 완전성은 단계로 나눠볼 수도 있다. 특정 문헌의 분류는 아니지만, 이름이 없거나 하는 일과 무관한 상태에서, 하는 일을 거짓 없이 담은 상태(Honest)로, 부수효과까지 빠짐없이 담은 상태(Honest & Complete)로, 나아가 왜 그 일을 하는지와 업무 언어까지 담은 이름(Intent, Domain Abstraction)으로 옮겨가는 단계로 정리해볼 수 있다. 이 마지막 단계는 4부에서 다시 다룰 통용 언어(Ubiquitous Language)와 맞닿는다. `Blacklist`, `IdentityCheck`라는 이름이 이미 그 자리에 있다.
+
+다만 이 분리가 항상 옳지는 않다. 충전과 알림이 업무 규칙상 반드시 한 세트로 실행돼야 한다면, 함수를 둘로 쪼개는 순간 그 업무적 의미는 코드 어디에도 남지 않고 호출자의 기억에만 의존하게 된다. 당장 갈라놓을 필요가 없다면 YAGNI 원칙대로 `chargeAndNotify`를 그대로 둔다. 두 절차가 지금 정말 함께만 쓰인다면 미리 나눠봐야 얻는 것이 없고, 오히려 파사드라는 간접 계층만 하나 늘어난다. 알림 방식이 갈라질 조짐이 보일 때 그때 가서 쪼갠다. 지금 갈라야 한다면 `charge`와 알림을 각각 감춘 채로 두고, 그 둘을 정해진 순서로 호출하는 파사드 하나를 따로 둔다.
+
+```java
+class ChargeAndNotify {
+    void handle(UserId userId, long amount) {
+        charge(userId, amount);
+        notifyChargeCompleted(userId);
+    }
+}
+```
+
+이렇게 하면 두 절차를 같은 순서로 묶어야 한다는 업무 규칙은 파사드 하나에만 남고, `charge`와 알림 각각은 서로를 몰라도 되는 기능적 응집으로 남는다.
+
+#### 정보적 응집(Communicational Cohesion)
+
+정기결제 지갑에 사용자별 종합 신뢰 점수를 매기는 기능이 필요해졌다고 하자. 연체 이력, 결제 실패율, 가입 기간이라는 서로 다른 기준마다 점수를 매기는 로직이 다른데, 입력과 출력의 모양이 같다는 이유로 한 메서드에 묶고 호출부에서 가중합을 내는 경우가 흔하다.
+
+**Before**
+
+```java
+enum TrustCriteria { OVERDUE_HISTORY, FAILURE_RATE, TENURE }
+
+long calculateScore(UserId userId, TrustCriteria criteria) {
+    // criteria에 따라 완전히 다른 판단 로직
+}
+
+long total = calculateScore(userId, TrustCriteria.OVERDUE_HISTORY) * overdueWeight
+    + calculateScore(userId, TrustCriteria.FAILURE_RATE) * failureRateWeight
+    + calculateScore(userId, TrustCriteria.TENURE) * tenureWeight;
+```
+
+이 메서드가 하는 일을 한 문장으로 쓰면 "연체 이력을 보거나, 결제 실패율을 보거나, 가입 기간을 본다"이다. 세 로직은 입력과 출력의 모양만 같을 뿐 서로 다른 판단 기준을 쓰고, 호출부는 세 결과를 매번 함께 묶어 가중합을 낸다. 분기를 다형성으로 바꾸기의 `calculateFee`는 결제 수단 하나가 수수료·한도·영수증 문구 등 여러 메서드에 흩어져 반복됐지만, 여기서는 세 기준이 이 가중합이라는 단 하나의 호출 지점에만 모여 있다. 새 기준이 추가돼도 손볼 곳은 이 가중합 식 하나뿐이라, 여러 곳에 흩어진 분기를 막으려고 인터페이스로 묶을 이유가 없다. 그대로 나누는 것으로 충분하다.
+
+**After**
+
+```java
+long calculateOverdueScore(UserId userId) { /* ... */ }
+long calculateFailureRateScore(UserId userId) { /* ... */ }
+long calculateTenureScore(UserId userId) { /* ... */ }
+
+long total = calculateOverdueScore(userId) * overdueWeight
+    + calculateFailureRateScore(userId) * failureRateWeight
+    + calculateTenureScore(userId) * tenureWeight;
+```
+
+메서드 수준에서는 이렇게 나누는 것이 적절하지만, 클래스 수준에서는 사정이 다르다. 서로 다른 일을 하더라도 같은 데이터에 함께 작용하는 메서드를 한곳에 모으는 것 자체는 유용하다.
+
+```java
+interface WalletRepository {
+    Wallet findByUserId(UserId userId);
+    void credit(UserId userId, long amount);
+    void debit(UserId userId, long amount);
+}
+```
+
+`findByUserId`, `credit`, `debit`은 서로 다른 일을 하지만 전부 Wallet이라는 같은 데이터에 작용한다는 공통점으로 묶여 있다. 이 정도 응집은 저장소 계층에서는 자연스럽다. 어떤 메서드를 봐도 지갑 데이터를 다룬다는 것을 알 수 있고, Wallet의 스키마가 바뀌면 고칠 곳이 이 인터페이스 하나로 좁혀지는 이점도 있다. 다만 도메인 로직을 담는 계층이 여기서 멈추면 안 된다. 앞서 상태와 제어 제거하기에서 본 Functional Core, Imperative Shell 구분처럼, 정보적 응집은 저장소(Imperative Shell)가 머무를 자리이지 도메인 규칙(Functional Core)이 머무를 자리는 아니다.
+
+#### 시간적 응집(Temporal Cohesion)
+
+시간적 응집은 지갑 서비스가 시작할 때 설정을 읽고 외부 API 클라이언트를 초기화하는 절차처럼, 서로 무관한 일들이 같은 시점에 실행돼야 한다는 이유만으로 한곳에 묶일 때 생긴다. "초기화"나 "정리"라는 이름 자체가 이 응집의 신호다. 완전히 없애기는 어렵지만, 그 안에 묶인 항목들이 서로 아무 관계가 없다는 사실을 알고 있는 것만으로도 나중에 항목 하나를 옮기거나 지울 때 실수를 줄일 수 있다.
+
+#### 논리적 응집(Logical Cohesion)
+
+논리적 응집은 "파싱한다"처럼 비슷한 범주로 묶였을 뿐, 새 종류가 늘어날 때마다 분기를 추가해야 하는 코드에서 생긴다. 앞서 정보적 응집과 갈라지는 지점이 이 확장성이다. 이 문제는 분기를 다형성으로 바꾸기에서 이미 다뤘다. `ChargeMethod`에 따라 계산 방식이 완전히 달라지던 `calculateFee`가 이 응집이었고, `Charge` 인터페이스와 `CardCharge`, `BankTransferCharge`, `PointCharge`로 나눈 것이 그 해소다.
+
+#### 우연적 응집(Coincidental Cohesion)
+
+우연적 응집은 여러 클래스에서 반복되는 코드 조각을 이유 없이 한 유틸 클래스에 몰아넣을 때 생긴다. 왜 이 메서드들이 한곳에 있는지 합리적으로 설명할 수 없다면 이 응집이다. 상태 없는 유틸 클래스는 당장 테스트하기 쉽고 변경 시 부작용도 적어 크게 해롭지 않지만, 여러 곳에서 참조되어 손대기 어려워지거나 다른 라이브러리의 비슷한 이름과 뒤섞이는 문제를 부른다. 여섯 단계 중 가장 낮은 자리에 있는 만큼, 새 코드를 짤 때는 애초에 만들지 않는 것이 유일한 해법이다.
 
 ### 층(Stratified Design)으로 격리하기
 
