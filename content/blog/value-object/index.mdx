@@ -3,7 +3,7 @@ title: 값으로 다루는 객체, Value Object 이해하기
 description: DDD에서 Value Object의 불변성, 값 동등성, Smart Constructor, Anti-Corruption Layer를 Java 예시로 설명하고, Parse don't validate와 Make Illegal States Unrepresentable 원칙을 소개합니다.
 author: Mimul
 date: "2018-05-05T10:10:13.000Z"
-lastModificationTime: "2018-05-10T10:00:00.000Z"
+lastModificationTime: "2018-05-14T10:00:00.000Z"
 image: "./value_object.png"
 tags:
   - ddd
@@ -161,7 +161,7 @@ void createUser(Email email) {
 }
 ```
 
-public 생성자로도 검증은 가능하다. Smart Constructor의 차이는 "검증을 거치지 않고는 이 객체를 만들 수 없다"는 것을 구조적으로 강제한다는 점이다. 호출자가 실수로 `new Email("invalid")`처럼 검증 경로를 우회할 여지 자체를 없앤다. `Email` 타입을 받는 메서드는 검증을 다시 할 필요가 없다. 타입 자체가 "이미 검증된 이메일"임을 보장하기 때문이다.
+public 생성자로도 검증은 가능하다. Smart Constructor의 차이는 "검증을 거치지 않고는 이 객체를 만들 수 없다"는 것을 구조적으로 강제한다는 점이다. 호출자가 실수로 `new Email("invalid")`처럼 검증 경로를 우회할 여지 자체를 없앤다. `Email` 타입을 받는 메서드는 검증을 다시 할 필요가 없다. 타입 자체가 "이미 검증된 이메일"임을 보장하기 때문이다. 이렇게 프리미티브 타입을 감싸 만든 타입을 함수형 진영에서는 브랜드 타입(branded type)이라 부르기도 한다. 이름은 다르지만 가리키는 것은 같다. 검증을 통과한 원시값에 타입이라는 표식을 붙여, 표식이 없는 값과 컴파일러가 구분할 수 있게 만드는 것이다.
 
 이와 반대로 검증만 하고 타입을 바꾸지 않으면, 검증 로직이 호출 지점마다 흩어지는 "Shotgun Parsing" 안티패턴이 된다. 입력의 일부가 유효함을 확인한 뒤 다른 부분에서 무효함을 발견하는 상황이 생기고, 그 시점에 프로그램 상태가 얼마나 진행됐는지 추론하기 어려워진다.
 
@@ -193,6 +193,8 @@ final class Age {
 이메일 형식 검증을 `User` Entity에 두는 것보다 `Email` Value Object에 두는 편이 응집도가 높다. 나이의 성인 판정 로직이 `User`에 있는 것보다 `Age`에 있는 것이 더 자연스럽다. 관련 있는 것끼리 묶이므로 관련 없는 곳에서 동일한 로직이 중복될 가능성이 줄어든다.
 
 나이는 단순한 정수가 아니다. 정수에 허용되는 연산이라도 나이에 곱셈이나 나눗셈을 적용하는 것은 도메인적으로 무의미하기 때문이다. 전용 타입으로 묶으면 이런 부적절한 연산이 자연스럽게 차단된다.
+
+값 객체는 속성값뿐 아니라 다른 객체를 가리키는 식별자를 감싸는 데도 쓰인다. 주문이 고객을 참조할 때 `Customer` 객체를 통째로 들고 있는 대신, `CustomerId`처럼 식별자 하나만 감싼 값 객체로 참조하는 식이다. `Long customerId`와 `Long orderId`를 그대로 쓰면 두 값을 바꿔 넘겨도 컴파일러가 잡지 못하지만, 각각을 별도의 값 객체로 감싸면 이런 실수는 컴파일 타임에 드러난다. 객체 참조 대신 식별자로만 연결되므로 두 대상 사이의 결합도 그만큼 느슨해진다.
 
 ### 5. 불가능한 상태를 표현할 수 없게 만들기 - "Make Illegal States Unrepresentable"
 
