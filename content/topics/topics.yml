@@ -382,3 +382,7 @@
   slug: programming
   description: "프로그래밍의 모든 것"
   image: "programming.png"
+- title: Lesson
+  slug: lesson
+  description: "교훈"
+  image: "lesson.jpg"
