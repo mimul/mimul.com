@@ -2,9 +2,9 @@
   <rect x="0" y="0" width="1140" height="460" fill="#FFFFFF"/>
   <text x="570" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1F2937">카테고리-상품, 외래 키 대신 교차 엔티티로</text>
 
-  <!-- Row 1: 분해 전 -->
-  <rect x="20" y="128" width="86" height="28" rx="14" fill="#F1F5F9"/>
-  <text x="63" y="147" text-anchor="middle" font-size="12.5" fill="#475569" font-weight="700">분해 전</text>
+  <!-- Row 1: 외래 키 방식 -->
+  <rect x="12" y="128" width="116" height="28" rx="14" fill="#F1F5F9"/>
+  <text x="70" y="147" text-anchor="middle" font-size="12.5" fill="#475569" font-weight="700">외래 키 방식</text>
 
   <rect x="140" y="98" width="220" height="90" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
   <text x="250" y="132" text-anchor="middle" font-size="15" font-weight="700" fill="#1F2937">카테고리 (R)</text>
@@ -22,9 +22,9 @@
   <text x="982" y="124" text-anchor="middle" font-size="11.5" font-weight="700" fill="#B91C1C">분류 시점에 UPDATE 발생</text>
   <text x="982" y="142" text-anchor="middle" font-size="10.5" fill="#B91C1C">미분류 상태는 NULL로 대기</text>
 
-  <!-- Row 2: 분해 후 -->
-  <rect x="20" y="308" width="86" height="28" rx="14" fill="#F1F5F9"/>
-  <text x="63" y="327" text-anchor="middle" font-size="12.5" fill="#475569" font-weight="700">분해 후</text>
+  <!-- Row 2: 교차 엔티티 방식 -->
+  <rect x="12" y="308" width="116" height="28" rx="14" fill="#F1F5F9"/>
+  <text x="70" y="327" text-anchor="middle" font-size="12.5" fill="#475569" font-weight="700">교차 엔티티 방식</text>
 
   <rect x="140" y="278" width="220" height="90" rx="10" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
   <text x="250" y="312" text-anchor="middle" font-size="15" font-weight="700" fill="#1F2937">카테고리 (R)</text>
