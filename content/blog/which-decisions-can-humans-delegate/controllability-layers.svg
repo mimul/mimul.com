@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+  <!-- 잘못된 변경의 피해를 가두는 네 겹: 기존 소프트웨어 공학의 자산 -->
+  <defs>
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.8" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <pattern id="h-blue" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)">
+      <rect width="7" height="7" fill="#eef4fb"/>
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#b9d3ee" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="h-green" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)">
+      <rect width="7" height="7" fill="#eff6f0"/>
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#bcdcc1" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="h-yellow" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)">
+      <rect width="7" height="7" fill="#fcf7e8"/>
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#eed9a6" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="h-peach" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)">
+      <rect width="7" height="7" fill="#fbf0ec"/>
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#efc2b4" stroke-width="1.3"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="520" fill="#ffffff"/>
+
+  <g filter="url(#rough)" stroke="#1e1e1e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="300" cy="270" rx="270" ry="215" fill="url(#h-blue)"/>
+    <ellipse cx="300" cy="270" rx="205" ry="163" fill="url(#h-green)"/>
+    <ellipse cx="300" cy="270" rx="140" ry="112" fill="url(#h-yellow)"/>
+    <ellipse cx="300" cy="270" rx="80" ry="64" fill="url(#h-peach)"/>
+    <!-- 폭발 표시 -->
+    <path d="M300,262 L306,274 L320,270 L312,280 L322,288 L308,288 L306,302 L300,291 L292,302 L291,288 L278,289 L288,280 L280,270 L294,274 Z" fill="#ffffff"/>
+    <!-- 안내선 -->
+    <path d="M376,250 L600,118" fill="none" stroke-dasharray="4,5"/>
+    <path d="M438,262 L600,208" fill="none" stroke-dasharray="4,5"/>
+    <path d="M504,276 L600,298" fill="none" stroke-dasharray="4,5"/>
+    <path d="M566,292 L600,388" fill="none" stroke-dasharray="4,5"/>
+  </g>
+
+  <g font-family="'Nanum Pen Script'" fill="#1e1e1e">
+    <text x="300" y="236" font-size="22" text-anchor="middle">잘못된 변경</text>
+    <text x="608" y="112" font-size="27">되돌린다</text>
+    <text x="608" y="140" font-size="21" fill="#555">Recovery · Compensation</text>
+    <text x="608" y="202" font-size="27">가둔다</text>
+    <text x="608" y="230" font-size="21" fill="#555">Bulkhead · Circuit Breaker</text>
+    <text x="608" y="292" font-size="27">조금씩 노출한다</text>
+    <text x="608" y="320" font-size="21" fill="#555">Canary · Blue/Green</text>
+    <text x="608" y="382" font-size="27">배포와 릴리스를 분리한다</text>
+    <text x="608" y="410" font-size="21" fill="#555">Feature Toggle · Expand and Contract</text>
+    <text x="450" y="500" font-size="24" fill="#555" text-anchor="middle">겹이 많을수록 틀려도 피해가 사용자에게 닿지 않는다</text>
+  </g>
+</svg>
