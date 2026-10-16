@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="480" viewBox="0 0 900 480">
-  <!-- 측정 가능성의 골: 기계가 판정하는 왼쪽 언덕과 사람의 이해가 필요한 오른쪽 언덕 사이 -->
+  <!-- 측정 가능성의 골짜기: 기계가 판정하는 왼쪽 언덕과 사람의 이해가 필요한 오른쪽 언덕 사이 -->
   <defs>
     <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
       <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/>
@@ -35,7 +35,7 @@
 
   <g font-family="'Nanum Pen Script'" fill="#1e1e1e">
     <text x="450" y="60" text-anchor="middle" font-size="30">AI의 출력 속도와 양</text>
-    <text x="450" y="458" text-anchor="middle" font-size="34">측정 가능성의 골</text>
+    <text x="450" y="458" text-anchor="middle" font-size="34">측정 가능성의 골짜기</text>
 
     <text x="180" y="238" text-anchor="middle" font-size="28">컴파일 ✓</text>
     <text x="180" y="275" text-anchor="middle" font-size="28">테스트 ✓</text>
