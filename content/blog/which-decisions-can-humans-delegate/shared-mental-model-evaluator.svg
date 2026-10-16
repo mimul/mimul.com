@@ -55,18 +55,20 @@
 
   <g font-family="'Nanum Pen Script'" fill="#1e1e1e" text-anchor="middle">
     <text x="110" y="250" font-size="26">사람</text>
+    <text x="118" y="278" font-size="20" fill="#555">모델 바깥의 오해를 찾는다</text>
+    <text x="440" y="156" font-size="21" fill="#555">예시는 컴파일 시점에 검증된다</text>
     <text x="110" y="412" font-size="26">AI</text>
     <text x="200" y="150" font-size="22" fill="#555">무엇이 올바른지</text>
     <text x="200" y="392" font-size="22" fill="#555">빠르게 초안·검증</text>
-    <text x="440" y="212" font-size="30">공유 멘탈 모델</text>
+    <text x="440" y="212" font-size="30">실행 가능한 공유 멘탈 모델</text>
     <text x="440" y="240" font-size="22" fill="#555">(상위 의사결정을 적어 둔 것)</text>
     <text x="440" y="285" font-size="24">업무 데이터와 행위</text>
-    <text x="440" y="318" font-size="24">기대하는 입출력 예</text>
+    <text x="440" y="318" font-size="24">기대하는 입출력 예시</text>
     <text x="605" y="240" font-size="24">평가</text>
     <text x="755" y="178" font-size="26">하위 결정과 코드</text>
     <text x="745" y="213" font-size="22">트랜잭션 방식</text>
     <text x="745" y="261" font-size="22">멱등성 방식</text>
     <text x="745" y="309" font-size="22">구체 코드</text>
-    <text x="640" y="460" font-size="24" fill="#555">판정이 어긋나면 모델의 해상도를 올린다</text>
+    <text x="640" y="460" font-size="24" fill="#555">판정이 어긋나거나 빈칸이 남으면 모델의 해상도를 올린다</text>
   </g>
 </svg>
