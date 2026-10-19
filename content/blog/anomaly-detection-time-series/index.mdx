@@ -101,6 +101,8 @@ $$s(x,n) = 2^{-E(h(x))/c(n)}, \qquad c(n) = 2H(n-1) - \frac{2(n-1)}{n}$$
 
 $c(n)$은 정상적인 이진 탐색 트리에서 나오는 평균 경로 길이를 나타내는 정규화 상수이고, $H(i)$는 조화수(harmonic number)다. 경로가 평균보다 훨씬 짧을수록($E(h(x)) \ll c(n)$) 점수가 1에 가까워지고, 평균과 비슷할수록 0.5에 가까워진다.
 
+같은 발상을 스트리밍 데이터용으로 바꾼 것이 Amazon SageMaker의 Random Cut Forest(RCF)다. 학습 데이터의 무작위 표본을 트리 수만큼 나눠 각 트리가 경계 상자를 무작위 절단으로 계속 쪼개는 점은 Isolation Forest와 같고, 새 점의 이상 점수는 그 점을 트리에 끼워 넣었을 때 트리의 복잡도가 얼마나 늘어나는지의 기댓값으로 정의한다. 근사적으로는 점이 놓이는 깊이에 반비례하므로 Isolation Forest의 경로 길이와 같은 양을 잰다. 표본은 저수지 표집(reservoir sampling)으로 스트림에서 갱신하고, 트리당 표본 수의 역수가 데이터에서 기대하는 이상 비율(256이면 약 0.4%)과 맞도록 고르라고 안내한다. 이상 비율에 대한 가정을 파라미터로 넣는다는 점에서 이 값은 아래 예제의 contamination과 역할이 겹친다.
+
 Isolation Forest 자체는 시계열의 순서를 직접 다루지 않으므로, 시계열에 적용하려면 부분열을 특징 벡터로 바꾸는 전처리가 필요하다. 아래 예제는 길이 20짜리 슬라이딩 윈도우마다 평균, 표준편차, 범위, 기울기 네 가지 통계량을 뽑아 그 특징 공간에서 Isolation Forest를 학습한다.
 
 ```python
@@ -128,7 +130,7 @@ pred = clf.fit_predict(feats)  # -1: 이상
 
 ## 밀도 기반 중 시계열에만 있는 기법, 인코딩 기반
 
-인코딩 기반(encoding-based) 방법은 시계열을 원래 값 그대로 두지 않고 기호나 상태의 나열로 압축한다. 문법 기반(grammar-based) 방법은 시계열을 SAX 같은 방법으로 이산 기호열로 바꾼 뒤, 문법 규칙에 잘 들어맞지 않는 부분을 이상으로 본다(GrammarViz, Ensemble GI). HMM(은닉 마르코프 모델) 기반 방법은 시계열이 몇 개의 은닉 상태 사이를 오간다고 보고, 그 상태 전이 확률이 낮은 구간을 이상으로 판정한다. 베이지안 네트워크 기반 방법(LaserDBN, EDBN)은 변수 사이의 조건부 의존 관계를 그래프로 학습해 같은 방식으로 이상을 판정한다. PCA(주성분분석)도 이 갈래에 속한다. 시계열을 저차원 주성분 공간에 투영한 뒤 원래 공간으로 복원했을 때 오차가 큰 부분을 이상으로 본다. 다만 PCA는 1편의 EDA에서 시각화 도구로만 썼고, 이상탐지 기법으로는 이 시리즈가 참고하는 책이나 예제 저장소에서 다루지 않는다.
+인코딩 기반(encoding-based) 방법은 시계열을 원래 값 그대로 두지 않고 기호나 상태의 나열로 압축한다. 문법 기반(grammar-based) 방법은 시계열을 SAX 같은 방법으로 이산 기호열로 바꾼 뒤, 문법 규칙에 잘 들어맞지 않는 부분을 이상으로 본다(GrammarViz, Ensemble GI). HMM(은닉 마르코프 모델) 기반 방법은 시계열이 몇 개의 은닉 상태 사이를 오간다고 보고, 그 상태 전이 확률이 낮은 구간을 이상으로 판정한다. 베이지안 네트워크 기반 방법(LaserDBN, EDBN)은 변수 사이의 조건부 의존 관계를 그래프로 학습해 같은 방식으로 이상을 판정한다. PCA(주성분분석)도 이 갈래에 속한다. 시계열을 저차원 주성분 공간에 투영한 뒤 원래 공간으로 복원했을 때 오차가 큰 부분을 이상으로 본다. 다만 PCA는 1편의 EDA에서 시각화 도구로만 썼고, 이상탐지 기법으로는 이 시리즈가 참고하는 책이나 예제 저장소에서 다루지 않는다. 다만 재구성 오차로 판정하는 방식 자체는 상용 데이터 웨어하우스에 내장될 만큼 흔하다. Google BigQuery ML의 이상탐지 함수는 PCA 모델과 오토인코더 모델에 대해 입력을 저차원으로 압축했다가 복원한 평균제곱오차를 이상 점수로 쓰고, 학습 데이터 중 이상으로 간주할 비율(contamination)에서 임계값을 정한다. 2편 kNN 절에서 본 같은 함수의 k-평균 모델이 정규화 거리에 적용하던 비율 기반 임계값을 재구성 오차에 그대로 적용한 형태다.
 
 인코딩 기반이 그래프 기반이나 트리 기반과 겹칠 수 있다는 점도 논문이 밝히는 지점이다. HMM의 상태 전이는 그 자체로 그래프이고, 문법 규칙을 나무 구조로 표현하면 트리 기반과도 맞닿는다. 논문은 이런 중복을 인정하면서도, 기법을 소개할 때는 가장 두드러진 메커니즘 하나로 분류한다.
 
@@ -222,3 +224,5 @@ score = ((series - forecast) / resid_std) ** 2
 - [Holt-Winters Algorithm & Anomaly Detection (VMware Avi Load Balancer)](https://blogs.vmware.com/load-balancing/2024/03/20/holt-winters-algorithm-anomaly-detection-vmware-avi-load-balancer/)
 - [Unsupervised real-time anomaly detection for streaming data (Numenta, Neurocomputing 2017)](https://doi.org/10.1016/j.neucom.2017.04.070)
 - [Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications (Donut)](https://arxiv.org/abs/1802.03903)
+- [How RCF Works (Amazon SageMaker Random Cut Forest)](https://docs.aws.amazon.com/sagemaker/latest/dg/rcf_how-it-works.html)
+- [The ML.DETECT_ANOMALIES function (Google BigQuery ML)](https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-detect-anomalies)
