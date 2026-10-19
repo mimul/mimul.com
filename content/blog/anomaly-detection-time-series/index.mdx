@@ -87,13 +87,13 @@ def matrix_profile(series, window):
 
 상용 서비스에도 쓰인다. 오류 추적 서비스 Sentry는 Matrix Profile과 예측 기반 모델 Prophet을 결합해 서비스 메트릭의 이상탐지 기능을 프로덕션에 적용했다. Visa Research는 변수가 여럿인 다차원 시계열로 Matrix Profile을 확장해, 여러 센서나 지표를 동시에 다루는 이상탐지에도 이 방식이 통한다는 것을 보였다.
 
-클러스터링 기반 방법(NormA, SAND 등)은 접근이 다르다. 부분열 전체를 몇 개의 대표 패턴(군집)으로 나눠두고, 새 부분열이 어느 군집에도 잘 속하지 않으면 이상으로 판정한다. 불일치 기반이 이웃 하나까지의 거리만 보는 것과 달리, 클러스터링 기반은 정상 패턴들의 전체적인 분포를 먼저 요약해둔다는 점에서 다음에 볼 밀도 기반 방법과 발상이 가깝다.
+클러스터링 기반 방법(NormA, SAND 등)은 접근이 다르다. 부분열 전체를 몇 개의 대표 패턴(군집)으로 나눠두고, 새 부분열이 어느 군집에도 잘 속하지 않으면 이상으로 판정한다. 불일치 기반이 이웃 하나까지의 거리만 보는 것과 달리, 클러스터링 기반은 정상 패턴들의 전체적인 분포를 먼저 요약해둔다는 점에서 다음에 볼 밀도 기반 방법과 발상이 가깝다. NormA도 Series2Graph와 같은 EDF R&D와 Université de Paris의 공동 연구에서 나왔다. 부분열들을 군집으로 묶은 뒤 각 군집의 중심을 빈도, 포괄 범위, 중심성 기준으로 가중해 정상 모델(Normal Model)을 자동으로 만들고, 새 부분열과 이 정상 모델 사이의 거리로 이상 점수를 매긴다. 같은 유형의 이상이 반복해서 나타나도 정상 모델이 그 이상에 끌려가지 않게 한 설계가 이 방법의 핵심이다.
 
 ## 밀도 기반 중 시계열에만 있는 기법, 그래프 기반과 트리 기반
 
 밀도 기반 안에서 2편까지 다룬 분포 기반(홀텔링 이론, 마할라노비스-다구치법)과 인코딩 기반의 일부(GMM)를 제외하면, 그래프 기반과 트리 기반, 그리고 인코딩 기반의 나머지가 남는다.
 
-그래프 기반(graph-based) 방법은 시계열의 부분열을 그래프의 노드로, 부분열 사이의 전이를 에지로 표현한다. 비슷한 부분열을 하나의 노드로 묶고, 어떤 노드의 부분열 다음에 다른 노드의 부분열이 나타난 횟수를 에지 가중치로 쓰는 식이다. 그래프를 만들고 나면 노드의 차수나 에지 가중치처럼 그래프의 특성으로 이상을 판정한다. Series2Graph, DADS가 이 방식을 쓴다.
+그래프 기반(graph-based) 방법은 시계열의 부분열을 그래프의 노드로, 부분열 사이의 전이를 에지로 표현한다. 비슷한 부분열을 하나의 노드로 묶고, 어떤 노드의 부분열 다음에 다른 노드의 부분열이 나타난 횟수를 에지 가중치로 쓰는 식이다. 그래프를 만들고 나면 노드의 차수나 에지 가중치처럼 그래프의 특성으로 이상을 판정한다. Series2Graph, DADS가 이 방식을 쓴다. Series2Graph는 프랑스 전력회사 EDF의 연구조직 EDF R&D 소속 연구자가 Université de Paris와 함께 개발한 방법으로, 라벨도 이상이 섞이지 않은 정상 데이터도 요구하지 않으면서 길이가 서로 다른 이상까지 찾는 것을 목표로 삼았다.
 
 트리 기반(tree-based)의 대표 기법은 Isolation Forest다. 착안점은 간단하다. 데이터를 무작위로 골라 무작위 분할선으로 계속 이등분하다 보면, 이상치는 정상치보다 적은 횟수의 분할만으로 고립된다. 여러 개의 무작위 분할 트리를 만들고, 각 인스턴스가 트리 루트에서 고립되기까지 필요한 평균 경로 길이가 짧을수록 이상 점수가 높아진다. 인스턴스 $x$가 여러 트리에서 고립되기까지 걸린 경로 길이의 평균을 $E(h(x))$라 하면, 이상 점수는 다음과 같이 정의된다.
 
@@ -226,3 +226,5 @@ score = ((series - forecast) / resid_std) ** 2
 - [Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications (Donut)](https://arxiv.org/abs/1802.03903)
 - [How RCF Works (Amazon SageMaker Random Cut Forest)](https://docs.aws.amazon.com/sagemaker/latest/dg/rcf_how-it-works.html)
 - [The ML.DETECT_ANOMALIES function (Google BigQuery ML)](https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-detect-anomalies)
+- [Series2Graph: Graph-based Subsequence Anomaly Detection for Time Series (EDF R&D)](https://arxiv.org/abs/2207.12208)
+- [Unsupervised and Scalable Subsequence Anomaly Detection in Large Data Series (NormA, VLDB Journal 2021)](https://helios2.mi.parisdescartes.fr/~themisp/publications/vldbj21-norma.pdf)

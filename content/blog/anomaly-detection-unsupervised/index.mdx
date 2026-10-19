@@ -129,6 +129,8 @@ th_upper = stats.poisson.ppf(1 - TARGET_FP_RATE / 2, mu=rate_per_exposure * t_te
 
 울산과 제주 두 지역이 이 기준을 벗어나 이상으로 판정됐다. 둘 다 면적이 좁은 지역이라 절대 건수(울산 8건, 제주 23건)는 많지 않지만, 면적당 밀도로 보면 전국 평균 발생률로 기대되는 값의 각각 5배와 9배를 넘는다.
 
+건수가 적은 계수 데이터의 어려움을 다룬 사례로 Amazon Prime Video 연구진이 2023년에 발표한 저계수(low-count) 시계열 이상탐지 연구가 있다. 대규모 온라인 플랫폼이 감시하는 지표 중에는 단위 시간당 발생 건수가 한 자릿수에 머무는 드문 이벤트가 많다. 연구진은 평균 발생률 $\lambda$를 따르는 포아송분포로 이런 계수를 생성하고 발생률이 일정 비율 줄어드는 구간을 이상으로 주입한 벤치마크를 만들었다. 포아송 변수의 신호 대 잡음비는 $\sqrt{\lambda}$에 비례하므로 건수가 적을수록 정상 구간과 이상 구간의 분포가 겹치고, 널리 쓰이는 알고리즘들이 모두 이 구간에서 성능이 떨어졌다. 연구진은 이상 점수를 시간 방향으로 평활화하는 후처리가 성능을 일관되게 올린다는 것을 월마트 소매점 판매량 데이터에서도 확인했다. 지진 예제에서 절대 건수가 적은 지역일수록 정상 범위가 상대적으로 넓어지는 것과 같은 원인이다.
+
 ## 분산이 예상보다 큰 계수 데이터 다루기, 과분산
 
 포아송분포에는 평균과 분산이 같다는 전제가 숨어 있다. 그런데 실제 계수 데이터는 평균보다 분산이 훨씬 큰 경우가 잦다. 이를 과분산(overdispersion)이라 부른다. 과분산 상태에서 포아송분포를 그대로 쓰면 정상 범위를 실제보다 좁게 잡아, 정상 데이터를 이상으로 오판하는 경우가 늘어난다. 앞 절의 이항분포 예제도 같은 문제를 안고 있다. 선수마다 성공률이 다르면 성공 수의 분산은 성공 확률 하나로 계산한 이항분포의 분산보다 커지고, 그 차이가 상한을 넘는 선수로 나타난다. 이항분포에서는 성공 확률이 베타분포를 따라 선수마다 다르다고 가정하는 베타이항분포로 같은 보정을 할 수 있는데, 이 글에서는 포아송분포 쪽 보정만 코드로 다룬다.
@@ -314,3 +316,4 @@ k=1일 때는 개별 데이터 하나하나에 민감하게 반응해 경계가 
 - [Detection of influenza-like illness aberrations by directly monitoring Pearson residuals of fitted negative binomial regression models](https://pmc.ncbi.nlm.nih.gov/articles/PMC4352259/)
 - [Sparse Gaussian Markov Random Field Mixtures for Anomaly Detection (IBM Research, ICDM 2016)](https://ide-research.net/papers/2016_ICDM_Ide.pdf)
 - [The ML.DETECT_ANOMALIES function (Google BigQuery ML)](https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-detect-anomalies)
+- [Low-count Time Series Anomaly Detection (Amazon Prime Video, MLSP 2023)](https://arxiv.org/abs/2308.12925)
