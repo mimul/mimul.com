@@ -212,6 +212,8 @@ def metropolis_hastings(log_posterior, init, step, n_iter=8000, burn=2000, seed=
 
 두 파라미터 모두 특정 구간 안에서 위아래로 고르게 흔들리며, 표본을 뽑을수록 특정 방향으로 쏠리는 추세가 보이지 않는다. 이런 안정된 궤적은 표본이 사후분포에 수렴했다는 신호다. 다만 체인 하나의 궤적만으로 수렴을 확정할 수는 없고, 초기값을 달리한 체인 여러 개가 같은 분포에 모이는지 보는 편이 더 확실하다. 반대로 궤적이 한 방향으로 계속 표류하거나 특정 구간에 오래 머문다면, 아직 초기값의 영향이 남아 있거나 제안 폭을 다시 조정해야 한다.
 
+MCMC의 비용과 효용은 Meta가 공개한 시계열 예측 라이브러리 Prophet의 설계에서도 드러난다. Prophet은 Stan 위에서 베이지안 모델을 적합하는데, 기본값은 사후확률이 가장 높은 점 하나만 찾는 MAP 추정이라 추세와 관측 잡음의 불확실성만 돌려주고, 계절성 성분의 불확실성까지 얻으려면 `mcmc_samples` 옵션으로 전체 베이지안 표본추출로 바꿔야 한다. 문서는 이 경우 계산 시간이 몇 초에서 몇 분으로 늘어난다고 안내한다. 사후분포 전체가 필요한 항목에만 표본추출을 켜는 이 설계가, 닫힌 해가 없을 때 표본으로 사후분포를 근사한다는 이 절의 동기와 그 대가를 함께 보여준다.
+
 ## 이항 로지스틱 회귀와 포아송 회귀의 베이지안 버전
 
 MCMC로 얻은 사후분포 표본은 두 가지 계수 데이터 모델에 그대로 적용된다. 시도 수 $n$ 중 성공 수 $y$를 다루는 이항 로지스틱 회귀는 연결함수로 로짓함수를, 관측 구간 $t$당 발생 수를 다루는 포아송 회귀는 연결함수로 로그함수를 쓴다.
@@ -273,6 +275,8 @@ $u_j$는 판매자마다 고정된 값이 아니라 분산 $\tau^2$인 정규분
 
 25개 판매자의 잔차 평균이 판매자마다 뚜렷하게 다르다. dealer13은 평균 -255.6으로 예측가보다 낮게 파는 경향이, dealer6은 평균 +256.4로 예측가보다 높게 파는 경향이 있다. 연식·주행거리·차종이 같아도 어느 판매자에게서 사는지에 따라 가격이 500만원 넘게 차이 날 수 있다. GLMM은 이 판매자별 차이를 절편에 더해지는 랜덤효과 항으로 명시적으로 모델링해, 판매자 정보까지 반영한 더 좁고 정확한 정상 범위를 구한다. (이 글에서는 개념과 동기를 소개하는 데 그치며, 실제 학습·이상점수 계산 결과는 생략한다.)
 
+랜덤효과를 서비스에 쓴 사례로 의류 구독 서비스 Stitch Fix가 있다. 고객과 스타일리스트의 조합이 성공할지를 과거 결과로 예측하는 GLMM에 고객 효과, 스타일리스트 효과, 둘의 상호작용 효과를 랜덤효과로 넣었다. 거래 이력이 적은 고객의 효과는 0 쪽으로 축소(shrinkage)되므로 신규 고객은 평균적인 고객으로 출발하고, 데이터가 쌓일수록 그 고객만의 효과가 드러난다. 랜덤효과의 분산을 데이터에서 함께 추정하기 때문에 정규화 강도를 교차검증으로 고를 필요가 없다는 점이 리지회귀의 $\lambda$와 대비된다. 중고차 데이터의 판매자 효과도 같은 틀이어서, 거래가 적은 판매자의 $u_j$는 0 가까이 머물고 거래가 많은 판매자일수록 위 그림의 잔차 평균에 가까워진다.
+
 ## 3편에서 다룬 기법들이 논문의 분류체계에서 차지하는 위치
 
 이 글에서 다룬 선형회귀, 다변량 선형회귀, 리지회귀, 감마회귀, 베이지안 선형회귀, 베이지안 로지스틱 회귀, 베이지안 포아송 회귀는 모두 입력에서 출력을 예측하고, 그 예측과 실제값의 차이(예측 오차)를 이상 점수로 쓴다는 공통점을 가진다. 논문 ["Dive into Time-Series Anomaly Detection: A Decade Review"](https://arxiv.org/pdf/2412.20512)의 분류체계에서는 이런 접근을 예측 기반(prediction-based), 그중에서도 예측 오차 기반(prediction error-based) 방법으로 분류한다.
@@ -295,3 +299,5 @@ $u_j$는 판매자마다 고정된 값이 아니라 분산 $\tau^2$인 정규분
 - [Meridian is now available to everyone](https://blog.google/products/ads-commerce/meridian-marketing-mix-model-open-to-everyone/)
 - [TheEconomist/us-potus-model](https://github.com/TheEconomist/us-potus-model)
 - [The value of statistical forecasts in the UK association football betting market](https://www.sciencedirect.com/science/article/abs/pii/S016920700400010X)
+- [Uncertainty Intervals (Prophet)](https://facebook.github.io/prophet/docs/uncertainty_intervals.html)
+- [Learning from the experience of others with mixed effects models (Stitch Fix)](https://multithreaded.stitchfix.com/blog/2015/07/14/glmms/)

@@ -93,6 +93,8 @@ auroc = auc(fpr, tpr)
 
 이런 라벨 기반 지표는 실제 프로덕션 시스템에서도 그대로 쓰인다. Netflix는 스트리밍 서비스 사기 탐지에 쓴 딥 오토인코더 모델의 성능을 정확도 약 96%, F값 약 95%로 보고했고, Uber는 다차원 시계열 이상탐지 시스템 uVitals에서 정밀도·재현율·F값을 지속적으로 모니터링해 모델을 평가한다. 연구 벤치마크에서도 같은 지표를 쓴다. Amazon의 이미지 이상탐지 모델 PatchCore는 산업 결함 탐지 벤치마크(MVTec AD)에서 AUROC 최대 99.6%를 보고했다.
 
+라벨 기반 지표를 오프라인 계산에서 끝내지 않고 운영 지표와 연결한 사례가 Microsoft의 시계열 이상탐지 서비스다. Bing, Office, Azure에서 나오는 수백만 개의 지표를 감시하는 이 서비스는 새 모델을 배포하기 전에 오프라인 실험과 온라인 A/B 테스트를 모두 거친다. 오프라인에서는 편집자가 시계열의 진짜 이상 지점에 라벨을 붙이고 모델 결과 중 오탐을 다시 표시한 데이터로 정확도를 재고, 온라인에서는 일부 데이터 피드를 새 모델에 흘려 알림의 클릭률, 이상으로 판정된 비율, 오탐률로 배포 여부를 정한다. 정밀도와 재현율이 좋아도 운영자가 알림을 열어보지 않으면 소용이 없다는 판단이 평가 체계에 들어가 있다.
+
 같은 모델의 학습 데이터(정상 913건)에 통계모델 지표를 계산하면 로그가능도 -5352.28, AIC 10714.56, BIC 10738.64가 나온다. 로그가능도를 $\ell$, 추정한 파라미터 수를 $k$, 샘플 수를 $n$이라 하면 두 지표는 다음과 같이 정의된다.
 
 $$\text{AIC} = 2k - 2\ell, \qquad \text{BIC} = k\log n - 2\ell$$
@@ -191,3 +193,4 @@ $$P(|Z|>3) \approx 0.0027, \qquad 3^2 = 9 \approx \chi^2_{1}(1-0.0027)$$
 - [Machine Learning for Fraud Detection in Streaming Services (Netflix)](https://netflixtechblog.com/machine-learning-for-fraud-detection-in-streaming-services-b0b4ef3be3f6)
 - [uVitals - An Anomaly Detection & Alerting System (Uber)](https://www.uber.com/blog/uvitals-an-anomaly-detection-alerting-system/)
 - [Towards Total Recall in Industrial Anomaly Detection (PatchCore, Amazon Science)](https://www.amazon.science/code-and-datasets/towards-total-recall-in-industrial-anomaly-detection)
+- [Time-Series Anomaly Detection Service at Microsoft (KDD 2019)](https://arxiv.org/abs/1906.03821)
