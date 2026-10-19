@@ -158,18 +158,24 @@ from scipy.stats import nbinom
 
 def neg_log_likelihood(params, x, t):
     nb_shape, nb_theta = params
+    if nb_shape <= 0 or nb_theta <= 0:
+        return np.inf
     nb_prob = 1.0 / (1.0 + nb_theta * t)
     return -nbinom.logpmf(x, n=nb_shape, p=nb_prob).sum()
 
-best = None
-for shape0 in [0.5, 1.0, 5.0, 10.0]:
-    result = minimize(neg_log_likelihood, x0=(shape0, rate_per_exposure), args=(x_train, t_train),
-                       method="L-BFGS-B", bounds=[(1e-5, None), (1e-5, None)])
-    if best is None or result.fun < best.fun:
-        best = result
+initial_guesses = [(10.0, rate_per_exposure / 10.0), (1.0, rate_per_exposure),
+                    (0.5, rate_per_exposure * 2), (50.0, rate_per_exposure / 50.0)]
+best_result = None
+for init_guess in initial_guesses:
+    result = minimize(
+        neg_log_likelihood, x0=init_guess, args=(x_train, t_train),
+        method="L-BFGS-B", bounds=[(1e-5, None), (1e-5, None)],
+    )
+    if best_result is None or result.fun < best_result.fun:
+        best_result = result
 ```
 
-이 최적화는 초기값에 따라 다른 지역해로 수렴하기 쉬우므로, 위처럼 여러 초기값으로 시도한 뒤 음의 로그가능도(`result.fun`)가 가장 작은, 즉 가장 잘 맞는 결과를 채택한다.
+이 최적화는 초기값에 따라 다른 지역해로 수렴하기 쉬우므로, 위처럼 평균 발생률 $k\theta$가 추정값 근처에 오도록 잡은 여러 초기값으로 시도한 뒤 음의 로그가능도(`result.fun`)가 가장 작은, 즉 가장 잘 맞는 결과를 채택한다.
 
 ![과분산을 반영한 음이항분포 기준 정상 범위](./negbinom-boundary.png)
 
@@ -248,13 +254,22 @@ $$d(\mathbf{x}, \mathbf{x}') = \left(\sum_{i=1}^{M} |x_i - x_i'|^p\right)^{1/p}$
 거리 기반이므로 1편의 SVM과 같은 이유로 변수를 표준화한 뒤 거리를 잰다. 임계값은 GMM과 같은 분위점 방식이지만 한 가지 주의할 점이 있다. 학습 데이터 자체에서 k번째 이웃 거리를 재면 각 점의 가장 가까운 이웃이 자기 자신이 되어 거리가 0으로 나오므로, 학습 데이터를 절반으로 나눠 한쪽으로 이웃 탐색 모델을 만들고 다른 쪽의 거리 분포에서 분위점을 구한다.
 
 ```python
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import NearestNeighbors
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
-knn = NearestNeighbors(n_neighbors=k, metric="minkowski")
-knn.fit(X_fit_std)                                   # 학습 데이터의 절반
-distances, _ = knn.kneighbors(X_threshold_std)       # 나머지 절반으로 임계값 결정
+X_for_train, X_for_threshold = train_test_split(X_train, train_size=0.5, random_state=42)
+knn = NearestNeighbors(n_neighbors=k, algorithm="auto", metric="minkowski")
+pipe = Pipeline([("scaler", StandardScaler()), ("knn", knn)])
+pipe.fit(X_for_train)                                           # 학습 데이터의 절반
+
+X_th_std = pipe.named_steps["scaler"].transform(X_for_threshold)  # 나머지 절반으로 임계값 결정
+distances, _ = pipe.named_steps["knn"].kneighbors(X_th_std)
 anomaly_threshold = np.quantile(distances[:, -1], 1 - TARGET_FP_RATE)
-anomaly_scores = knn.kneighbors(X_inference_std)[0][:, -1]  # k번째 이웃까지의 거리
+
+X_inf_std = pipe.named_steps["scaler"].transform(X_inf)
+distances_inf, _ = pipe.named_steps["knn"].kneighbors(X_inf_std)  # [:, -1]이 k번째 이웃까지의 거리
 ```
 
 k 값에 따라 결정 경계가 어떻게 달라지는지 비교해본다.
