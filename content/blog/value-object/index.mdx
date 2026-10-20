@@ -1,9 +1,9 @@
 ---
-title: Value Object에 대해
+title: Value Object를 엔티티와 구분하고 생성 시점에 검증하는 방법
 description: DDD에서 Value Object의 불변성, 값 동등성, Smart Constructor를 Java 예시로 설명하고, Parse don't validate와 Make Illegal States Unrepresentable 원칙, 경계에서 파싱해 도메인을 보호하는 구조를 소개합니다.
 author: Mimul
 date: "2018-05-05T10:10:13.000Z"
-lastModificationTime: "2018-05-20T10:00:00.000Z"
+lastModificationTime: "2018-05-22T10:00:00.000Z"
 image: "./value_object.png"
 tags:
   - value-object
@@ -17,7 +17,7 @@ tags:
 void createUser(String email, int age, String postalCode) { ... }
 ```
 
-이 시그니처만 보고는 `email`이 올바른 형식인지, `age`가 음수가 아닌지, `postalCode`가 특정 형식을 따르는지 알 방법이 없다. 검증 로직은 메서드 본문에 흩어지고, 같은 검사가 여러 곳에 중복된다. Value Object는 이 문제를 타입 수준에서 해결한다. 이 글은 도메인 모델을 Java로 작성하는 개발자를 대상으로, Value Object가 무엇인지, 엔티티와 어떻게 다른지, 왜 생성자에서 검증해야 하는지, 그 검증을 어디에 두는지를 순서대로 정리한다.
+이 시그니처만 보고는 `email`이 올바른 형식인지, `age`가 음수가 아닌지, `postalCode`가 특정 형식을 따르는지 알 방법이 없다. 검증 로직은 메서드 본문에 흩어지고, 같은 검사가 여러 곳에 중복된다. Value Object는 이 문제를 타입 수준에서 해결한다. 이 글은 도메인 모델을 Java로 작성하는 개발자를 대상으로, Value Object가 무엇인지, 엔티티와 어떻게 다른지, 왜 생성자에서 검증해야 하는지, 언제 도입하고 어디서 멈추는지, 그 검증을 어디에 두는지를 순서대로 정리한다.
 
 ## Value Object란
 
@@ -41,7 +41,7 @@ Eric Evans는 같은 것을 도메인 쪽에서 본다. Value Object는 개념�
 
 수명의 차이는 식별자의 유무에서 따라 나온다. 엔티티는 식별자로 "그 직원"을 계속 가리킬 수 있으므로 생성부터 소멸까지 연속된 이력을 갖고, 그 변화의 역사(부서 이동, 승진)가 추적 대상이 된다. 반면 Value Object는 같은 값을 가진 두 인스턴스를 구별할 수 없으므로, 이 객체가 언제 생겨 언제 사라졌는지를 물을 대상 자체가 없다. 필요할 때 만들고, 쓰고, 버려도 도메인에는 아무 일도 일어나지 않는다.
 
-엔티티와 Value Object는 대립 관계가 아니다. Value Object는 수명이 없으므로 혼자 존재하지 않고 항상 어느 엔티티에 속한다. 저장할 때도 Value Object를 위한 테이블을 따로 두지 않고 부모 엔티티의 테이블에 함께 넣는 것이 보통이다. `User` 엔티티가 `Email`, `Age`, `PostalCode`라는 Value Object를 속성으로 갖는 식이다.
+엔티티와 Value Object는 대립 관계가 아니다. Value Object는 수명이 없으므로 저장될 때는 항상 어느 엔티티에 속하고, Value Object를 위한 테이블을 따로 두지 않고 부모 엔티티의 테이블에 함께 넣는 것이 보통이다. `User` 엔티티가 `Email`, `Age`, `PostalCode`라는 Value Object를 속성으로 갖는 식이다.
 
 Value Object가 엔티티를 가리킬 수도 있다. 주문 항목이라는 Value Object가 상품 엔티티를 가리키는 식이다. 다만 애그리거트(함께 저장되고 함께 규칙을 지키는 객체 묶음)의 경계를 넘을 때는 `Product` 객체를 통째로 들고 있는 대신 `ProductId`처럼 식별자 하나만 감싼 Value Object로 참조한다. DDD의 애그리거트 규칙은 외부에서 애그리거트의 루트만 참조하라고 하고, 이를 한 걸음 더 밀면 다른 애그리거트는 객체가 아니라 식별자로만 참조하라는 규칙이 된다. 식별자로만 연결되므로 두 애그리거트 사이의 결합이 느슨해지고, 주문을 읽을 때 상품까지 딸려 오지 않는다.
 
@@ -123,7 +123,7 @@ final class PostalCode {
 }
 ```
 
-`equals()`가 식별자 대신 값을 비교하므로, 서로 다른 경로로 만들어진 두 `PostalCode`도 코드가 같으면 같은 우편번호다. Value Object는 "어느 인스턴스냐"가 아닌 "무슨 값이냐"로 동일성을 판단한다. 생성자를 숨기고 `of`라는 정적 메서드로만 만들게 한 이유는 "생성 시점에 검증을 모으기" 절에서 다룬다.
+`equals()`가 식별자 대신 값을 비교하므로, 서로 다른 경로로 만들어진 두 `PostalCode`도 코드가 같으면 같은 우편번호다. 생성자를 숨기고 `of`라는 정적 메서드로만 만들게 한 이유는 "생성 시점에 검증을 모으기" 절에서 다룬다.
 
 ### 도메인 로직의 응집
 
@@ -178,7 +178,7 @@ if (first.isPresent()) {
 
 검증만 하고 타입을 바꾸지 않으면, 검증 로직이 호출 지점마다 흩어지는 "Shotgun Parsing" 안티패턴이 된다. 입력의 일부가 유효함을 확인하고 처리를 시작한 뒤 다른 부분에서 무효함을 발견하는 상황이 생기고, 그 시점에는 잘못된 입력의 일부가 이미 처리된 뒤라 되돌리기 어렵다.
 
-실무에서 전환 지점을 찾는 단서는 `void`를 반환하는 검증 메서드다. `void validateEmail(String email)` 형태는 검증 결과를 버린다. 반환값이 없다는 것은 그 지식이 타입 시스템에 기록되지 않는다는 뜻이고, 호출자가 동일한 검증을 반복할 가능성이 남는다. `Email parseEmail(String email)`처럼 더 구체적인 타입을 반환하도록 바꾸면 그 지식이 보존된다.
+실무에서 전환 지점을 찾는 단서는 `void`를 반환하는 검증 메서드다. `void validateEmail(String email)` 형태는 검증 결과를 버린다. 반환값이 없으면 그 지식이 타입 시스템에 기록되지 않고, 호출자가 동일한 검증을 반복할 가능성이 남는다. `Email parseEmail(String email)`처럼 더 구체적인 타입을 반환하도록 바꾸면 그 지식이 보존된다.
 
 ### Smart Constructor
 
@@ -203,7 +203,7 @@ void createUser(Email email) {
 }
 ```
 
-public 생성자로도 검증은 가능하다. Smart Constructor의 차이는 "검증을 거치지 않고는 이 객체를 만들 수 없다"는 것을 구조적으로 강제한다는 점이다. 호출자가 실수로 `new Email("invalid")`처럼 검증 경로를 우회할 여지 자체를 없앤다. `Email` 타입을 받는 메서드는 검증을 다시 할 필요가 없다. 타입 자체가 "이미 검증된 이메일"임을 보장하기 때문이다.
+앞의 `Money`처럼 public 생성자로도 검증은 가능하다. Smart Constructor의 차이는 "검증을 거치지 않고는 이 객체를 만들 수 없다"는 것을 구조적으로 강제한다는 점이다. 호출자가 실수로 `new Email("invalid")`처럼 검증 경로를 우회할 여지 자체를 없앤다. `Email` 타입을 받는 메서드는 검증을 다시 할 필요가 없다. 타입 자체가 "이미 검증된 이메일"임을 보장하기 때문이다.
 
 이 패턴은 두 부분으로 이루어진다. 하나는 원시값을 감싸 컴파일러가 구별할 수 있는 별도 타입을 만드는 것이고, 다른 하나는 그 타입의 생성 경로를 검증을 거치는 하나로 좁히는 것이다. 감싸는 쪽을 TypeScript 진영에서는 브랜드 타입(branded type), Haskell에서는 newtype이라 부른다. 감싸기만 해서는 표식이 붙었다는 사실밖에 보장하지 못하고, 생성자를 숨기고 검증하는 팩토리만 열어 두어야 그 표식이 "검증을 통과했다"는 뜻이 된다.
 
@@ -317,6 +317,7 @@ class UserService {
 거부하는 방식은 입력의 성격에 따라 달라야 한다. 지금까지의 예시는 모두 `IllegalArgumentException`을 던졌다. 도메인 안쪽 코드가 잘못된 값을 넘기는 것은 프로그래머 오류이므로 예외가 맞다. 하지만 사용자가 입력 폼에 적은 값이 틀린 것은 예상된 상황이고, 이때 예외는 첫 번째 오류에서 멈추므로 이메일과 우편번호가 둘 다 틀렸다는 사실을 한 번에 알려 주지 못한다. 내가 쓰는 방식은 Value Object에 진입점을 둘 두는 것이다. `tryParse`는 `Optional`이나 성공과 실패를 담는 결과 타입을 돌려주고, `of`는 그 위에서 예외를 던진다.
 
 ```java
+// Email 클래스 안
 public static Optional<Email> tryParse(String raw) {
     return raw.contains("@") ? Optional.of(new Email(raw)) : Optional.empty();
 }
