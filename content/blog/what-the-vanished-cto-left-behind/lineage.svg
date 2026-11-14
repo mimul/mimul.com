@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="430" viewBox="0 0 750 430"><defs>
+<filter id="rough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="12" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+<pattern id="hb" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#eef4fb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#b9d3ee" stroke-width="1.2"/></pattern>
+<pattern id="hg" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#eff6f0"/><line x1="0" y1="0" x2="0" y2="7" stroke="#bcdcc1" stroke-width="1.2"/></pattern>
+<pattern id="hy" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#fcf7e8"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eed9a6" stroke-width="1.2"/></pattern>
+<pattern id="hp" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#fbf0ec"/><line x1="0" y1="0" x2="0" y2="7" stroke="#efc2b4" stroke-width="1.2"/></pattern>
+<pattern id="hgr" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#f4f4f4"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d2d2d2" stroke-width="1.2"/></pattern>
+<marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1,1 L6,4 L1,7" fill="none" stroke="#1e1e1e" stroke-width="1.4"/></marker>
+<marker id="ahr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1,1 L6,4 L1,7" fill="none" stroke="#c0604a" stroke-width="1.4"/></marker>
+</defs><rect width="750" height="430" fill="#fff"/>
+<g filter="url(#rough)" stroke="#1e1e1e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<rect x="255" y="160" width="240" height="100" rx="10" fill="url(#hy)"/>
+<rect x="5" y="30" width="190" height="80" rx="10" fill="url(#hb)"/>
+<rect x="555" y="30" width="190" height="80" rx="10" fill="url(#hg)"/>
+<rect x="5" y="290" width="190" height="80" rx="10" fill="url(#hp)"/>
+<rect x="555" y="290" width="190" height="80" rx="10" fill="url(#hgr)"/>
+<path d="M262,165 L200,100" marker-end="url(#ah)"/>
+<path d="M488,165 L550,100" marker-end="url(#ah)"/>
+<path d="M262,255 L200,300" marker-end="url(#ah)"/>
+<path d="M488,255 L550,300" marker-end="url(#ah)"/>
+</g>
+<g font-family="'Nanum Pen Script'" fill="#1e1e1e">
+<text x="375" y="190" font-size="20" text-anchor="middle" fill="#1e1e1e">Lee Holloway, 2009</text>
+<text x="375" y="215" font-size="17" text-anchor="middle" fill="#555">Anycast</text>
+<text x="375" y="238" font-size="17" text-anchor="middle" fill="#555">모든 서버가 모든 일을 한다</text>
+<text x="100" y="58" font-size="18" text-anchor="middle" fill="#1e1e1e">Martin J. Levy</text>
+<text x="100" y="80" font-size="14" text-anchor="middle" fill="#555">네트워크 확장, 피어링</text>
+<text x="100" y="100" font-size="13" text-anchor="middle" fill="#777">100개 IXP (2016)</text>
+<text x="650" y="58" font-size="18" text-anchor="middle" fill="#1e1e1e">Marek Majkowski</text>
+<text x="650" y="80" font-size="14" text-anchor="middle" fill="#555">eBPF/XDP 소프트웨어화</text>
+<text x="650" y="100" font-size="13" text-anchor="middle" fill="#777">L4Drop (2018)</text>
+<text x="100" y="318" font-size="18" text-anchor="middle" fill="#1e1e1e">John Graham-Cumming</text>
+<text x="100" y="340" font-size="14" text-anchor="middle" fill="#555">내부 기술의 제품화</text>
+<text x="100" y="360" font-size="13" text-anchor="middle" fill="#777">Workers (2017), Cloudflare One (2020)</text>
+<text x="650" y="318" font-size="18" text-anchor="middle" fill="#1e1e1e">Omer Yoachimik</text>
+<text x="650" y="340" font-size="14" text-anchor="middle" fill="#555">무인 DDoS 운영</text>
+<text x="650" y="360" font-size="13" text-anchor="middle" fill="#777">dosd (2021)</text>
+<text x="375" y="405" font-size="17" text-anchor="middle" fill="#555">사람은 떠나도 아키텍처는 남는다</text>
+</g></svg>
