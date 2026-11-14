@@ -70,7 +70,7 @@ Anycast에는 이 두 약점이 없다. 어느 서버로 갈지는 DNS가 아니
 
 ### 역할별 전용 장비 방식과 균질한 구조의 차이
 
-네트워크 서비스를 만드는 전통적인 방식은 역할별로 장비를 두는 방식이다. 앞단에 로드밸런서 장비, 그 뒤에 캐시 서버, DNS 서버, 방화벽 장비, DDoS 완화 장비를 따로 세운다. 장비마다 그 일에 특화된 하드웨어와 소프트웨어가 들어가고, 기능이 하나 늘면 장비가 한 종류 는다. Holloway는 데이터센터 내부를 이렇게 짜지 않았다. 원문은 이 구조를 셀(Cell) 아키텍처라고 부르는데, Cloudflare 자신의 표현으로는 "모든 소프트웨어가 모든 서버에서 돌아간다"에 가깝다. 데이터센터 안의 서버는 전부 같은 리눅스에 같은 소프트웨어 묶음을 올린 똑같은 기계이고, 어느 한 대든 캐시, DNS, WAF(웹 애플리케이션 방화벽), DDoS 완화, 나중에는 Workers까지 모든 역할을 할 수 있다.
+네트워크 서비스를 만드는 전통적인 방식은 역할별로 장비를 두는 방식이다. 앞단에 로드밸런서 장비, 그 뒤에 캐시 서버, DNS 서버, 방화벽 장비, DDoS 완화 장비를 따로 세운다. 장비마다 그 일에 특화된 하드웨어와 소프트웨어가 들어가고, 기능이 하나 늘면 장비가 한 종류 는다. Holloway는 데이터센터 내부를 이렇게 짜지 않았다. Cloudflare는 이 구조를 "모든 서버가 모든 서비스를 실행한다(every server can run every service)"는 말로 부른다. 2020년 새 서버 세대를 소개하는 글은 설계 목표를 "모든 도시의 모든 서버가 모든 서비스를 실행하게 하는 것"이라고 적었고, 같은 해 네트워크를 설명하는 글은 "모든 제품이 모든 서버에"라는 절 제목 아래 "Cloudflare의 모든 서비스는 전체 네트워크에 걸쳐 표준화돼 있다"고 설명한다. 이 글에서는 이 구조를 줄여서 균질한 구조라고 부른다. 데이터센터 안의 서버는 전부 같은 리눅스에 같은 소프트웨어 묶음을 올린 똑같은 기계이고, 어느 한 대든 캐시, DNS, WAF(웹 애플리케이션 방화벽), DDoS 완화, 나중에는 Workers까지 모든 역할을 할 수 있다.
 
 식당 주방에 비유하면 차이가 분명해진다. 전용 장비 방식은 튀김 담당, 면 담당, 디저트 담당이 따로 있는 주방이다. 각자 자기 일은 빠르지만 튀김 담당이 결근하면 그날 튀김 메뉴는 없다. 새 메뉴를 넣으려면 그 메뉴 담당을 새로 뽑아야 한다. 균질한 구조는 모든 요리사가 모든 메뉴를 만들 수 있는 주방이다. 한 명이 빠져도 메뉴는 그대로이고, 새 메뉴는 레시피를 모두에게 나눠 주는 것으로 끝난다.
 
@@ -204,6 +204,8 @@ Holloway 같은 인물이 Cloudflare에만 있었던 것은 아니다. 회사의
 - [Cloudflare has a third cofounder, Lee Holloway, who's credited with making the company what it is today](https://techcrunch.com/2019/08/15/cloudflare-has-a-third-cofounder-lee-holloway-whos-credited-with-making-the-company-what-is-today)
 - [A Brief Primer on Anycast](https://blog.cloudflare.com/a-brief-anycast-primer/)
 - [Cloudflare architecture and how BPF eats the world](https://blog.cloudflare.com/cloudflare-architecture-and-how-bpf-eats-the-world/)
+- [Cloudflare's Gen X: Servers for an Accelerated Future](https://blog.cloudflare.com/cloudflares-gen-x-servers-for-an-accelerated-future/)
+- [Our network: Cloudflare One](https://blog.cloudflare.com/our-network-cloudflare-one/)
 - [No Scrubs: The Architecture That Made Unmetered Mitigation Possible](https://blog.cloudflare.com/no-scrubs-architecture-unmetered-mitigation/)
 - [Unmetered Mitigation: DDoS Protection Without Limits](https://blog.cloudflare.com/unmetered-mitigation/)
 - [Introducing Cloudflare Workers](https://blog.cloudflare.com/introducing-cloudflare-workers/)
