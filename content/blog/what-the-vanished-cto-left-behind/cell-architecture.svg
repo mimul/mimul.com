@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="400" viewBox="0 0 750 400"><defs>
+<filter id="rough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+<pattern id="hb" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#eef4fb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#b9d3ee" stroke-width="1.2"/></pattern>
+<pattern id="hg" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#eff6f0"/><line x1="0" y1="0" x2="0" y2="7" stroke="#bcdcc1" stroke-width="1.2"/></pattern>
+<pattern id="hy" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#fcf7e8"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eed9a6" stroke-width="1.2"/></pattern>
+<pattern id="hp" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#fbf0ec"/><line x1="0" y1="0" x2="0" y2="7" stroke="#efc2b4" stroke-width="1.2"/></pattern>
+<pattern id="hgr" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#f4f4f4"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d2d2d2" stroke-width="1.2"/></pattern>
+<marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1,1 L6,4 L1,7" fill="none" stroke="#1e1e1e" stroke-width="1.4"/></marker>
+<marker id="ahr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1,1 L6,4 L1,7" fill="none" stroke="#c0604a" stroke-width="1.4"/></marker>
+</defs><rect width="750" height="400" fill="#fff"/>
+<g filter="url(#rough)" stroke="#1e1e1e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<path d="M375,70 L375,380" stroke="#aaa" stroke-dasharray="5,6"/>
+<rect x="90" y="95" width="200" height="40" rx="2" fill="url(#hy)"/>
+<path d="M190,135 L190,149" marker-end="url(#ah)"/>
+<rect x="90" y="149" width="200" height="40" rx="8" fill="url(#hb)"/>
+<path d="M190,189 L190,203" marker-end="url(#ah)"/>
+<rect x="90" y="203" width="200" height="40" rx="2" fill="url(#hg)"/>
+<path d="M190,243 L190,257" marker-end="url(#ah)"/>
+<rect x="90" y="257" width="200" height="40" rx="8" fill="url(#hp)"/>
+<path d="M190,297 L190,311" marker-end="url(#ah)"/>
+<rect x="90" y="311" width="200" height="40" rx="2" fill="url(#hgr)"/>
+<rect x="420" y="95" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="428" cy="103" r="1.6" fill="#1e1e1e"/><circle cx="428" cy="111" r="1.6" fill="#1e1e1e"/><path d="M434,103 L476,103 M434,111 L476,111"/>
+<rect x="498" y="95" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="506" cy="103" r="1.6" fill="#1e1e1e"/><circle cx="506" cy="111" r="1.6" fill="#1e1e1e"/><path d="M512,103 L554,103 M512,111 L554,111"/>
+<rect x="576" y="95" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="584" cy="103" r="1.6" fill="#1e1e1e"/><circle cx="584" cy="111" r="1.6" fill="#1e1e1e"/><path d="M590,103 L632,103 M590,111 L632,111"/>
+<rect x="654" y="95" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="662" cy="103" r="1.6" fill="#1e1e1e"/><circle cx="662" cy="111" r="1.6" fill="#1e1e1e"/><path d="M668,103 L710,103 M668,111 L710,111"/>
+<rect x="420" y="173" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="428" cy="181" r="1.6" fill="#1e1e1e"/><circle cx="428" cy="189" r="1.6" fill="#1e1e1e"/><path d="M434,181 L476,181 M434,189 L476,189"/>
+<rect x="498" y="173" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="506" cy="181" r="1.6" fill="#1e1e1e"/><circle cx="506" cy="189" r="1.6" fill="#1e1e1e"/><path d="M512,181 L554,181 M512,189 L554,189"/>
+<rect x="576" y="173" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="584" cy="181" r="1.6" fill="#1e1e1e"/><circle cx="584" cy="189" r="1.6" fill="#1e1e1e"/><path d="M590,181 L632,181 M590,189 L632,189"/>
+<rect x="654" y="173" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="662" cy="181" r="1.6" fill="#1e1e1e"/><circle cx="662" cy="189" r="1.6" fill="#1e1e1e"/><path d="M668,181 L710,181 M668,189 L710,189"/>
+<rect x="420" y="251" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="428" cy="259" r="1.6" fill="#1e1e1e"/><circle cx="428" cy="267" r="1.6" fill="#1e1e1e"/><path d="M434,259 L476,259 M434,267 L476,267"/>
+<rect x="498" y="251" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="506" cy="259" r="1.6" fill="#1e1e1e"/><circle cx="506" cy="267" r="1.6" fill="#1e1e1e"/><path d="M512,259 L554,259 M512,267 L554,267"/>
+<rect x="576" y="251" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="584" cy="259" r="1.6" fill="#1e1e1e"/><circle cx="584" cy="267" r="1.6" fill="#1e1e1e"/><path d="M590,259 L632,259 M590,267 L632,267"/>
+<rect x="654" y="251" width="62" height="58" rx="4" fill="url(#hb)"/><circle cx="662" cy="259" r="1.6" fill="#1e1e1e"/><circle cx="662" cy="267" r="1.6" fill="#1e1e1e"/><path d="M668,259 L710,259 M668,267 L710,267"/>
+
+<path d="M588,262 L604,278 M604,262 L588,278" stroke="#c0604a" stroke-width="2.2"/>
+</g>
+<g font-family="'Nanum Pen Script'" fill="#1e1e1e">
+<text x="190" y="121" font-size="17" text-anchor="middle" fill="#1e1e1e">로드밸런서 장비</text>
+<text x="190" y="175" font-size="17" text-anchor="middle" fill="#1e1e1e">캐시 서버</text>
+<text x="190" y="229" font-size="17" text-anchor="middle" fill="#1e1e1e">DNS 서버</text>
+<text x="190" y="283" font-size="17" text-anchor="middle" fill="#1e1e1e">WAF 장비</text>
+<text x="190" y="337" font-size="17" text-anchor="middle" fill="#1e1e1e">DDoS 완화 장비</text>
+<text x="190" y="52" font-size="22" text-anchor="middle" fill="#1e1e1e">역할별 전용 장비</text>
+<text x="190" y="385" font-size="15" text-anchor="middle" fill="#777">기능이 늘면 장비 종류가 는다</text>
+<text x="451" y="133" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="451" y="149" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="529" y="133" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="529" y="149" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="607" y="133" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="607" y="149" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="685" y="133" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="685" y="149" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="451" y="211" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="451" y="227" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="529" y="211" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="529" y="227" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="607" y="211" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="607" y="227" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="685" y="211" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="685" y="227" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="451" y="289" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="451" y="305" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="529" y="289" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="529" y="305" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="607" y="289" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="607" y="305" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="685" y="289" font-size="10" text-anchor="middle" fill="#555">캐시·DNS·WAF</text>
+<text x="685" y="305" font-size="10" text-anchor="middle" fill="#555">DDoS·Workers</text>
+<text x="575" y="52" font-size="22" text-anchor="middle" fill="#1e1e1e">모든 서버가 모든 일을 한다</text>
+<text x="575" y="360" font-size="15" text-anchor="middle" fill="#777">똑같은 서버, 똑같은 소프트웨어</text>
+<text x="575" y="380" font-size="15" text-anchor="middle" fill="#777">한 대가 죽으면 나머지가 그 일을 그대로 한다</text>
+</g></svg>
