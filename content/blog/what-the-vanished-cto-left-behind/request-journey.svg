@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="480" viewBox="0 0 750 480"><defs>
+<filter id="rough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+<pattern id="hb" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#eef4fb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#b9d3ee" stroke-width="1.2"/></pattern>
+<pattern id="hg" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#eff6f0"/><line x1="0" y1="0" x2="0" y2="7" stroke="#bcdcc1" stroke-width="1.2"/></pattern>
+<pattern id="hy" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#fcf7e8"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eed9a6" stroke-width="1.2"/></pattern>
+<pattern id="hgr" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(-41)"><rect width="7" height="7" fill="#f4f4f4"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d2d2d2" stroke-width="1.2"/></pattern>
+<marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1,1 L6,4 L1,7" fill="none" stroke="#1e1e1e" stroke-width="1.4"/></marker>
+<marker id="ahr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1,1 L6,4 L1,7" fill="none" stroke="#c0604a" stroke-width="1.4"/></marker>
+</defs><rect width="750" height="480" fill="#fff"/>
+<g filter="url(#rough)" stroke="#1e1e1e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+<circle cx="55" cy="215" r="7"/><path d="M55,222 L55,240 M46,230 L64,230 M55,240 L48,254 M55,240 L62,254"/>
+<rect x="115" y="110" width="125" height="54" rx="6" fill="url(#hy)"/>
+<path d="M66,210 L112,152" marker-end="url(#ah)"/>
+<path d="M125,160 L80,215" stroke="#777" stroke-dasharray="4,4" marker-end="url(#ah)"/>
+<circle cx="290" cy="245" r="14" fill="url(#hgr)"/>
+<path d="M70,245 L272,245" marker-end="url(#ah)"/>
+<path d="M306,245 L343,245" marker-end="url(#ah)"/>
+<rect x="348" y="95" width="255" height="340" rx="10" fill="url(#hb)"/>
+<rect x="368" y="135" width="140" height="46" rx="6" fill="#fff"/>
+<rect x="368" y="202" width="140" height="46" rx="6" fill="#fff"/>
+<rect x="368" y="269" width="140" height="46" rx="6" fill="#fff"/>
+<rect x="368" y="336" width="140" height="46" rx="6" fill="#fff"/>
+<path d="M438,183 L438,199" marker-end="url(#ah)"/>
+<path d="M438,250 L438,266" marker-end="url(#ah)"/>
+<path d="M438,317 L438,333" marker-end="url(#ah)"/>
+<rect x="638" y="268" width="98" height="50" rx="6" fill="url(#hg)"/>
+<path d="M508,306 L634,296" marker-end="url(#ah)"/>
+<rect x="628" y="118" width="108" height="46" rx="6" fill="url(#hy)"/>
+<path d="M626,150 L606,162" stroke="#c0604a" stroke-dasharray="3,3" marker-end="url(#ahr)"/>
+</g>
+<g font-family="'Nanum Pen Script'" fill="#1e1e1e">
+<text x="375" y="42" font-size="22" text-anchor="middle">요청 하나가 지나는 길</text>
+<text x="55" y="282" font-size="16" text-anchor="middle">사용자</text>
+<text x="177" y="132" font-size="18" text-anchor="middle">DNS</text>
+<text x="177" y="153" font-size="14" text-anchor="middle" fill="#555">Cloudflare의 IP를 돌려준다</text>
+<text x="290" y="282" font-size="14" text-anchor="middle">라우터</text>
+<text x="290" y="299" font-size="13" text-anchor="middle" fill="#777">BGP가 가까운</text>
+<text x="290" y="315" font-size="13" text-anchor="middle" fill="#777">데이터센터를 고른다</text>
+<text x="475" y="122" font-size="17" text-anchor="middle">Cloudflare 데이터센터</text>
+<text x="438" y="156" font-size="16" text-anchor="middle">TLS 종료</text>
+<text x="438" y="174" font-size="12" text-anchor="middle" fill="#777">연결이 둘이 된다</text>
+<text x="438" y="223" font-size="16" text-anchor="middle">DDoS · WAF · 봇 검사</text>
+<text x="438" y="241" font-size="12" text-anchor="middle" fill="#777">통과 · 차단 · 추가 검증</text>
+<text x="438" y="290" font-size="16" text-anchor="middle">캐시</text>
+<text x="438" y="308" font-size="12" text-anchor="middle" fill="#777">적중이면 여기서 응답</text>
+<text x="438" y="357" font-size="16" text-anchor="middle">Workers</text>
+<text x="438" y="375" font-size="12" text-anchor="middle" fill="#777">고객 코드가 응답을 만든다</text>
+<text x="530" y="160" font-size="13" text-anchor="start" fill="#555">암호화</text>
+<text x="530" y="227" font-size="13" text-anchor="start" fill="#555">보안</text>
+<text x="530" y="294" font-size="13" text-anchor="start" fill="#555">시스템 설계</text>
+<text x="530" y="361" font-size="13" text-anchor="start" fill="#555">런타임</text>
+<text x="687" y="297" font-size="15" text-anchor="middle">오리진 서버</text>
+<text x="572" y="324" font-size="12" text-anchor="middle" fill="#777">미적중일 때만</text>
+<text x="682" y="146" font-size="15" text-anchor="middle">대시보드 설정</text>
+<text x="690" y="185" font-size="12" text-anchor="middle" fill="#c0604a">몇 초 안에 모든 서버로</text>
+<text x="375" y="462" font-size="14" text-anchor="middle" fill="#777">층마다 분야가 다르고, 앞 층의 결정이 뒤 층의 경로를 바꾼다</text>
+</g></svg>
