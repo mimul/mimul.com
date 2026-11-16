@@ -173,23 +173,7 @@ Anycast는 거점이 많을수록, 그리고 각 거점이 현지 네트워크�
 
 ### 사람은 떠나도 아키텍처는 남는다
 
-네 사람의 작업은 분야가 전부 다르다. 피어링과 거점 확장, 커널 프로그래밍, 제품 전략, 보안 운영. 그런데 넷 모두 같은 두 가지 성질 위에서 일했다. Levy는 Anycast가 효과를 내도록 거점을 가깝게 깔았고, Majkowski는 모든 서버가 범용이라는 점을 이용해 하드웨어를 소프트웨어로 바꿨으며, Graham-Cumming은 그 범용 서버의 능력을 제품으로 열었고, Yoachimik은 그 서버 하나하나에 판단 능력을 넣었다.
-
-## 7장 무대 뒤의 설계자는 Cloudflare에만 있지 않았다
-
-Holloway 같은 인물이 Cloudflare에만 있었던 것은 아니다. 회사의 얼굴은 경영자였지만 그 회사의 기술적 토대를 실제로 쌓은 엔지니어가 따로 있고, 그 이름이 바깥에 거의 알려지지 않은 사례가 해외에는 여럿 있다. 여기서는 소개만 하고, 각 인물의 설계 결정이 회사에 무엇을 남겼는지는 조사를 더 해서 별도의 글로 다룰 생각이다.
-
-**Shel Kaphan, Amazon**: 1994년 Jeff Bezos가 뽑은 첫 번째 직원이다. 초기 Amazon 사이트를 공동으로 만들고 상품 리뷰 시스템을 썼으며, 1999년 CTO 직함으로 회사를 떠났다. 회사가 커지면서 그의 일이 새로 들어온 기술 관리자 둘에게 나뉘었고, 그는 그 과정을 "내 일이 쪼개졌다"고 회고한다. Bezos는 그를 "Amazon 역사상 가장 중요한 사람"이라고 부른 적이 있다.
-
-**Bob Miner, Oracle**: Larry Ellison과 함께 1977년 Oracle을 세운 공동창업자이자 수석 엔지니어다. Ellison이 고객을 상대하는 동안 Miner는 소프트웨어 개발을 맡았고, 초기 Oracle 데이터베이스의 핵심 코드를 썼다. 버전 3의 대부분을 혼자 짰다는 기록이 남아 있다. 1994년 암으로 세상을 떠났고, 이후 Oracle의 이야기는 거의 Ellison의 이야기로만 전해진다.
-
-**Curtis Priem, Nvidia**: 1993년 Jensen Huang, Chris Malachowsky와 함께 Nvidia를 세우고 2003년까지 CTO를 지냈다. Sun Microsystems에서 그래픽 칩을 만들던 경력을 바탕으로 창업 초기 아키텍처를 맡았다. 개인적인 문제로 2003년에 회사를 떠났고 2006년까지 지분을 대부분 처분했다. Fortune은 2024년에 그를 "잊힌 공동창업자"라고 불렀다.
-
-**Danny Lewin, Akamai**: 4장에서 본 Akamai의 공동창업자다. MIT 박사과정에서 지도교수 Tom Leighton과 함께 1997년 "Consistent Hashing and Random Trees" 논문을 썼고, 이 논문이 제안한 일관된 해싱이 변하는 서버 집합에 요청을 분배하는 CDN의 수학적 기반이 됐다. 1998년 그 이론으로 Akamai를 세웠고, 2001년 9월 11일 American Airlines 11편에서 희생됐다. CDN이라는 범주의 알고리즘 토대를 만든 사람이 그 범주가 자리 잡는 것을 보지 못했다.
-
-**Eric Bina, Mosaic와 Netscape**: 1993년 NCSA에서 Marc Andreessen과 둘이서 Mosaic 브라우저를 만들었다. 사흘 나흘을 내리 일하고 하루를 쓰러져 자는 식으로 짰다고 그는 회고한다. Mosaic을 다룬 초기 기사에는 둘 중 누구의 이름도 없었고, 이후 Netscape를 공동 창업했지만 웹 브라우저의 역사는 대체로 Andreessen의 이름으로 기록됐다.
-
-다섯 사람의 공통점은 Holloway와 같다. 회사가 무엇 위에 서 있는지를 결정한 사람이 회사의 얼굴이 아니었고, 그 결정은 그들이 떠난 뒤에도 남았다.
+네 사람의 작업은 분야가 전부 다르다. 피어링과 거점 확장, 커널 프로그래밍, 제품 전략, 보안 운영. 그런데 넷 모두 같은 두 가지 성질 위에서 일했다. Levy는 Anycast가 효과를 내도록 거점을 가깝게 깔았고, Majkowski는 모든 서버가 범용이라는 점을 이용해 하드웨어를 소프트웨어로 바꿨으며, Graham-Cumming은 그 범용 서버의 능력을 제품으로 열었고, Yoachimik은 그 서버 하나하나에 판단 능력을 넣었다. 넷의 작업 대부분은 그가 떠난 2016년 이후에 나왔지만, 어느 것도 두 결정을 뒤집지 않고 그 위에 쌓였다.
 
 ## 맺으며, 사라진 천재 CTO가 남긴 것
 
@@ -218,8 +202,3 @@ Holloway 같은 인물이 Cloudflare에만 있었던 것은 아니다. 회사의
 - [Think Global, Peer Local: Peer with Cloudflare at 100 Internet Exchange Points](https://blog.cloudflare.com/think-global-peer-local-peer-with-cloudflare-at-100-internet-exchange-points/)
 - [500 Tbps of capacity: 16 years of scaling our global network](https://blog.cloudflare.com/500-tbps-of-capacity/)
 - [Three chapters at Cloudflare: Programmer to CTO to Board of Directors](https://blog.cloudflare.com/three-chapters-at-cloudflare-programmer-to-cto-to-board-of-directors/)
-- [Employee #1: Amazon (Shel Kaphan)](https://www.ycombinator.com/blog/employee-1-amazon/)
-- [Bob Miner, Wikipedia](https://en.wikipedia.org/wiki/Bob_Miner)
-- [Nvidia's forgotten co-founder Curtis Priem](https://fortune.com/2024/04/05/nvidia-forgotten-co-founder-curtis-priem/)
-- [Consistent hashing, Wikipedia](https://en.wikipedia.org/wiki/Consistent_hashing)
-- [Eric Bina, Wikipedia](https://en.wikipedia.org/wiki/Eric_Bina)
