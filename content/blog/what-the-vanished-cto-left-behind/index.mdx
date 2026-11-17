@@ -182,45 +182,46 @@ Cloudflare에는 스크러빙 센터가 없다. Anycast와 균질한 구조, 두
 
 ## 6. Holloway 이후, 후임자들은 그의 철학을 어떻게 이어갔나
 
-Holloway가 떠난 뒤의 Cloudflare를 후임자들의 인물 소개로 쓰면 그가 남긴 설계와의 연결이 끊긴다. 대신 Holloway가 그린 설계를 뒤의 사람들이 네트워크, 커널, 제품, 운영이라는 각자의 분야에서 규모로 키운 과정으로 읽으면 그가 남긴 것이 무엇인지가 분명해진다.
+Holloway가 떠난 뒤의 Cloudflare를 후임자들의 인물 소개로 쓰면 그가 남긴 설계와의 연결이 끊긴다. 대신 두 결정이 그 뒤의 손에서 어떻게 커졌는지를 따라가면 그가 남긴 것이 무엇인지가 분명해진다. 기술 조직의 방향을 정하는 자리는 2012년 무렵 프로그래머로 합류한 John Graham-Cumming이 여러 해 CTO로 맡았다. 그가 기술을 이끄는 동안 Workers와 Cloudflare One이 나왔고, 1절의 Universal SSL 밤샘을 Wired에 증언한 사람도 그다. [2025년 3월 그는 이사회로 옮기며](https://blog.cloudflare.com/three-chapters-at-cloudflare-programmer-to-cto-to-board-of-directors/) 오래 함께 일한 Dane Knecht에게 CTO 자리를 넘겼다. 철학의 사업 쪽 절반, 즉 같은 기능을 무료 요금제까지 내려 보내는 결정은 공동창업자 Prince의 몫이었고, 5절에서 인용한 두 선언이 그의 글이다. 아래에서는 그 리더십 아래에서 설계를 실제로 키운 네 줄기를 본다.
 
-![가운데 Lee Holloway의 두 결정(Anycast, 모든 서버가 모든 일)에서 네 갈래로 뻗어나간 계승을 보여주는 그림. Martin J. Levy는 네트워크 확장, Marek Majkowski는 커널 소프트웨어화, John Graham-Cumming은 제품화, Omer Yoachimik은 무인 DDoS 운영](./lineage.png)
+![가운데 Lee Holloway의 두 결정(Anycast, 모든 서버가 모든 일)에서 네 갈래로 뻗어나간 계승을 보여주는 그림. Kenton Varda는 런타임(Workers), Pingora 팀은 프록시, Marek Majkowski는 커널(L4Drop), Martin J. Levy와 인프라 조직은 네트워크 확장. 아래에 기술 리더십이 Graham-Cumming에서 Knecht로 이어졌다는 표시](./lineage.png)
 
-### Martin J. Levy와 인프라 조직, 기반을 세계 규모로 확장
+### Kenton Varda, 균질한 구조를 컴퓨팅 플랫폼으로 넓히다
 
-Anycast는 거점이 많을수록, 그리고 각 거점이 현지 네트워크와 직접 연결돼 있을수록 효과가 커진다. 라우터가 "가장 가까운 거점"을 고를 때 그 거점이 실제로 가까워야 하기 때문이다. 2014년 3월에 합류한 [Martin J. Levy](https://www.lonap.net/about/team/martin.levy)는 IPv6와 BGP 전문가로 이 확장을 이끌었다. 2016년 1월 Cloudflare는 [100번째 인터넷 익스체인지에 가입](https://blog.cloudflare.com/think-global-peer-local-peer-with-cloudflare-at-100-internet-exchange-points/)했고, 당시 75곳 넘는 거점 거의 전부가 현지 익스체인지 가까이에 있었다. 일부 거점에서는 나가는 트래픽의 90% 이상이 익스체인지를 통해 직접 전달됐다. 피어링을 직접 하면 지연이 줄 뿐 아니라, DDoS 트래픽이 중간 네트워크를 거치지 않고 가장 짧은 경로로 Cloudflare에 닿아 다른 네트워크의 혼잡을 줄인다. Holloway가 그린 Anycast가 종이 위의 설계에서 300개 도시의 물리적 네트워크가 된 과정에 그의 이름이 있다. 그는 2021년 초 회사를 떠나 은퇴했다. 거점을 늘리는 일이 네트워크 엔지니어 한 사람의 일은 아니었다. 한때 네트워크 엔지니어가 [Tom Paseka](https://cloudflare.tv/event/bveXG8gk) 한 명뿐이던 회사는 인프라 조직을 따로 꾸렸고, 그 조직을 이끈 [Nitin Rao](https://datacenterdynamics.com/en/profile/nitinrao)가 재직하는 동안 거점은 23개 도시에서 190개 넘는 도시로 늘었다. 2020년 새 서버 세대를 소개하며 "모든 도시의 모든 서버가 모든 서비스를 실행한다"는 설계 목표를 적은 글도 그가 썼다. 서버 구매와 거점 확장을 맡은 조직이 그 문장을 목표로 적었다는 점에서, 두 결정은 한 사람의 신념이 아니라 조직의 일하는 방식이 됐다.
+[2017년 9월 Workers를 소개한 글](https://blog.cloudflare.com/introducing-cloudflare-workers/)을 쓴 사람이 Kenton Varda다. Google에서 Protocol Buffers를 다시 설계하고 Cap'n Proto를 만든 그는 컨테이너 기반 샌드박스를 다루던 배경에서 출발해, 고객 코드를 모든 서버에 올리는 방법으로 컨테이너가 아닌 V8 isolate를 골랐다. 5절에서 본 대로 그 선택이 균질한 구조를 깨지 않고 Workers를 가능하게 했다. [2020년에는 Durable Objects](https://blog.cloudflare.com/introducing-workers-durable-objects/)로 "객체 하나는 전 세계에 한 곳"이라는 상태 모델을 더했고, [2022년에는 Workers 런타임 workerd를 오픈소스로 공개했다](https://blog.cloudflare.com/workerd-open-source-workers-runtime/). 내가 보기에 그의 작업은 Holloway의 두 번째 결정을 가장 멀리까지 밀고 간 사례다. "모든 서버가 모든 서비스를 실행한다"에서 서비스의 범위가 Cloudflare의 것만이 아니라 고객의 코드까지 넓어졌기 때문이다.
 
-### Marek Majkowski, eBPF와 XDP로 전용 하드웨어를 소프트웨어로 대체
+### Pingora 팀, 모든 서버가 돌리는 프록시의 심장을 교체하다
+
+들어가며와 3절에서 본 요청의 응용 단계는 프록시 안에서 일어난다. Cloudflare는 오랫동안 그 프록시를 NGINX 위에 얹어 썼는데, [2022년 9월 Yuchen Wu와 Andrew Hauck이 Rust로 새로 만든 Pingora로 바꿨다고 밝혔다](https://blog.cloudflare.com/how-we-built-pingora-the-proxy-that-connects-cloudflare-to-the-internet/). 글에 따르면 Pingora는 오리진과 통신하는 거의 모든 HTTP 요청을 처리하며 하루 1조 건을 넘고, 같은 트래픽에서 이전 프록시보다 CPU를 약 70%, 메모리를 약 67% 덜 쓴다. NGINX를 버린 이유는 구조였다. 프로세스를 늘려 확장하면 오리진 연결 풀이 프로세스마다 흩어져 재사용률이 떨어지는데, Pingora는 스레드로 확장해 연결 풀을 공유한다. [2024년에는 프레임워크로 오픈소스화됐다](https://blog.cloudflare.com/pingora-open-source/). 이 작업이 계승의 사례인 이유는 바꾼 것과 바꾸지 않은 것의 대비에 있다. 모든 서버가 같은 프록시를 돌린다는 구조는 그대로 두고 그 프록시의 내부만 갈아 끼웠다. 소프트웨어 하나를 바꾸면 네트워크 전체가 바뀐다는 3절의 논리가 방어 기능 추가뿐 아니라 심장부 교체에도 그대로 적용됐다.
+
+### Marek Majkowski, 커널에서 전용 하드웨어를 대체하다
 
 "모든 서버가 모든 일을 한다"는 결정이 10년 뒤 어떻게 열매를 맺었는지 보여주는 사람이 Marek Majkowski다. 그가 맡은 작업은 DDoS 방어와 패킷 처리를 리눅스 커널 안에서 최대한 빠르게 하는 것이었다. 그 중심에 eBPF와 XDP가 있다. eBPF는 커널을 다시 컴파일하지 않고도 커널 안에서 작은 프로그램을 안전하게 실행하게 해 주는 장치이고, XDP는 그 프로그램을 네트워크 드라이버 단계, 즉 패킷이 도착하는 가장 이른 지점에 붙이는 방식이다. 패킷이 커널의 나머지 부분을 건드리기 전에 버릴 수 있으니 CPU를 거의 쓰지 않고 초당 수백만 패킷을 떨어뜨릴 수 있다.
 
-[2018년 11월에 공개된 L4Drop](https://blog.cloudflare.com/l4drop-xdp-ebpf-based-ddos-mitigations/)이 이 작업의 결실이다. 이전에는 Floodgate라는 도구가 특정 네트워크 카드 제조사의 기술에 기대어 패킷을 걸렀는데, 새 카드가 그 기술을 지원하지 않게 되면서 수명이 다했다. L4Drop은 공격 탐지 시스템이 만든 규칙을 eBPF 프로그램으로 컴파일해 XDP에서 실행한다. 특정 하드웨어에 묶이지 않고, 임계값을 넘을 때만 켜지는 것이 아니라 항상 켜져 있으며, 여러 CPU에서 동시에 돌아간다. 공개된 실제 공격 그래프에서 서버 한 대가 초당 800만 패킷을 떨어뜨리는 동안 CPU 사용률은 약 10%만 올랐다. 이 작업으로 Cloudflare는 고가의 전용 하드웨어에 의존하지 않고 범용 서버와 소프트웨어로 움직이는 서비스가 됐다. 내가 보기에 이 대목이 Holloway의 결정과 가장 직접적으로 이어지는 연결고리다. 모든 서버가 범용 리눅스 서버였기 때문에 커널 기술 하나가 네트워크 전체의 방어 능력을 한 번에 끌어올릴 수 있었다.
+[2018년 11월에 공개된 L4Drop](https://blog.cloudflare.com/l4drop-xdp-ebpf-based-ddos-mitigations/)이 이 작업의 결실이다. 이전에는 Floodgate라는 도구가 특정 네트워크 카드 제조사의 기술에 기대어 패킷을 걸렀는데, 새 카드가 그 기술을 지원하지 않게 되면서 수명이 다했다. L4Drop은 공격 탐지 시스템이 만든 규칙을 eBPF 프로그램으로 컴파일해 XDP에서 실행한다. 특정 하드웨어에 묶이지 않고, 임계값을 넘을 때만 켜지는 것이 아니라 항상 켜져 있으며, 여러 CPU에서 동시에 돌아간다. 공개된 실제 공격 그래프에서 서버 한 대가 초당 800만 패킷을 떨어뜨리는 동안 CPU 사용률은 약 10%만 올랐다. 이 작업으로 Cloudflare는 고가의 전용 하드웨어에 의존하지 않고 범용 서버와 소프트웨어로 움직이는 서비스가 됐다. 내가 보기에 이 대목이 Holloway의 결정과 가장 직접적으로 이어지는 연결고리다. 모든 서버가 범용 리눅스 서버였기 때문에 커널 기술 하나가 네트워크 전체의 방어 능력을 한 번에 끌어올릴 수 있었다. 같은 흐름의 운영 쪽 끝이 [2021년에 공개된 dosd](https://blog.cloudflare.com/deep-dive-cloudflare-autonomous-edge-ddos-protection/)다. 모든 엣지 서버에서 돌아가는 이 탐지 데몬은 자기에게 들어오는 패킷과 HTTP 요청을 스스로 분석해 공격이라고 판단하면 중앙의 합의를 기다리지 않고 그 자리에서 완화 규칙을 만들어 XDP 단계에 밀어 넣는다. 공개 당시 수치로 3·4계층 공격의 98.6%를 이 데몬이 탐지했다. 균질한 서버가 여기에서는 스스로 판단하는 서버가 됐다.
 
-### John Graham-Cumming, 내부 기술을 제품으로 개방
+### Anycast 쪽 계승, 거점을 촘촘하게 깐 사람들
 
-2012년 무렵 합류해 13년 넘게 일하고 [2025년 3월 CTO에서 물러나 이사회로 옮긴](https://blog.cloudflare.com/three-chapters-at-cloudflare-programmer-to-cto-to-board-of-directors/) John Graham-Cumming의 공헌은 기술 전략과 제품화다. 그가 기술을 이끄는 동안 내부 플랫폼 기술이 Workers라는 제품으로 바깥에 열렸고, 팬데믹의 원격 근무 수요에 맞춰 Cloudflare One이 나왔다. 두 제품은 모든 서버가 범용이라는 Holloway의 기반이 있었기에 가능했지만, 기반이 있다고 제품이 저절로 나오지는 않는다. 내부에서만 쓰던 능력을 바깥 개발자가 쓸 수 있는 형태로 다듬고 그것이 CDN 회사가 아닌 범용 분산 클라우드로 가는 길이라고 판단하는 일은 기술 조직 전체의 방향을 정하는 일이고, 그 자리가 CTO였다. Universal SSL 출시 전날의 밤샘을 Wired에 증언한 사람도 그다.
+세 줄기가 전부 두 번째 결정 위의 일이라면, 첫 번째 결정인 Anycast는 소프트웨어가 아니라 거점과 회선으로 이어졌다. Anycast는 거점이 많을수록, 그리고 각 거점이 현지 네트워크와 직접 연결돼 있을수록 효과가 커진다. 라우터가 "가장 가까운 거점"을 고를 때 그 거점이 실제로 가까워야 하기 때문이다. 2014년 3월에 합류한 IPv6와 BGP 전문가 Martin J. Levy가 이 확장을 이끌었고, [2016년 1월 Cloudflare는 100번째 인터넷 익스체인지에 가입했다](https://blog.cloudflare.com/think-global-peer-local-peer-with-cloudflare-at-100-internet-exchange-points/). 당시 75곳 넘는 거점 거의 전부가 현지 익스체인지 가까이에 있었고, 일부 거점에서는 나가는 트래픽의 90% 이상이 익스체인지를 통해 직접 전달됐다. 피어링을 직접 하면 지연이 줄 뿐 아니라, DDoS 트래픽이 중간 네트워크를 거치지 않고 가장 짧은 경로로 Cloudflare에 닿아 다른 네트워크의 혼잡을 줄인다. 그는 [2021년 초 회사를 떠나 은퇴했다](https://www.lonap.net/about/team/martin.levy). 거점을 늘리는 일이 네트워크 엔지니어 한 사람의 일은 아니었다. 한때 네트워크 엔지니어가 [Tom Paseka](https://cloudflare.tv/event/bveXG8gk) 한 명뿐이던 회사는 인프라 조직을 따로 꾸렸고, 그 조직을 이끈 [Nitin Rao](https://datacenterdynamics.com/en/profile/nitinrao)가 재직하는 동안 거점은 23개 도시에서 190개 넘는 도시로 늘었다. [2020년 새 서버 세대를 소개하며](https://blog.cloudflare.com/cloudflares-gen-x-servers-for-an-accelerated-future/) "모든 도시의 모든 서버가 모든 서비스를 실행한다"는 설계 목표를 적은 글도 그가 썼다. 이 줄기의 사람들은 소프트웨어 아키텍트가 아니지만, 라우터가 고르는 "가장 가까운 거점"을 실제로 가깝게 만든 일 없이는 Anycast라는 결정은 종이 위의 설계에 머물렀다.
 
-### Omer Yoachimik, 공격을 무인으로 흡수하는 DDoS 운영
+### 네 줄기가 공유한 전제
 
-DDoS 방어 제품을 맡고 있는 Omer Yoachimik의 영역은 운영이다. 2021년 3월 [그가 설명한 dosd](https://blog.cloudflare.com/deep-dive-cloudflare-autonomous-edge-ddos-protection/)는 Cloudflare의 모든 엣지 서버에서 돌아가는 탐지 데몬이다. 각 서버가 자기에게 들어오는 패킷과 HTTP 요청을 스스로 분석하고, 공격이라고 판단하면 중앙의 합의를 기다리지 않고 그 자리에서 완화 규칙을 만들어 커널의 XDP 단계에 밀어 넣는다. 이전의 Gatebot은 네트워크 중앙에서 전체를 보며 큰 공격을 조율하는 시스템이었고, dosd는 그것을 보완해 작고 국지적인 공격을 서버 단위에서 즉시 처리한다. 공개 당시 수치로 3·4계층 공격의 98.6%를 dosd가 탐지했다. 모든 서버가 방어 장치이면서 각자 판단까지 하는 구조이기 때문에, 역대 최대급 공격도 대부분 사람이 개입하기 전에 흡수된다. 균질한 서버가 여기에서는 스스로 판단하는 서버가 됐다.
-
-### 네 사람의 작업이 공유한 전제
-
-네 사람의 작업은 분야가 전부 다르다. 피어링과 거점 확장, 커널 프로그래밍, 제품 전략, 보안 운영. 그런데 넷 모두 같은 두 가지 성질 위에서 일했고, 그 대응은 아래 표가 정리한다. 작업 대부분은 Holloway가 떠난 2016년 이후에 나왔지만, 어느 것도 두 결정을 뒤집지 않고 그 위에 쌓였다.
+네 줄기의 작업은 분야가 전부 다르다. 런타임, 프록시, 커널, 네트워크. 그런데 넷 모두 같은 두 가지 성질 위에서 일했고, 그 대응은 아래 표가 정리한다. 작업 대부분은 Holloway가 떠난 2016년 이후에 나왔지만, 어느 것도 두 결정을 뒤집지 않고 그 위에 쌓였다.
 
 | 인물 | 영역 | 키운 결정 | 대표 작업 |
 |---|---|---|---|
 | Lee Holloway | 설계 | 두 결정 모두 | 2009년 창업 설계, 2014년 Universal SSL |
-| Martin J. Levy, Nitin Rao, Tom Paseka | 네트워크와 인프라 | Anycast | 2016년 100번째 익스체인지 가입, 거점을 수십 개 도시에서 300개 넘는 도시로 확장 |
+| John Graham-Cumming, Dane Knecht | 기술 리더십 | 두 결정 모두 | 2012년 이후 CTO 재임, 2025년 승계 |
+| Kenton Varda | 런타임 | 균질한 구조 | 2017년 Workers, 2020년 Durable Objects, 2022년 workerd |
+| Yuchen Wu, Andrew Hauck | 프록시 | 균질한 구조 | 2022년 Pingora |
 | Marek Majkowski | 커널 | 균질한 구조 | 2018년 L4Drop |
-| John Graham-Cumming | 제품 전략 | 두 결정 모두 | 2017년 Workers, 2020년 Cloudflare One |
-| Omer Yoachimik | DDoS 운영 | 균질한 구조 | 2021년 dosd |
+| Martin J. Levy, Nitin Rao, Tom Paseka | 네트워크와 인프라 | Anycast | 2016년 100번째 익스체인지 가입, 거점 확장 |
 
 ## 맺으며, 그가 한 일과 후임자들이 이어간 것
 
 그가 한 일은 코드나 장비를 만든 것이 아니라 기술을 쌓아 올릴 기반을 만든 일이다. 2009년의 Cloudflare가 Anycast와 균질한 서버 구조를 당장의 비용으로 평가했다면 둘 다 고르지 않았을 가능성이 크다. 검증된 DNS 방식이 더 싸고 안전했고, 역할별 전용 장비가 더 익숙했다. 두 결정은 그 시점에 돈으로 환산되지 않았다. 대신 이후 10년의 제품과 방어 기술이 그 위에 쌓였다. 그 기반은 물론 약점도 함께 물려줬다. 같은 것이 어디서나 돌아간다는 성질은 잘못된 설정도 어디서나 돌아가게 하고, 그 대가를 2019년과 2025년에 치렀다. 그래도 Cloudflare는 구조를 바꾸지 않고 배포에 시간차를 두는 쪽을 골랐다. 기반을 바꾸는 대신 그 위에 안전장치라는 층을 하나 더 올렸다.
 
-사람은 떠나도 아키텍처는 남는다. Levy가 거점을 현지 네트워크에 직접 붙이고, Majkowski가 방어 하드웨어를 커널 프로그램으로 바꾸고, Graham-Cumming이 내부 능력을 Workers로 열고, Yoachimik이 서버마다 판단 능력을 넣은 일은 전부 그 두 결정 위에서 이루어졌다. 넷 중 누구도 두 결정을 다시 내릴 필요가 없었고, 철학이 이어졌다는 말은 그 사실을 가리킨다.
+사람은 떠나도 아키텍처는 남는다. Varda가 고객 코드를 모든 서버에 올리고, Pingora 팀이 프록시의 심장을 갈아 끼우고, Majkowski가 방어 하드웨어를 커널 프로그램으로 바꾸고, Levy와 인프라 조직이 거점을 현지 네트워크에 직접 붙인 일은 전부 그 두 결정 위에서 이루어졌다. 누구도 두 결정을 다시 내릴 필요가 없었고, 철학이 이어졌다는 말은 그 사실을 가리킨다.
 
 솔직히 이 글을 쓰면서 가장 오래 생각한 대목이 있다. Holloway가 그 결정을 내릴 때 15년 뒤의 제품군을 내다봤을 리는 없다. 그가 가진 것은 "실패는 반드시 일어난다"는 전제와, 그 전제에서 일관되게 따라 나오는 설계뿐이었다. 결과적으로 그 일관성이 이후의 모든 제품이 기댈 토대가 됐다. 기술 결정을 내리는 자리에서 비용만 먼저 따졌다면 Anycast도, 균질한 구조도, 무료 DDoS 방어도 나올 수 없었다. 비용의 질문 옆에 "이 위에 무엇을 쌓을 수 있느냐"를 함께 두는 일, 그것이 Holloway가 한 일의 핵심이고 후임자들이 이어간 철학이라고 나는 생각한다.
 
@@ -244,6 +245,9 @@ DDoS 방어 제품을 맡고 있는 Omer Yoachimik의 영역은 운영이다. 20
 - [Cloud Computing without Containers](https://blog.cloudflare.com/cloud-computing-without-containers/)
 - [Workers Durable Objects Beta: A New Approach to Stateful Serverless](https://blog.cloudflare.com/introducing-workers-durable-objects/)
 - [Introducing Quicksilver: Configuration Distribution at Internet Scale](https://blog.cloudflare.com/introducing-quicksilver-configuration-distribution-at-internet-scale/)
+- [How we built Pingora, the proxy that connects Cloudflare to the Internet](https://blog.cloudflare.com/how-we-built-pingora-the-proxy-that-connects-cloudflare-to-the-internet/)
+- [Open sourcing Pingora](https://blog.cloudflare.com/pingora-open-source/)
+- [Introducing workerd: the Open Source Workers runtime](https://blog.cloudflare.com/workerd-open-source-workers-runtime/)
 - [Proxy status, Cloudflare Docs](https://developers.cloudflare.com/dns/proxy-status/)
 - [SSL/TLS encryption modes, Cloudflare Docs](https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/)
 - [BeyondCorp: A New Approach to Enterprise Security, Google Research](https://research.google/pubs/beyondcorp-a-new-approach-to-enterprise-security/)
